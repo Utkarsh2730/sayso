@@ -1,0 +1,1004 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Debrief · App</title>
+<meta name="theme-color" content="#06080b">
+<link rel="icon" href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 32 32'%3E%3Crect width='32' height='32' rx='8' fill='%235eead4'/%3E%3Cpath d='M9 13v6M13 9v14M17 11v10M21 14v4M25 12v8' stroke='%2306080b' stroke-width='2.4' stroke-linecap='round'/%3E%3C/svg%3E">
+<style>
+  :root {
+    --bg: #06080b; --panel: #0b0f14; --card: rgba(255,255,255,.03); --line: rgba(255,255,255,.08); --line2: rgba(255,255,255,.14);
+    --text: #eef2f5; --muted: #8b95a1; --dim: #5d6773;
+    --aqua: #5eead4; --aqua2: #22d3ee; --violet: #a78bfa; --warn: #fbbf24; --err: #f87171; --ok: #4ade80;
+    --sans: ui-sans-serif, -apple-system, "Segoe UI", Roboto, "Helvetica Neue", sans-serif;
+    --mono: ui-monospace, "SF Mono", "Cascadia Code", Menlo, monospace;
+  }
+  * { box-sizing: border-box; }
+  [hidden] { display: none !important; }
+  :focus-visible { outline: 2px solid var(--aqua); outline-offset: 2px; }
+  input:focus-visible, textarea:focus-visible, select:focus-visible { outline: none; }
+  /* One colour per deal stage, used on tags and the stage picker */
+  .st-lead { --st: #94a3b8; } .st-qualified { --st: #60a5fa; } .st-demo { --st: #5eead4; } .st-proposal { --st: #22d3ee; }
+  .st-negotiation { --st: #a78bfa; } .st-won { --st: #4ade80; } .st-lost { --st: #f87171; }
+  html { overflow-x: clip; }
+  body { margin: 0; background: var(--bg); color: var(--text); font: 15px/1.5 var(--sans); -webkit-font-smoothing: antialiased; }
+  body::before { content: ""; position: fixed; inset: 0; pointer-events: none; z-index: -1;
+    background: radial-gradient(700px 400px at 15% -5%, rgba(94,234,212,.09), transparent 70%), radial-gradient(600px 400px at 95% 0%, rgba(167,139,250,.07), transparent 70%); }
+  a { color: inherit; text-decoration: none; }
+  button { font: inherit; color: inherit; }
+
+  header { position: sticky; top: 0; z-index: 20; background: rgba(6,8,11,.75); backdrop-filter: blur(14px); -webkit-backdrop-filter: blur(14px); border-bottom: 1px solid var(--line); }
+  header .in { max-width: 1240px; margin: 0 auto; padding: 0 20px; height: 60px; display: flex; align-items: center; gap: 14px; }
+  .logo { display: flex; align-items: center; gap: 10px; font-weight: 700; letter-spacing: -.02em; font-size: 17px; }
+  .logo i { width: 26px; height: 26px; border-radius: 7px; background: var(--aqua); display: grid; place-items: center; }
+  .logo i svg { width: 16px; height: 16px; }
+  .chip { font: 11px var(--mono); color: var(--muted); border: 1px solid var(--line); padding: 4px 9px; border-radius: 999px; white-space: nowrap; }
+  .chip.on { color: var(--aqua); border-color: rgba(94,234,212,.3); }
+  header .sp { flex: 1; }
+  header nav { display: flex; gap: 18px; font-size: 14px; color: var(--muted); margin-left: 10px; }
+  header nav a:hover, header nav a.cur { color: var(--text); }
+  @media (max-width: 700px) { header .chip.model, header .chip.hs, #restoreBtn, header a[href="/api/backup.json"] { display: none; } }
+  @media (max-width: 420px) { header nav { display: none; } }
+
+  main { max-width: 1240px; margin: 0 auto; padding: 20px 20px 80px; }
+  .banner { display: flex; gap: 12px; align-items: center; flex-wrap: wrap; border: 1px solid rgba(167,139,250,.3); background: rgba(167,139,250,.07); border-radius: 14px; padding: 10px 14px; margin-bottom: 16px; font-size: 13.5px; color: #d6d0f5; }
+  .banner b { color: var(--violet); font: 600 11px var(--mono); letter-spacing: .1em; }
+
+  .stats { display: grid; grid-template-columns: repeat(6, 1fr); border: 1px solid var(--line); border-radius: 16px; background: var(--card); overflow: hidden; margin-bottom: 20px; }
+  .stat { padding: 16px 18px; border-right: 1px solid var(--line); min-width: 0; }
+  .stat:last-child { border-right: 0; }
+  .stat b { display: block; font-size: 26px; letter-spacing: -.03em; font-variant-numeric: tabular-nums; }
+  .stat span { font: 10.5px var(--mono); color: var(--muted); text-transform: uppercase; letter-spacing: .08em; }
+  .stat.due b { color: var(--warn); }
+  .stat.wfs b { color: var(--violet); }
+  @media (max-width: 860px) { .stats { grid-template-columns: repeat(3, 1fr); } .stat:nth-child(3) { border-right: 0; } .stat:nth-child(-n+3) { border-bottom: 1px solid var(--line); } }
+  @media (max-width: 520px) { .stats { grid-template-columns: 1fr 1fr; } .stat { border-right: 1px solid var(--line) !important; border-bottom: 1px solid var(--line); } .stat:nth-child(2n) { border-right: 0 !important; } .stat:last-child:nth-child(odd) { grid-column: 1 / -1; border-right: 0 !important; border-bottom: 0; } }
+
+  .grid { display: grid; grid-template-columns: minmax(0, 1fr) minmax(0, 1.1fr); gap: 20px; align-items: start; }
+  @media (max-width: 900px) { .grid { grid-template-columns: 1fr; } }
+  @media (min-width: 901px) { .grid > .panel:first-child { position: sticky; top: 76px; } }
+  .panel { border: 1px solid var(--line); border-radius: 18px; background: var(--panel); padding: 20px; min-width: 0; }
+  .ph { display: flex; align-items: center; justify-content: space-between; gap: 12px; margin-bottom: 14px; flex-wrap: wrap; }
+  .ph h2 { margin: 0; font: 500 11.5px var(--mono); letter-spacing: .12em; text-transform: uppercase; color: var(--aqua); }
+
+  /* Wispr Flow: the main way to talk to Debrief */
+  .wf { display: flex; align-items: center; gap: 12px; flex-wrap: wrap; padding: 12px 14px; margin-bottom: 12px; border-radius: 14px;
+    border: 1px solid rgba(167,139,250,.35); background: radial-gradient(260px 120px at 0% 50%, rgba(167,139,250,.16), transparent 70%), rgba(0,0,0,.25); font-size: 14px; color: #d6d0f5; transition: border-color .3s, box-shadow .3s; }
+  .wf .wfb { display: inline-flex; align-items: center; gap: 7px; font: 600 12px var(--mono); letter-spacing: .06em; color: var(--violet); white-space: nowrap; }
+  .wf .wfb svg { width: 16px; height: 16px; }
+  .wf kbd { color: #ede9fe; border-color: rgba(167,139,250,.5); }
+  .wf a { margin-left: auto; font-size: 12.5px; color: var(--violet); white-space: nowrap; }
+  .wf a:hover { text-decoration: underline; }
+  .wf.hit { border-color: var(--violet); box-shadow: 0 0 0 3px rgba(167,139,250,.15); }
+  .mic { display: flex; align-items: center; gap: 16px; padding: 16px; border: 1px solid var(--line); border-radius: 14px; background: rgba(0,0,0,.25); margin-bottom: 12px; }
+  .micBtn { flex: none; width: 60px; height: 60px; border-radius: 50%; border: 0; cursor: pointer; display: grid; place-items: center; color: #04110f;
+    background: radial-gradient(circle at 35% 35%, #a5f3e6, var(--aqua) 50%, #0e7490); box-shadow: 0 8px 26px -8px rgba(94,234,212,.6); transition: transform .12s; }
+  .micBtn:active { transform: scale(.95); }
+  .micBtn.rec { animation: orb 1.4s infinite; background: radial-gradient(circle at 35% 35%, #fecaca, #f87171 50%, #b91c1c); }
+  @keyframes orb { 0% { box-shadow: 0 0 0 0 rgba(248,113,113,.55); } 70% { box-shadow: 0 0 0 16px rgba(248,113,113,0); } }
+  .micBtn svg { width: 24px; height: 24px; }
+  .micBtn.small { width: 40px; height: 40px; }
+  .micBtn.small svg { width: 18px; height: 18px; }
+  #micStatus { font-size: 14px; color: #cbd5df; }
+  #micSub { font: 12px var(--mono); color: var(--dim); margin-top: 2px; }
+  .wave { display: none; gap: 3px; align-items: center; height: 22px; margin-left: auto; }
+  .rec-on .wave { display: flex; }
+  .wave i { width: 3px; border-radius: 2px; background: var(--err); height: 30%; animation: wv 1s ease-in-out infinite; }
+  @keyframes wv { 50% { height: 100%; } }
+
+  textarea, input, select { width: 100%; background: rgba(0,0,0,.3); color: var(--text); border: 1px solid var(--line); border-radius: 10px; padding: 10px 12px; font: inherit; transition: border-color .15s, background .15s; }
+  textarea:focus, input:focus, select:focus { outline: none; border-color: rgba(94,234,212,.55); background: rgba(94,234,212,.04); }
+  #transcript { min-height: 170px; resize: vertical; line-height: 1.6; }
+  .src { font: 11px var(--mono); color: var(--dim); margin-top: 6px; min-height: 16px; }
+  .src.wispr { color: var(--violet); }
+  .hint { color: var(--dim); font: 11.5px var(--mono); margin: 10px 0 16px; display: flex; gap: 6px 14px; flex-wrap: wrap; }
+  .hint b { color: var(--muted); font-weight: 500; }
+  @media (hover: none) { .hint { display: none; } }
+  kbd { font: 11px var(--mono); border: 1px solid var(--line2); border-bottom-width: 2px; padding: 1px 6px; border-radius: 5px; color: var(--muted); }
+  .row { display: flex; gap: 10px; flex-wrap: wrap; align-items: center; }
+  .btn { display: inline-flex; align-items: center; gap: 8px; padding: 10px 16px; border-radius: 999px; font-weight: 600; font-size: 14px; border: 1px solid var(--line2); background: transparent; cursor: pointer; transition: background .15s, border-color .15s, transform .1s; white-space: nowrap; }
+  .btn:hover { border-color: rgba(255,255,255,.3); }
+  .btn:active { transform: scale(.98); }
+  .btn.primary { background: var(--aqua); color: #04110f; border-color: var(--aqua); }
+  .btn.primary:hover { background: #7ff0de; }
+  .btn.sm { padding: 6px 12px; font-size: 12.5px; }
+  .btn:disabled { opacity: .5; cursor: default; }
+  .link { background: none; border: 0; color: var(--muted); cursor: pointer; font-size: 13px; padding: 0; }
+  .link:hover { color: var(--text); }
+
+  .msg { font-size: 13.5px; min-height: 20px; margin-top: 10px; }
+  .msg.err { color: var(--err); } .msg.ok { color: var(--ok); }
+  .timing { font: 11.5px var(--mono); color: var(--dim); }
+  .timing b { color: var(--aqua); font-weight: 500; }
+
+  .fields { display: grid; grid-template-columns: repeat(6, minmax(0, 1fr)); gap: 10px; }
+  .fields .s2 { grid-column: span 2; } .fields .s3 { grid-column: span 3; } .fields .s4 { grid-column: span 4; } .fields .s6 { grid-column: 1 / -1; }
+  .grp { grid-column: 1 / -1; display: flex; align-items: center; gap: 10px; font: 600 10.5px var(--mono); letter-spacing: .14em; text-transform: uppercase; color: var(--muted); margin-top: 6px; }
+  .grp:first-child { margin-top: 0; }
+  .grp::after { content: ""; flex: 1; height: 1px; background: var(--line); }
+  select[data-k="deal_stage"] { border-left: 3px solid var(--st, var(--line)); }
+  .fields label { display: block; font: 10.5px var(--mono); color: var(--dim); text-transform: uppercase; letter-spacing: .08em; position: relative; }
+  .fields label > :is(input, select, textarea) { margin-top: 5px; text-transform: none; letter-spacing: normal; font: 14px var(--sans); }
+
+  .fields textarea { min-height: 64px; resize: vertical; }
+  .pending > :is(input, select, textarea) { color: transparent; background: linear-gradient(90deg, rgba(255,255,255,.02), rgba(255,255,255,.07), rgba(255,255,255,.02)) 0 0 / 200% 100%; animation: sh 1.3s infinite linear; }
+  @keyframes sh { to { background-position: -200% 0; } }
+  .fresh > :is(input, select, textarea) { border-color: rgba(94,234,212,.5); background: rgba(94,234,212,.06); }
+  @media (max-width: 620px) { .fields .s2, .fields .s3, .fields .s4 { grid-column: 1 / -1; } }
+  .empty { color: var(--dim); border: 1px dashed var(--line2); border-radius: 14px; padding: 36px 20px; text-align: center; font-size: 14px; }
+  .empty b { display: block; color: var(--muted); font-size: 15px; margin-bottom: 4px; font-weight: 600; }
+  .howto { display: grid; gap: 12px; padding: 8px 4px; }
+  .howto div { display: grid; grid-template-columns: 34px 1fr; gap: 12px; align-items: start; padding: 14px; border: 1px solid var(--line); border-radius: 14px; background: var(--card); }
+  .howto i { width: 34px; height: 34px; border-radius: 10px; display: grid; place-items: center; font: 600 13px var(--mono); font-style: normal; color: var(--aqua); background: rgba(94,234,212,.1); border: 1px solid rgba(94,234,212,.25); }
+  .howto b { display: block; font-size: 14.5px; margin-bottom: 2px; }
+  .howto span { color: var(--muted); font-size: 13.5px; }
+  .howto q { color: #cbd5df; }
+
+  .correct { flex: 1 1 100%; display: flex; gap: 10px; align-items: center; padding: 6px; border: 1px solid rgba(167,139,250,.3); border-radius: 12px; background: rgba(167,139,250,.06); }
+  .correct input { border: 0; background: transparent; padding: 8px 4px; }
+  .correct input:focus { background: transparent; }
+  .correct .micBtn { background: radial-gradient(circle at 35% 35%, #ddd6fe, var(--violet) 55%, #6d28d9); color: #0b0618; box-shadow: none; }
+  .correct .micBtn.rec { background: radial-gradient(circle at 35% 35%, #fecaca, #f87171 50%, #b91c1c); }
+  .chips { display: flex; gap: 6px; flex-wrap: wrap; margin-top: 12px; }
+  .chips button { font: 11.5px var(--mono); color: var(--muted); border: 1px solid var(--line); background: transparent; border-radius: 999px; padding: 4px 10px; cursor: pointer; }
+  .chips button:hover { color: var(--text); border-color: var(--line2); }
+
+  .actions { position: sticky; bottom: 12px; z-index: 6; margin-top: 16px; padding: 10px; display: flex; gap: 10px; flex-wrap: wrap; align-items: center;
+    border: 1px solid var(--line2); border-radius: 16px; background: rgba(11,15,20,.88); backdrop-filter: blur(12px); -webkit-backdrop-filter: blur(12px); box-shadow: 0 16px 40px -12px rgba(0,0,0,.7); }
+  @media (max-width: 560px) {
+    .actions { padding: 8px; gap: 8px; bottom: 8px; }
+    .actions .btn { padding: 8px 14px; font-size: 13.5px; }
+    .actions .correct input { font-size: 14px; }
+  }
+  /* Contact history (repeat calls) */
+  .hist { margin-bottom: 14px; padding: 12px 14px; border-radius: 14px; border: 1px solid rgba(94,234,212,.3); background: rgba(94,234,212,.05); font-size: 13.5px; }
+  .hist .hh { display: flex; justify-content: space-between; gap: 10px; flex-wrap: wrap; align-items: baseline; }
+  .hist .hh b { color: var(--aqua); font-size: 14px; }
+  .hist .hh span { font: 11.5px var(--mono); color: var(--violet); }
+  .hist ul { list-style: none; margin: 8px 0 0; padding: 0; display: grid; gap: 5px; color: #c3cbd4; }
+  .hist li { display: flex; gap: 8px; align-items: center; min-width: 0; }
+  .hist li > span:first-child { font: 11.5px var(--mono); color: var(--dim); min-width: 52px; }
+  .hist .close { display: flex; gap: 8px; align-items: center; margin-top: 10px; color: var(--muted); cursor: pointer; }
+  .hist .close input { width: auto; margin: 0; }
+  .carried > :is(input, select, textarea) { border-style: dashed; border-color: rgba(167,139,250,.55); }
+  .email { margin-top: 16px; border: 1px solid var(--line); border-radius: 14px; padding: 14px; background: rgba(0,0,0,.2); }
+  .email h3 { margin: 0 0 10px; font: 500 11px var(--mono); letter-spacing: .12em; text-transform: uppercase; color: var(--aqua); display: flex; justify-content: space-between; align-items: center; gap: 10px; }
+  .email textarea { min-height: 170px; margin-top: 8px; line-height: 1.55; }
+  .email .row { margin-top: 10px; }
+
+  .ask { margin-top: 20px; }
+  .askBar { display: flex; gap: 10px; align-items: center; padding: 8px; border: 1px solid var(--line2); border-radius: 14px; background: rgba(0,0,0,.25); }
+  .askBar input { border: 0; background: transparent; padding: 8px 4px; font-size: 15px; }
+  .askBar input:focus { background: transparent; }
+  .answer { margin-top: 14px; padding: 16px; border: 1px solid var(--line); border-radius: 14px; background: rgba(0,0,0,.2); font-size: 14.5px; line-height: 1.65; color: #dfe5ea; white-space: pre-wrap; }
+  .cite { display: inline-flex; align-items: center; font: 600 11px var(--mono); color: var(--aqua); border: 1px solid rgba(94,234,212,.35); background: rgba(94,234,212,.08); border-radius: 6px; padding: 1px 6px; margin: 0 2px; cursor: pointer; vertical-align: 1px; }
+  .cite:hover { background: rgba(94,234,212,.18); }
+  .srcs { display: flex; gap: 8px; flex-wrap: wrap; margin-top: 12px; }
+  .srcs button { text-align: left; border: 1px solid var(--line); background: var(--card); border-radius: 10px; padding: 8px 12px; cursor: pointer; font-size: 13px; }
+  .srcs button:hover { border-color: var(--line2); }
+  .srcs small { display: block; font: 10.5px var(--mono); color: var(--dim); text-transform: uppercase; letter-spacing: .06em; }
+  .call.flash { animation: flash 1.6s ease; }
+  @keyframes flash { 0%, 40% { border-color: var(--aqua); box-shadow: 0 0 0 3px rgba(94,234,212,.15); } }
+  .lower { display: grid; grid-template-columns: minmax(0, 1fr) minmax(0, 2fr); gap: 20px; margin-top: 20px; align-items: start; }
+  @media (max-width: 900px) { .lower { grid-template-columns: 1fr; } }
+  .due { display: grid; gap: 8px; }
+  .dueItem { display: grid; grid-template-columns: 1fr auto; gap: 2px 10px; padding: 12px; border: 1px solid var(--line); border-radius: 12px; background: var(--card); }
+  .dueItem.over { border-color: rgba(251,191,36,.35); }
+  .dueItem b { font-size: 14px; }
+  .dueItem small { grid-column: 1; color: var(--muted); font-size: 13px; }
+  .dueItem .when { font: 11px var(--mono); color: var(--warn); }
+  .dueItem button { grid-row: 1 / span 3; grid-column: 2; align-self: center; }
+
+  #search { max-width: 260px; padding: 8px 12px; font-size: 13.5px; border-radius: 999px; }
+  .calls { display: grid; gap: 10px; }
+  .call { border: 1px solid var(--line); border-radius: 14px; padding: 14px 16px; background: var(--card); display: grid; grid-template-columns: 38px minmax(0, 1fr); gap: 0 14px; animation: pop .35s ease; transition: border-color .15s; }
+  .call:hover { border-color: var(--line2); }
+  .av { width: 38px; height: 38px; border-radius: 12px; display: grid; place-items: center; font: 650 13px var(--sans); color: #04110f; background: var(--st, #94a3b8); }
+  .cb { min-width: 0; display: grid; gap: 4px; }
+  .ctop { display: flex; justify-content: space-between; gap: 10px; align-items: flex-start; }
+  .call h3 span { color: var(--muted); font-weight: 500; }
+  @media (max-width: 560px) { .ctop { flex-direction: column; gap: 6px; } .call { grid-template-columns: 1fr; } .av { display: none; } }
+  @keyframes pop { from { opacity: 0; transform: translateY(-6px); } }
+  .call h3 { margin: 0; font-size: 15.5px; letter-spacing: -.01em; }
+  .call .meta { font: 11.5px var(--mono); color: var(--dim); }
+  .call p { margin: 2px 0 0; color: #c3cbd4; font-size: 14px; }
+  .call .next { font-size: 13.5px; color: var(--muted); }
+  .call .next b { color: var(--aqua); font-weight: 600; }
+  .call details { font-size: 13.5px; color: #c3cbd4; }
+  .call summary { cursor: pointer; color: var(--muted); font-size: 13px; }
+  .call pre { white-space: pre-wrap; font: 13.5px/1.55 var(--sans); margin: 8px 0 0; padding: 12px; border-radius: 10px; background: rgba(0,0,0,.25); border: 1px solid var(--line); }
+  .call .acts { display: flex; gap: 14px; align-items: center; margin-top: 4px; flex-wrap: wrap; min-height: 20px; }
+  @media (hover: hover) { .call .del { opacity: 0; transition: opacity .15s; } .call:hover .del, .call:focus-within .del { opacity: 1; } }
+  .tags { display: flex; gap: 6px; align-items: start; }
+  .tag { font: 600 10px var(--mono); letter-spacing: .08em; text-transform: uppercase; padding: 4px 9px; border-radius: 999px; border: 1px solid color-mix(in srgb, var(--st, var(--aqua)) 45%, transparent); color: var(--st, var(--aqua)); background: color-mix(in srgb, var(--st, var(--aqua)) 8%, transparent); white-space: nowrap; }
+  .tag.sample { --st: #a78bfa; }
+  .sync { font: 11px var(--mono); }
+  .sync.pending { color: var(--warn); } .sync.synced { color: var(--ok); } .sync.failed { color: var(--err); }
+  .feat { font: 11px var(--mono); color: var(--warn); }
+
+  .toast { position: fixed; left: 50%; bottom: 24px; transform: translate(-50%, 20px); opacity: 0; background: #111820; border: 1px solid var(--line2); border-radius: 999px; padding: 10px 18px; font-size: 14px; transition: opacity .2s, transform .2s; pointer-events: none; z-index: 30; box-shadow: 0 20px 50px -10px rgba(0,0,0,.6); max-width: calc(100% - 32px); }
+  .toast.show { opacity: 1; transform: translate(-50%, 0); }
+  @media (prefers-reduced-motion: reduce) { *, *::before, *::after { animation: none !important; transition: none !important; } }
+</style>
+</head>
+<body>
+<header>
+  <div class="in">
+    <a class="logo" href="/"><i><svg viewBox="0 0 24 24" fill="none" stroke="#06080b" stroke-width="2.6" stroke-linecap="round"><path d="M5 10v4M9 6v12M13 8v8M17 11v2M21 9v6"/></svg></i>Debrief</a>
+    <nav><a class="cur" href="/app">App</a><a href="/proof">Proof</a></nav>
+    <span class="sp"></span>
+    <span class="chip model" id="modelChip">claude</span>
+    <span class="chip hs" id="hsChip">HubSpot off</span>
+    <a class="btn sm" href="/api/backup.json" title="Download every call as a backup file">Backup</a>
+    <label class="btn sm" id="restoreBtn" hidden title="Merge calls from a backup file">Restore<input type="file" id="restoreFile" accept="application/json,.json" hidden></label>
+    <a class="btn sm" href="/api/export.csv">Export CSV</a>
+  </div>
+</header>
+
+<main>
+  <div class="banner" id="banner" hidden><b>DEMO</b><span id="bannerText">This workspace is private to your browser and starts with 6 sample calls. Try the sample recap, ask your pipeline a question, or talk through a call of your own.</span><button class="btn sm" id="resetBtn" style="margin-left:auto">Reset to sample data</button></div>
+  <section class="stats" id="stats"></section>
+
+  <div class="grid">
+    <section class="panel">
+      <div class="ph"><h2>01 · Recap the call</h2><button class="link" id="sampleBtn">Try a sample recap</button></div>
+      <div class="wf" id="wfBar">
+        <span class="wfb"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round"><path d="M3 10v4M7 7v10M11 4v16M15 8v8M19 10v4"/></svg>WISPR FLOW</span>
+        <span id="wfText">Click the box below, hold <kbd>fn</kbd> and talk.</span>
+        <a href="https://wisprflow.ai" target="_blank" rel="noopener">Get Wispr Flow ↗</a>
+      </div>
+      <div class="mic" id="micBox">
+        <button class="micBtn" id="micBtn" aria-label="Start recording"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round"><rect x="9" y="3" width="6" height="12" rx="3"/><path d="M5 11a7 7 0 0 0 14 0M12 18v3"/></svg></button>
+        <div><div id="micStatus">No Wispr Flow on this computer?</div><div id="micSub">tap the mic to use your browser's speech recognition</div></div>
+        <div class="wave" aria-hidden="true"><i style="animation-delay:-.1s"></i><i style="animation-delay:-.5s"></i><i style="animation-delay:-.3s"></i><i style="animation-delay:-.8s"></i><i style="animation-delay:-.2s"></i><i style="animation-delay:-.6s"></i><i style="animation-delay:-.4s"></i></div>
+      </div>
+      <textarea id="transcript" placeholder="Who did you speak to, what do they need, and what happens next?"></textarea>
+      <div class="src" id="srcTag"></div>
+      <div class="hint" aria-label="Keyboard shortcuts (Ctrl on Windows)"><span><b>⌘↵</b> extract</span><span><b>⌘S</b> save</span><span><b>⌘M</b> mic</span><span><b>⌘E</b> email</span><span><b>⌘K</b> ask</span></div>
+      <div class="row"><button class="btn primary" id="extractBtn">Extract CRM fields</button><span class="timing" id="timing"></span></div>
+      <div class="msg" id="extractMsg"></div>
+    </section>
+
+    <section class="panel">
+      <div class="ph"><h2>02 · Review, correct &amp; save</h2><span class="timing" id="liveTag"></span></div>
+      <div id="review"><div class="howto">
+        <div><i>1</i><p style="margin:0"><b>Talk through the call</b><span>Who, what they need, what happens next. Ramble and correct yourself; it copes.</span></p></div>
+        <div><i>2</i><p style="margin:0"><b>Watch the record fill in</b><span>Fields appear here while Claude writes. Fix any by saying <q>the value is five lakh</q>.</span></p></div>
+        <div><i>3</i><p style="margin:0"><b>Email and save</b><span>Say <q>write the follow-up</q>, then <q>save</q>. Done, hands-free.</span></p></div>
+      </div></div>
+    </section>
+  </div>
+
+  <section class="panel ask" id="askPanel">
+    <div class="ph"><h2>Ask your pipeline</h2><span class="timing" id="askTiming"></span></div>
+    <div class="askBar">
+      <button class="micBtn small" id="askMic" aria-label="Ask by voice"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round"><rect x="9" y="3" width="6" height="12" rx="3"/><path d="M5 11a7 7 0 0 0 14 0M12 18v3"/></svg></button>
+      <input id="askInput" placeholder="Ask anything about your calls, e.g. who should I follow up with this week?" autocomplete="off">
+      <button class="btn primary sm" id="askBtn">Ask</button>
+    </div>
+    <div class="chips" id="askChips">
+      <button>Who should I follow up with this week?</button>
+      <button>Which deals are stuck, and why?</button>
+      <button>What problems do prospects mention most?</button>
+      <button>Summarise my pipeline by stage and value</button>
+    </div>
+    <div id="askOut"></div>
+  </section>
+
+  <div class="lower">
+    <section class="panel">
+      <div class="ph"><h2>Follow-ups due</h2></div>
+      <div class="due" id="due"></div>
+    </section>
+    <section class="panel">
+      <div class="ph"><h2>03 · Logged calls</h2><input id="search" type="search" placeholder="Search name, company, notes…"></div>
+      <div class="calls" id="calls"></div>
+    </section>
+  </div>
+</main>
+<div class="toast" id="toast" role="status" aria-live="polite"></div>
+
+<script>
+const $ = (id) => document.getElementById(id);
+const STAGES = ["lead", "qualified", "demo", "proposal", "negotiation", "won", "lost"];
+// The review form, grouped. Spans are columns out of 6 (everything is full width on phones).
+const GROUPS = [
+  ["Contact", [["contact_name", "Name", "s2"], ["company", "Company", "s2"], ["role", "Role", "s2"], ["email", "Email", "s4"], ["phone", "Phone", "s2"]]],
+  ["Deal", [["deal_stage", "Stage", "s2"], ["deal_value", "Value", "s2"], ["follow_up_date", "Follow-up", "s2"], ["next_step", "Next step", "s6"]]],
+  ["Notes", [["summary", "Summary", "s6"], ["pain_points", "Pain points · one per line", "s3"], ["action_items", "Action items · one per line", "s3"]]],
+];
+const FIELDS = GROUPS.flatMap(([, fields]) => fields);
+const LIST_FIELDS = new Set(["pain_points", "action_items"]);
+const SAMPLE = "Just got off a call with Priya Nair, she's head of ops at Acme Logistics. Her email is priya at acme logistics dot in. They're losing about two hours a day on manual dispatch spreadsheets and their drivers keep getting double-booked. Budget is roughly four lakh rupees a year. She wants a demo for her three team leads. I'll send the invite today and follow up Tuesday, no wait, Thursday.";
+
+const state = {
+  config: { hubspot: false, public_mode: false }, record: null, email: null, dirty: new Set(),
+  task: null, micSeconds: 0, source: null, calls: [], stats: null, sender: "",
+};
+const esc = (s) => String(s ?? "").replace(/[&<>"']/g, (c) => ({ "&": "&amp;", "<": "&lt;", ">": "&gt;", '"': "&quot;", "'": "&#39;" })[c]);
+const todayStr = () => new Date().toLocaleDateString("en-CA");
+const secs = (ms) => `${(ms / 1000).toFixed(ms < 1000 ? 2 : 1)}s`;
+const store = { get: (k) => { try { return localStorage.getItem(k); } catch { return null; } }, set: (k, v) => { try { localStorage.setItem(k, v); } catch {} } };
+
+let toastTimer;
+function toast(text) {
+  $("toast").textContent = text;
+  $("toast").classList.add("show");
+  clearTimeout(toastTimer);
+  toastTimer = setTimeout(() => $("toast").classList.remove("show"), 2400);
+}
+
+async function api(path, opts = {}) {
+  const res = await fetch(path, { headers: { "Content-Type": "application/json" }, ...opts });
+  const body = await res.json().catch(() => ({}));
+  if (!res.ok) throw new Error(body.error ?? res.statusText);
+  return body;
+}
+
+// Runs one streamed Claude task. Only one runs at a time; starting another cancels the previous one.
+async function runTask(path, body, onPartial) {
+  state.task?.abort();
+  const ctrl = new AbortController();
+  state.task = ctrl;
+  const t0 = performance.now();
+  let first = null;
+  try {
+    const res = await fetch(path, { method: "POST", headers: { "Content-Type": "application/json" }, body: JSON.stringify(body), signal: ctrl.signal });
+    if (!res.ok || !res.body) throw new Error((await res.json().catch(() => ({}))).error ?? res.statusText);
+    const reader = res.body.pipeThrough(new TextDecoderStream()).getReader();
+    let buf = "";
+    for (;;) {
+      const { value, done } = await reader.read();
+      if (done) break;
+      buf += value;
+      let nl;
+      while ((nl = buf.indexOf("\n")) >= 0) {
+        const line = buf.slice(0, nl); buf = buf.slice(nl + 1);
+        if (!line) continue;
+        const msg = JSON.parse(line);
+        if (msg.type === "error") throw new Error(msg.error);
+        first ??= performance.now() - t0;
+        onPartial(msg.data, msg.type === "done");
+        if (msg.type === "done") return { data: msg.data, first, total: performance.now() - t0 };
+      }
+    }
+    throw new Error("The connection closed before the answer finished.");
+  } finally {
+    if (state.task === ctrl) state.task = null;
+  }
+}
+const isAbort = (err) => err.name === "AbortError";
+
+// ---------- Speech (browser recognition; the Wispr Flow desktop app types straight into any field) ----------
+const SR = window.SpeechRecognition || window.webkitSpeechRecognition;
+let rec = null;
+function listen({ target, button, onStop, onTick }) {
+  if (!SR) { target.focus(); toast("Use Wispr Flow here: this browser has no built-in speech recognition."); return null; }
+  const r = new SR();
+  r.continuous = true; r.interimResults = true; r.lang = navigator.language || "en-IN";
+  const base = target.value.trim();
+  const started = Date.now();
+  r.onresult = (e) => {
+    let text = "";
+    for (const res of e.results) text += res[0].transcript;
+    target.value = (base ? base + " " : "") + text.trim();
+  };
+  let ended = false;
+  const finish = (ok) => {
+    if (ended) return;
+    ended = true;
+    clearInterval(tick);
+    button.classList.remove("rec");
+    rec = null;
+    onStop((Date.now() - started) / 1000, ok);
+  };
+  r.onerror = (e) => { if (e.error !== "aborted" && e.error !== "no-speech") toast(`Mic: ${e.error === "not-allowed" ? "permission denied" : e.error}`); finish(false); };
+  r.onend = () => finish(true);
+  r.start();
+  button.classList.add("rec");
+  const tick = setInterval(() => onTick?.((Date.now() - started) / 1000), 250);
+  rec = { stop: () => r.stop(), button };
+  return rec;
+}
+
+const fmt = (s) => `${Math.floor(s / 60)}:${String(Math.floor(s % 60)).padStart(2, "0")}`;
+
+function micIdle() {
+  const [main, sub] = SR
+    ? ["No Wispr Flow on this computer?", "tap the mic to use your browser's speech recognition"]
+    : ["No Wispr Flow on this computer?", "type the recap, or install Wispr Flow to talk"];
+  $("micStatus").textContent = main;
+  $("micSub").textContent = sub;
+}
+
+function toggleRecapMic() {
+  if (rec) return rec.stop();
+  $("micBox").classList.add("rec-on");
+  $("micStatus").textContent = "Listening… tap when you're done";
+  const r = listen({
+    target: $("transcript"), button: $("micBtn"),
+    onTick: (s) => { $("micSub").textContent = fmt(s); },
+    onStop: (s, ok) => {
+      $("micBox").classList.remove("rec-on");
+      state.micSeconds += s;
+      if (!state.source || state.source === "typed") state.source = "mic";
+      updateSource();
+      $("micStatus").textContent = ok ? "Got it." : "Nothing came through. Try again, or type.";
+      $("micSub").textContent = `${fmt(state.micSeconds)} recorded`;
+      // Recognition delivers its last words just after stopping; give it a beat, then extract automatically.
+      if (ok) setTimeout(() => $("transcript").value.trim() && extract(), 300);
+    },
+  });
+  if (!r) $("micBox").classList.remove("rec-on");
+}
+$("micBtn").onclick = toggleRecapMic;
+
+// Wispr Flow's default push-to-talk key: fn on a Mac, Ctrl + Win on Windows (users can change it in Wispr Flow).
+const isMac = /mac|iphone|ipad/i.test(navigator.userAgentData?.platform || navigator.platform || navigator.userAgent);
+const wfPrompt = `Click the box below, hold <kbd title="Wispr Flow's default shortcut; yours may differ">${isMac ? "fn" : "Ctrl + Win"}</kbd> and talk.`;
+$("wfText").innerHTML = wfPrompt;
+
+// Wispr Flow (and other dictation tools) insert whole phrases at once; typing inserts a character at a time.
+let wisprChars = 0, typedChars = 0;
+$("transcript").addEventListener("beforeinput", (e) => {
+  const len = (e.data ?? e.dataTransfer?.getData("text") ?? "").length;
+  if ((e.inputType === "insertText" || e.inputType === "insertFromPaste" || e.inputType === "insertReplacementText") && len >= 12) wisprChars += len;
+  else if (e.inputType === "insertText") typedChars += len;
+});
+$("transcript").addEventListener("input", updateSource);
+function updateSource() {
+  const has = $("transcript").value.trim().length > 0;
+  if (!has) { state.source = null; wisprChars = typedChars = 0; }
+  else if (!["mic", "sample"].includes(state.source)) state.source = wisprChars > typedChars ? "wispr" : "typed";
+  const labels = { wispr: "● dictated with Wispr Flow", mic: "● dictated with browser mic", typed: "typed", sample: "sample recap" };
+  $("srcTag").textContent = state.source ? labels[state.source] : "";
+  const dictated = state.source === "wispr";
+  $("wfBar").classList.toggle("hit", dictated);
+  $("wfText").innerHTML = dictated ? "✓ Dictation detected. Keep talking, or extract when you're done." : wfPrompt;
+  $("srcTag").className = `src ${state.source === "wispr" ? "wispr" : ""}`;
+}
+$("sampleBtn").onclick = () => { $("transcript").value = SAMPLE; state.source = "sample"; updateSource(); extract(); };
+
+// ---------- Extraction ----------
+async function extract() {
+  if (rec) return rec.stop();
+  const transcript = $("transcript").value.trim();
+  if (!transcript) { $("transcript").focus(); return; }
+  state.dirty.clear();
+  state.email = null;
+  state.record = Object.fromEntries(FIELDS.map(([k]) => [k, LIST_FIELDS.has(k) ? [] : ""]));
+  state.record.deal_stage = "lead"; state.record.sentiment = "neutral";
+  renderReview(true);
+  $("extractMsg").className = "msg"; $("extractMsg").textContent = "";
+  $("extractBtn").textContent = "Extracting…";
+  $("liveTag").innerHTML = "<b>● streaming</b>";
+  try {
+    const { first, total } = await runTask("/api/extract", { transcript }, (data, final) => applyRecord(data, final));
+    $("timing").innerHTML = `first field <b>${secs(first)}</b> · done <b>${secs(total)}</b>`;
+    $("liveTag").textContent = "ready · correct by voice or edit";
+    applyHistory();
+  } catch (err) {
+    if (isAbort(err)) return;
+    $("extractMsg").className = "msg err"; $("extractMsg").textContent = err.message;
+    $("liveTag").textContent = "";
+    state.record = null;
+    $("review").innerHTML = '<div class="empty"><b>Nothing extracted</b>Fix the issue on the left and try again.</div>';
+  } finally {
+    $("extractBtn").textContent = "Extract CRM fields";
+  }
+}
+$("extractBtn").onclick = extract;
+
+function renderReview(pending) {
+  const r = state.record;
+  const control = (k) => {
+    if (k === "deal_stage") return `<select data-k="${k}" class="st-${esc(r[k])}">${STAGES.map((s) => `<option value="${s}" ${s === r[k] ? "selected" : ""}>${s[0].toUpperCase() + s.slice(1)}</option>`).join("")}</select>`;
+    if (LIST_FIELDS.has(k) || k === "summary") return `<textarea data-k="${k}"></textarea>`;
+    return `<input data-k="${k}" ${k === "follow_up_date" ? 'type="date"' : k === "email" ? 'type="email"' : ""} autocomplete="off">`;
+  };
+  $("review").innerHTML = `
+    <div id="historyBox"></div>
+    <div class="fields">${GROUPS.map(([group, fields]) => `<div class="grp">${group}</div>` + fields.map(([k, label, cls]) => `<label class="${cls} ${pending ? "pending" : ""}" data-f="${k}">${label}${control(k)}</label>`).join("")).join("")}</div>
+    <div class="chips" aria-label="Things you can say">
+      <button data-say="Change the stage to proposal">“stage is proposal”</button>
+      <button data-say="Move the follow-up to next Monday">“follow up next Monday”</button>
+      <button data-say="Write the follow-up email">“write the follow-up”</button>
+      <button data-say="Save">“save”</button>
+    </div>
+    <div id="emailBox"></div>
+    <div class="actions">
+      <div class="correct">
+        <button class="micBtn small" id="fixMic" aria-label="Speak a correction"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round"><rect x="9" y="3" width="6" height="12" rx="3"/><path d="M5 11a7 7 0 0 0 14 0M12 18v3"/></svg></button>
+        <input id="fixInput" placeholder="Say a correction, or “save” / “write the follow-up”" autocomplete="off" aria-label="Correction or command">
+      </div>
+      <button class="btn primary" id="saveBtn">${state.editingId ? "Save changes" : "Save to CRM"}</button>
+      <button class="btn" id="emailBtn">Draft email</button>
+      ${state.config.hubspot ? `<label class="row" style="gap:7px;font-size:13.5px;color:var(--muted)"><input type="checkbox" id="sync" checked style="width:auto;margin:0"> Sync to HubSpot</label>` : ""}
+      <button class="link" id="discardBtn" style="margin-left:auto">Discard</button>
+    </div>
+    <div class="msg" id="reviewMsg"></div>`;
+  for (const el of $("review").querySelectorAll("[data-k]")) {
+    el.addEventListener("input", () => { state.dirty.add(el.dataset.k); el.closest("label").classList.remove("pending"); });
+  }
+  const stage = $("review").querySelector('[data-k="deal_stage"]');
+  stage.addEventListener("change", () => (stage.className = `st-${stage.value}`));
+  $("saveBtn").onclick = save;
+  $("emailBtn").onclick = draftEmail;
+  $("discardBtn").onclick = discard;
+  $("fixInput").addEventListener("keydown", (e) => { if (e.key === "Enter") { e.preventDefault(); command($("fixInput").value); } });
+  $("fixMic").onclick = () => {
+    if (rec) return rec.stop();
+    $("fixInput").value = "";
+    listen({ target: $("fixInput"), button: $("fixMic"), onStop: (_, ok) => ok && setTimeout(() => command($("fixInput").value), 250) });
+  };
+  for (const b of $("review").querySelectorAll("[data-say]")) b.onclick = () => { $("fixInput").value = b.dataset.say; command(b.dataset.say); };
+  if (!pending) for (const [k] of FIELDS) setField(k, r[k]);
+  if (state.email) renderEmail();
+}
+
+function setField(k, v) {
+  const el = $("review").querySelector(`[data-k="${k}"]`);
+  if (!el) return;
+  el.value = Array.isArray(v) ? v.join("\n") : v ?? "";
+  if (k === "deal_stage") el.className = `st-${el.value}`;
+}
+
+// Fill fields as they stream in; never overwrite something the user has started editing.
+function applyRecord(partial, final) {
+  if (!state.record) return;
+  for (const [k] of FIELDS) {
+    if (!(k in partial) || state.dirty.has(k)) continue;
+    const v = partial[k];
+    const label = $("review").querySelector(`[data-f="${k}"]`);
+    const changed = JSON.stringify(v) !== JSON.stringify(state.record[k]) || label?.classList.contains("pending");
+    state.record[k] = v;
+    if (!changed || !label) continue;
+    setField(k, v);
+    label.classList.remove("pending");
+    label.classList.add("fresh");
+    setTimeout(() => label.classList.remove("fresh"), 700);
+  }
+  if (partial.sentiment) state.record.sentiment = partial.sentiment;
+  if (final) for (const l of $("review").querySelectorAll("label.pending")) l.classList.remove("pending");
+}
+
+function readReview() {
+  const r = { ...state.record };
+  for (const el of $("review").querySelectorAll("[data-k]")) {
+    const k = el.dataset.k;
+    r[k] = LIST_FIELDS.has(k) ? el.value.split("\n").map((s) => s.trim()).filter(Boolean) : el.value.trim();
+  }
+  return r;
+}
+
+// ---------- Hands-free commands and corrections ----------
+async function command(raw) {
+  const said = raw.trim().replace(/[.!]+$/, "");
+  if (!said || !state.record) return;
+  if (/^(save|save it|saved|looks good|that's (all|right|correct)|done)$/i.test(said)) return save();
+  if (/^(discard|cancel|start over|scrap (it|that))$/i.test(said)) return discard();
+  if (/\b(write|draft|make|create)\b.*\b(follow[ -]?up|email|mail)\b/i.test(said)) { $("fixInput").value = ""; return draftEmail(); }
+  if (state.task) return toast("One moment, still working on the last request…");
+
+  // Anything else is a correction: Claude returns the full record with just that change applied.
+  const before = readReview();
+  state.record = before;
+  state.dirty.clear();
+  $("liveTag").innerHTML = "<b>● applying correction</b>";
+  $("fixInput").disabled = true;
+  try {
+    const { total } = await runTask("/api/revise", { record: before, instruction: said }, (data, final) => {
+      const changed = Object.fromEntries(Object.entries(data).filter(([k, v]) => JSON.stringify(v) !== JSON.stringify(before[k])));
+      applyRecord(changed, final);
+    });
+    $("fixInput").value = "";
+    $("liveTag").innerHTML = `correction applied in <b>${secs(total)}</b>`;
+    applyHistory();
+  } catch (err) {
+    if (!isAbort(err)) { $("reviewMsg").className = "msg err"; $("reviewMsg").textContent = err.message; $("liveTag").textContent = ""; }
+  } finally {
+    if ($("fixInput")) $("fixInput").disabled = false;
+  }
+}
+
+// ---------- Follow-up email ----------
+function renderEmail() {
+  const e = state.email;
+  $("emailBox").innerHTML = `
+    <div class="email">
+      <h3><span>Follow-up email</span><span class="timing" id="emailTiming"></span></h3>
+      <input id="emailSubject" placeholder="Subject" value="${esc(e.subject)}">
+      <textarea id="emailBody" placeholder="Writing…">${esc(e.body)}</textarea>
+      <div class="row">
+        <button class="btn sm" id="copyEmail">Copy</button>
+        <a class="btn sm" id="mailEmail" href="#">Open in mail app</a>
+        <label class="row" style="gap:6px;font-size:12.5px;color:var(--dim);margin-left:auto">Sign as <input id="senderName" style="width:130px;padding:5px 9px;font-size:13px" value="${esc(state.sender)}"></label>
+      </div>
+    </div>`;
+  $("emailSubject").oninput = () => (state.email.subject = $("emailSubject").value);
+  $("emailBody").oninput = () => (state.email.body = $("emailBody").value);
+  $("senderName").onchange = () => { state.sender = $("senderName").value.trim(); store.set("debrief_sender", state.sender); };
+  $("copyEmail").onclick = async () => {
+    try { await navigator.clipboard.writeText(`Subject: ${state.email.subject}\n\n${state.email.body}`); toast("Email copied"); }
+    catch { toast("Copy failed: select the text and copy it instead"); }
+  };
+  $("mailEmail").onclick = (ev) => {
+    ev.preventDefault();
+    const to = readReview().email;
+    location.href = `mailto:${encodeURIComponent(to)}?subject=${encodeURIComponent(state.email.subject)}&body=${encodeURIComponent(state.email.body)}`;
+  };
+}
+
+async function draftEmail() {
+  if (!state.record) return;
+  if (state.task) return toast("One moment, still working on the last request…");
+  state.email = { subject: "", body: "" };
+  renderEmail();
+  $("emailBtn").textContent = "Writing…";
+  $("liveTag").innerHTML = "<b>● writing follow-up</b>";
+  try {
+    const { total } = await runTask("/api/followup", { record: readReview(), transcript: $("transcript").value.trim(), sender_name: state.sender }, (data) => {
+      if (typeof data.subject === "string") { state.email.subject = data.subject; $("emailSubject").value = data.subject; }
+      if (typeof data.body === "string") { state.email.body = data.body; $("emailBody").value = data.body; }
+    });
+    $("emailTiming").innerHTML = `written in <b>${secs(total)}</b>`;
+    $("liveTag").textContent = "ready · save when happy";
+  } catch (err) {
+    if (!isAbort(err)) { $("reviewMsg").className = "msg err"; $("reviewMsg").textContent = err.message; $("liveTag").textContent = ""; }
+    if (state.email && !state.email.body) { state.email = null; $("emailBox").innerHTML = ""; }
+  } finally {
+    if ($("emailBtn")) $("emailBtn").textContent = "Redraft email";
+  }
+}
+
+function resetCapture() {
+  $("transcript").value = ""; state.source = null; wisprChars = typedChars = 0; updateSource();
+  micIdle();
+  $("timing").textContent = ""; $("liveTag").textContent = "";
+  state.micSeconds = 0; state.record = null; state.email = null; state.dirty.clear();
+  state.editingId = null; state.history = [];
+}
+function discard() {
+  state.task?.abort();
+  const editing = state.editingId;
+  resetCapture();
+  $("review").innerHTML = `<div class="empty"><b>${editing ? "Edit cancelled" : "Discarded"}</b>Ready for the next call.</div>`;
+}
+
+// ---------- Contact history: repeat calls with the same person ----------
+const norm = (s) => String(s ?? "").toLowerCase().replace(/[^a-z0-9@.]+/g, " ").trim();
+// Same person: same email when both have one; otherwise same name, and same company unless one is blank.
+function sameContact(a, b) {
+  if (norm(a.email) && norm(b.email)) return norm(a.email) === norm(b.email);
+  if (!norm(a.contact_name) || norm(a.contact_name) !== norm(b.contact_name)) return false;
+  return !norm(a.company) || !norm(b.company) || norm(a.company) === norm(b.company);
+}
+// Earlier saved calls with the person in the record under review, newest first.
+function contactHistory(record) {
+  if (!record || (!record.contact_name && !record.email)) return [];
+  return state.calls
+    .filter((c) => !c.id.startsWith("tmp-") && c.id !== state.editingId && sameContact(record, c))
+    .sort((a, b) => b.created_at.localeCompare(a.created_at));
+}
+const ordinal = (n) => { const s = ["th", "st", "nd", "rd"], v = n % 100; return n + (s[(v - 20) % 10] || s[v] || s[0]); };
+const shortDate = (iso) => new Date(iso).toLocaleDateString(undefined, { day: "numeric", month: "short" });
+const CARRY = ["email", "phone", "company", "role"];
+
+// Fill details the speaker didn't repeat from their last call, and show what happened before.
+function applyHistory() {
+  const box = $("historyBox");
+  state.history = contactHistory(state.record);
+  if (!box) return;
+  if (!state.history.length) { box.innerHTML = ""; return; }
+  const last = state.history[0];
+  const filled = [];
+  for (const k of CARRY) {
+    if (String(state.record[k] ?? "").trim() || !last[k] || state.dirty.has(k)) continue;
+    state.record[k] = last[k];
+    setField(k, last[k]);
+    filled.push(k);
+    const label = $("review").querySelector(`[data-f="${k}"]`);
+    label?.classList.add("carried");
+    label?.setAttribute("title", `Filled from your call on ${shortDate(last.created_at)}`);
+  }
+  const open = state.history.find((c) => c.follow_up_date && !c.follow_up_done);
+  box.innerHTML = `<div class="hist">
+    <div class="hh"><b>↺ ${ordinal(state.history.length + 1)} call with ${esc(state.record.contact_name || last.contact_name)}</b>${filled.length ? `<span>${filled.join(", ")} filled from earlier</span>` : ""}</div>
+    <ul>${state.history.slice(0, 3).map((c) => `<li><span>${shortDate(c.created_at)}</span><span class="tag st-${esc(c.deal_stage)}">${esc(c.deal_stage)}</span><span>${esc(c.next_step || c.summary || "")}</span></li>`).join("")}</ul>
+    ${open ? `<label class="close"><input type="checkbox" id="closePrev" checked> This call is the follow-up: mark “${esc(open.next_step || "follow up")}” done</label>` : ""}
+  </div>`;
+}
+
+// ---------- Edit a saved call ----------
+function editCall(id) {
+  const c = state.calls.find((x) => x.id === id);
+  if (!c) return;
+  state.task?.abort();
+  resetCapture();
+  state.editingId = id;
+  state.record = Object.fromEntries(FIELDS.map(([k]) => [k, c[k] ?? (LIST_FIELDS.has(k) ? [] : "")]));
+  state.record.sentiment = c.sentiment ?? "neutral";
+  state.email = c.followup_body ? { subject: c.followup_subject ?? "", body: c.followup_body } : null;
+  $("transcript").value = c.transcript ?? "";
+  renderReview(false);
+  $("liveTag").innerHTML = `<b>editing</b> the call from ${shortDate(c.created_at)}`;
+  $("review").scrollIntoView({ behavior: "smooth", block: "start" });
+}
+
+// ---------- Save (optimistic) ----------
+async function save() {
+  if (!state.record) return;
+  if (state.task) return toast("Still working, one moment…");
+  if (state.editingId) return saveEdit();
+  const transcript = $("transcript").value.trim();
+  const words = transcript.split(/\s+/).filter(Boolean).length;
+  // Mic time when the mic was used; otherwise estimate speaking time at 150 words per minute.
+  const dictation_seconds = Math.round(state.micSeconds || (words / 150) * 60);
+  const record = readReview();
+  if (state.email?.body) Object.assign(record, { followup_subject: state.email.subject, followup_body: state.email.body });
+  const sync = Boolean($("sync")?.checked);
+  const input_source = state.source === "sample" ? "typed" : state.source || "typed";
+  // This call was the follow-up the earlier call scheduled, so close that one out.
+  const closing = $("closePrev")?.checked ? state.history.filter((c) => c.follow_up_date && !c.follow_up_done) : [];
+  for (const c of closing) c.follow_up_done = true;
+
+  const temp = { ...record, id: `tmp-${Date.now()}`, created_at: new Date().toISOString(), transcript, dictation_seconds, input_source, hubspot_status: sync ? "pending" : "off" };
+  state.calls.unshift(temp);
+  renderCalls();
+  resetCapture();
+  $("review").innerHTML = '<div class="empty"><b>Saved</b>On to the next call.</div>';
+  toast("Saved to CRM");
+
+  try {
+    const { call } = await api("/api/calls", { method: "POST", body: JSON.stringify({ record, transcript, dictation_seconds, input_source, sync }) });
+    Object.assign(temp, call);
+    await Promise.all(closing.map((c) => api(`/api/calls/${c.id}`, { method: "PATCH", body: JSON.stringify({ follow_up_done: true }) })));
+    refresh();
+  } catch (err) {
+    state.calls = state.calls.filter((c) => c !== temp);
+    renderCalls();
+    toast(`Save failed: ${err.message}`);
+  }
+}
+
+async function saveEdit() {
+  const id = state.editingId;
+  const record = readReview();
+  record.followup_subject = state.email?.subject ?? "";
+  record.followup_body = state.email?.body ?? "";
+  const call = state.calls.find((c) => c.id === id);
+  if (call) Object.assign(call, record);
+  renderCalls();
+  resetCapture();
+  $("review").innerHTML = '<div class="empty"><b>Changes saved</b>Ready for the next call.</div>';
+  toast("Call updated");
+  try {
+    await api(`/api/calls/${id}`, { method: "PATCH", body: JSON.stringify(record) });
+  } catch (err) {
+    toast(`Update failed: ${err.message}`);
+  }
+  refresh();
+}
+
+// ---------- Ask your pipeline ----------
+// Citations render as numbered footnotes ([C7] → 1) that match the numbered source cards below the answer.
+function citeOrder(text) {
+  return [...new Set(text.match(/C\d+/g) ?? [])];
+}
+function renderAnswer(text, refs = {}) {
+  const order = citeOrder(text);
+  const byId = Object.fromEntries(state.calls.map((c) => [c.id, c]));
+  return esc(text).replace(/\s*\[(C\d+)\]/g, (m, ref) => {
+    const n = order.indexOf(ref) + 1;
+    const c = byId[refs[ref]];
+    if (c) return ` <span class="cite" data-goto="${c.id}" title="${esc(c.contact_name)} · ${esc(c.company)}">${n}</span>`;
+    return Object.keys(refs).length ? "" : ` <span class="cite">${n}</span>`;
+  });
+}
+
+async function ask(question) {
+  question = (question ?? $("askInput").value).trim();
+  if (!question) return $("askInput").focus();
+  if (state.task) return toast("One moment, still working on the last request…");
+  $("askInput").value = question;
+  $("askOut").innerHTML = '<div class="answer" id="answerText"><span class="timing">Reading your calls…</span></div>';
+  $("askTiming").innerHTML = "<b>● thinking</b>";
+  try {
+    const { data, total } = await runTask("/api/ask", { question }, (d) => {
+      if (typeof d.answer === "string") $("answerText").innerHTML = renderAnswer(d.answer);
+    });
+    $("answerText").innerHTML = renderAnswer(data.answer, data.refs);
+    // Number sources in the order the answer cites them, then any extra sources Claude listed.
+    const refs = [...new Set([...citeOrder(data.answer), ...(data.sources ?? [])])].filter((r) => data.refs[r]);
+    const cited = refs.map((r, i) => [i + 1, state.calls.find((c) => c.id === data.refs[r])]).filter(([, c]) => c);
+    if (cited.length) {
+      $("askOut").insertAdjacentHTML("beforeend", `<div class="srcs">${cited.map(([n, c]) => `<button data-goto="${c.id}"><small><span class="cite" style="margin:0 6px 0 0">${n}</span>${esc(c.deal_stage)}${c.deal_value ? ` · ${esc(c.deal_value)}` : ""}</small>${esc(c.contact_name || "Unknown")} · ${esc(c.company)}</button>`).join("")}</div>`);
+    }
+    $("askTiming").innerHTML = `${data.searched} call${data.searched === 1 ? "" : "s"} searched · <b>${secs(total)}</b>`;
+  } catch (err) {
+    if (isAbort(err)) return;
+    $("askOut").innerHTML = `<div class="msg err">${esc(err.message)}</div>`;
+    $("askTiming").textContent = "";
+  }
+}
+$("askBtn").onclick = () => ask();
+$("askInput").addEventListener("keydown", (e) => { if (e.key === "Enter") { e.preventDefault(); ask(); } });
+for (const b of $("askChips").querySelectorAll("button")) b.onclick = () => ask(b.textContent);
+$("askMic").onclick = () => {
+  if (rec) return rec.stop();
+  $("askInput").value = "";
+  listen({ target: $("askInput"), button: $("askMic"), onStop: (_, ok) => ok && setTimeout(() => ask(), 250) });
+};
+
+// Jump from a citation to the call it came from.
+document.addEventListener("click", (e) => {
+  const t = e.target.closest("[data-goto]");
+  if (!t) return;
+  if ($("search").value) { $("search").value = ""; renderCalls(); }
+  const card = document.querySelector(`.call[data-id="${t.dataset.goto}"]`);
+  if (!card) return;
+  card.scrollIntoView({ behavior: "smooth", block: "center" });
+  card.classList.remove("flash"); void card.offsetWidth; card.classList.add("flash");
+});
+
+$("resetBtn").onclick = async () => {
+  if (!confirm("Replace everything in this workspace with the sample calls?")) return;
+  try {
+    await api("/api/reset", { method: "POST" });
+    discard();
+    $("askOut").innerHTML = ""; $("askTiming").textContent = ""; $("askInput").value = "";
+    await refresh();
+    toast("Workspace reset to sample data");
+  } catch (err) { toast(err.message); }
+};
+
+document.addEventListener("keydown", (e) => {
+  if (!(e.metaKey || e.ctrlKey)) return;
+  const k = e.key.toLowerCase();
+  if (k === "enter") { e.preventDefault(); document.activeElement?.id === "fixInput" ? command($("fixInput").value) : extract(); }
+  else if (k === "s") { e.preventDefault(); save(); }
+  else if (k === "m") { e.preventDefault(); toggleRecapMic(); }
+  else if (k === "e" && state.record) { e.preventDefault(); draftEmail(); }
+  else if (k === "k") { e.preventDefault(); $("askInput").focus(); $("askInput").select(); }
+});
+
+// ---------- Calls, stats, follow-ups ----------
+let pollTimer;
+async function refresh() {
+  const { calls, stats, all_stats } = await api("/api/calls");
+  state.calls = calls;
+  state.stats = state.config.can_reset ? all_stats : stats; // demo workspaces count their sample calls
+  renderStats(); renderCalls();
+  clearTimeout(pollTimer);
+  if (calls.some((c) => c.hubspot_status === "pending")) pollTimer = setTimeout(refresh, 1500);
+}
+
+function renderStats() {
+  const s = state.stats;
+  const tiles = [
+    [s.calls_logged, "Calls logged"], [s.minutes_saved, "Minutes saved"], [`${s.avg_completeness}%`, "Fields filled"],
+    [s.follow_ups_due, "Follow-ups due", s.follow_ups_due ? "due" : ""], [s.emails_drafted, "Emails drafted"],
+    [s.wispr_recaps, "Wispr Flow recaps", "wfs"],
+  ];
+  $("stats").innerHTML = tiles.map(([v, l, cls]) => `<div class="stat ${cls ?? ""}"><b>${v}</b><span>${l}</span></div>`).join("");
+}
+
+function niceDate(d) {
+  const diff = Math.round((new Date(d + "T00:00") - new Date(todayStr() + "T00:00")) / 86400000);
+  if (diff === 0) return "today";
+  if (diff === 1) return "tomorrow";
+  if (diff === -1) return "yesterday";
+  return diff < 0 ? `${-diff} days overdue` : new Date(d + "T00:00").toLocaleDateString(undefined, { weekday: "short", day: "numeric", month: "short" });
+}
+
+function renderCalls() {
+  const today = todayStr();
+  const soon = new Date(Date.now() + 3 * 86400000).toLocaleDateString("en-CA");
+  const due = state.calls
+    .filter((c) => c.follow_up_date && !c.follow_up_done && c.follow_up_date <= soon && !c.id.startsWith("tmp-"))
+    .sort((a, b) => a.follow_up_date.localeCompare(b.follow_up_date));
+  $("due").innerHTML = due.length ? due.map((c) => `
+    <div class="dueItem ${c.follow_up_date < today ? "over" : ""}">
+      <b>${esc(c.contact_name || "Unknown")}${c.company ? ` · ${esc(c.company)}` : ""}</b>
+      <small>${esc(c.next_step || "Follow up")}</small>
+      <span class="when">${niceDate(c.follow_up_date)}</span>
+      <button class="btn sm" data-done="${c.id}">Done</button>
+    </div>`).join("") : '<div class="empty" style="padding:24px"><b>All clear</b>Nothing due in the next 3 days.</div>';
+
+  const q = $("search").value.trim().toLowerCase();
+  const list = q ? state.calls.filter((c) => [c.contact_name, c.company, c.email, c.summary, c.next_step, c.deal_stage].join(" ").toLowerCase().includes(q)) : state.calls;
+  const syncLabel = { pending: "syncing to HubSpot…", synced: "✓ in HubSpot", failed: "HubSpot sync failed" };
+  const srcLabel = { wispr: "Wispr Flow", mic: "browser mic", typed: "typed" };
+  // Number each call per contact, oldest first, so repeat calls read "2nd call", "3rd call"…
+  const asc = state.calls.filter((c) => !c.id.startsWith("tmp-")).sort((a, b) => a.created_at.localeCompare(b.created_at));
+  const nth = new Map(asc.map((c, i) => [c.id, 1 + asc.slice(0, i).filter((p) => sameContact(c, p)).length]));
+  const initials = (n) => (n || "?").split(/\s+/).slice(0, 2).map((w) => w[0]).join("").toUpperCase();
+  $("calls").innerHTML = list.length ? list.map((c) => `
+    <article class="call st-${esc(c.deal_stage)}" data-id="${c.id}">
+      <div class="av" aria-hidden="true">${esc(initials(c.contact_name))}</div>
+      <div class="cb">
+        <div class="ctop">
+          <div style="min-width:0"><h3>${esc(c.contact_name || "Unknown contact")}${c.company ? ` <span>· ${esc(c.company)}</span>` : ""}</h3>
+            <div class="meta">${new Date(c.created_at).toLocaleString(undefined, { dateStyle: "medium", timeStyle: "short" })}${c.deal_value ? ` · ${esc(c.deal_value)}` : ""}${c.input_source ? ` · ${srcLabel[c.input_source] ?? ""}` : ""}${nth.get(c.id) > 1 ? ` · <b style="color:var(--aqua);font-weight:500">${ordinal(nth.get(c.id))} call</b>` : ""}</div></div>
+          <div class="tags">${c.is_sample ? '<span class="tag sample">sample</span>' : ""}<span class="tag">${esc(c.deal_stage)}</span></div>
+        </div>
+        ${c.summary ? `<p>${esc(c.summary)}</p>` : ""}
+        ${c.next_step ? `<div class="next"><b>Next →</b> ${esc(c.next_step)}${c.follow_up_date ? ` · ${c.follow_up_done ? "done" : niceDate(c.follow_up_date)}` : ""}</div>` : ""}
+        ${c.followup_body ? `<details><summary>Follow-up email · ${esc(c.followup_subject)}</summary><pre>${esc(c.followup_body)}</pre></details>` : ""}
+        <div class="acts">
+          ${syncLabel[c.hubspot_status] ? `<span class="sync ${c.hubspot_status}" title="${esc(c.hubspot_error ?? "")}">${syncLabel[c.hubspot_status]}</span>` : ""}
+          ${c.hubspot_status === "failed" || (state.config.hubspot && c.hubspot_status === "off") ? `<button class="link" data-sync="${c.id}">${c.hubspot_status === "failed" ? "retry" : "sync to HubSpot"}</button>` : ""}
+          ${!state.config.public_mode && !c.is_sample ? `<button class="link" data-feature="${c.id}">${c.featured ? '<span class="feat">★ featured on proof page</span>' : "☆ feature on proof page"}</button>` : ""}
+          ${c.id.startsWith("tmp-") ? "" : `<button class="link" data-edit="${c.id}">edit</button>`}
+          <button class="link del" data-del="${c.id}" style="margin-left:auto" aria-label="Delete call with ${esc(c.contact_name || "unknown contact")}">delete</button>
+        </div>
+      </div>
+    </article>`).join("")
+    : `<div class="empty"><b>${q ? "No matches" : "No calls yet"}</b>${q ? "Try a different search." : "Recap your first call above, or try the sample."}</div>`;
+}
+
+// One delegated handler for all list actions.
+document.addEventListener("click", async (e) => {
+  const edit = e.target.closest("[data-edit]");
+  if (edit) return editCall(edit.dataset.edit);
+  const t = e.target.closest("[data-done],[data-del],[data-sync],[data-feature]");
+  if (!t || t.closest(".call")?.dataset.id?.startsWith("tmp-")) return;
+  try {
+    if (t.dataset.done) {
+      const c = state.calls.find((x) => x.id === t.dataset.done);
+      if (c) c.follow_up_done = true;
+      renderCalls(); toast("Follow-up marked done");
+      await api(`/api/calls/${t.dataset.done}`, { method: "PATCH", body: JSON.stringify({ follow_up_done: true }) });
+    } else if (t.dataset.del) {
+      if (!confirm("Delete this call?")) return;
+      state.calls = state.calls.filter((x) => x.id !== t.dataset.del);
+      renderCalls();
+      await api(`/api/calls/${t.dataset.del}`, { method: "DELETE" });
+    } else if (t.dataset.sync) {
+      await api(`/api/calls/${t.dataset.sync}/sync`, { method: "POST" });
+    } else if (t.dataset.feature) {
+      const c = state.calls.find((x) => x.id === t.dataset.feature);
+      const featured = !c?.featured;
+      if (featured && !confirm("Feature this call on the public proof page? Its summary, recap and follow-up email become public. Contact names are shortened and emails and phone numbers are hidden.")) return;
+      if (c) c.featured = featured;
+      renderCalls();
+      await api(`/api/calls/${t.dataset.feature}`, { method: "PATCH", body: JSON.stringify({ featured }) });
+      toast(featured ? "Featured on the proof page" : "Removed from the proof page");
+    }
+    refresh();
+  } catch (err) {
+    toast(err.message); refresh();
+  }
+});
+
+$("restoreFile").addEventListener("change", async (e) => {
+  const file = e.target.files[0];
+  e.target.value = "";
+  if (!file) return;
+  try {
+    const { added, skipped } = await api("/api/restore", { method: "POST", body: await file.text() });
+    toast(`Restored ${added} call${added === 1 ? "" : "s"}${skipped ? ` (${skipped} already here)` : ""}`);
+    refresh();
+  } catch (err) { toast(`Restore failed: ${err.message}`); }
+});
+
+let searchTimer;
+$("search").addEventListener("input", () => { clearTimeout(searchTimer); searchTimer = setTimeout(renderCalls, 80); });
+
+// ---------- Boot: config first (decides which stats to show), then data ----------
+api("/api/config").then((c) => {
+  state.config = c;
+  state.sender = store.get("debrief_sender") ?? c.sender_name ?? "";
+  $("modelChip").textContent = c.model;
+  $("hsChip").textContent = c.hubspot ? "HubSpot connected" : "HubSpot off";
+  $("hsChip").classList.toggle("on", c.hubspot);
+  $("banner").hidden = !c.can_reset;
+  $("restoreBtn").hidden = c.public_mode;
+  micIdle();
+  if (c.demo_mode && !c.public_mode) $("bannerText").textContent = "Demo mode: Claude is simulated, so every recap returns the same sample. Your real data isn't touched.";
+}).then(refresh).catch((err) => toast(err.message));
+
+</script>
+</body>
+</html>

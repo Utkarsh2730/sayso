@@ -1,0 +1,336 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Debrief · Proof</title>
+<meta name="description" content="Real results from using Debrief on real sales calls.">
+<meta name="theme-color" content="#06080b">
+<link rel="icon" href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 32 32'%3E%3Crect width='32' height='32' rx='8' fill='%235eead4'/%3E%3Cpath d='M9 13v6M13 9v14M17 11v10M21 14v4M25 12v8' stroke='%2306080b' stroke-width='2.4' stroke-linecap='round'/%3E%3C/svg%3E">
+<style>
+  :root {
+    --bg: #06080b; --panel: #0b0f14; --card: rgba(255,255,255,.03); --line: rgba(255,255,255,.08); --line2: rgba(255,255,255,.14);
+    --text: #eef2f5; --muted: #8b95a1; --dim: #5d6773;
+    --aqua: #5eead4; --aqua2: #22d3ee; --violet: #a78bfa; --bar: #0d9488; --bar-hi: #14b8a6;
+    --sans: ui-sans-serif, -apple-system, "Segoe UI", Roboto, "Helvetica Neue", sans-serif;
+    --mono: ui-monospace, "SF Mono", "Cascadia Code", Menlo, monospace;
+  }
+  * { box-sizing: border-box; }
+  [hidden] { display: none !important; }
+  html { overflow-x: clip; }
+  body { margin: 0; background: var(--bg); color: var(--text); font: 15px/1.55 var(--sans); -webkit-font-smoothing: antialiased; }
+  body::before { content: ""; position: fixed; inset: 0; pointer-events: none; z-index: -1;
+    background: radial-gradient(700px 420px at 20% -5%, rgba(94,234,212,.1), transparent 70%), radial-gradient(600px 400px at 90% 0%, rgba(167,139,250,.08), transparent 70%); }
+  a { color: inherit; text-decoration: none; }
+  button { font: inherit; color: inherit; }
+  header { position: sticky; top: 0; z-index: 20; background: rgba(6,8,11,.75); backdrop-filter: blur(14px); -webkit-backdrop-filter: blur(14px); border-bottom: 1px solid var(--line); }
+  header .in { max-width: 1120px; margin: 0 auto; padding: 0 20px; height: 60px; display: flex; align-items: center; gap: 14px; }
+  .logo { display: flex; align-items: center; gap: 10px; font-weight: 700; letter-spacing: -.02em; font-size: 17px; }
+  .logo i { width: 26px; height: 26px; border-radius: 7px; background: var(--aqua); display: grid; place-items: center; }
+  .logo i svg { width: 16px; height: 16px; }
+  header nav { display: flex; gap: 18px; font-size: 14px; color: var(--muted); margin-left: 10px; }
+  header nav a:hover, header nav a.cur { color: var(--text); }
+  header .sp { flex: 1; }
+  .btn { display: inline-flex; align-items: center; gap: 8px; padding: 10px 16px; border-radius: 999px; font-weight: 600; font-size: 14px; border: 1px solid var(--line2); background: transparent; cursor: pointer; white-space: nowrap; }
+  .btn:hover { border-color: rgba(255,255,255,.3); }
+  .btn.primary { background: var(--aqua); color: #04110f; border-color: var(--aqua); }
+  .btn.sm { padding: 6px 12px; font-size: 12.5px; }
+
+  main { max-width: 1120px; margin: 0 auto; padding: 48px 20px 90px; }
+  .eyebrow { font: 500 12px/1 var(--mono); letter-spacing: .14em; text-transform: uppercase; color: var(--aqua); }
+  h1 { font-size: clamp(32px, 5vw, 54px); line-height: 1.05; letter-spacing: -.04em; margin: 14px 0 12px; }
+  .grad { background: linear-gradient(100deg, var(--aqua) 10%, var(--aqua2) 45%, var(--violet) 90%); -webkit-background-clip: text; background-clip: text; color: transparent; }
+  .lede { color: var(--muted); font-size: 17px; max-width: 680px; margin: 0; }
+  h2 { font-size: 22px; letter-spacing: -.02em; margin: 0 0 6px; }
+  section { margin-top: 56px; }
+  .sub { color: var(--muted); margin: 0 0 18px; font-size: 14.5px; }
+
+  .tiles { display: grid; grid-template-columns: repeat(4, 1fr); gap: 12px; margin-top: 34px; }
+  .tile { border: 1px solid var(--line); border-radius: 16px; background: var(--card); padding: 20px; }
+  .tile b { display: block; font-size: 40px; letter-spacing: -.04em; line-height: 1.05; font-variant-numeric: tabular-nums; }
+  .tile span { font: 11px var(--mono); color: var(--muted); text-transform: uppercase; letter-spacing: .1em; }
+  .tile small { display: block; color: var(--dim); font-size: 12.5px; margin-top: 6px; }
+  @media (max-width: 860px) { .tiles { grid-template-columns: 1fr 1fr; } }
+
+  .panel { border: 1px solid var(--line); border-radius: 18px; background: var(--panel); padding: 22px; }
+  .chart { position: relative; height: 220px; display: flex; align-items: flex-end; gap: 2px; padding: 0 0 26px; border-bottom: 0; }
+  .chart .grid { position: absolute; inset: 0 0 26px; pointer-events: none; }
+  .chart .grid i { position: absolute; left: 0; right: 0; border-top: 1px dashed rgba(255,255,255,.06); }
+  .chart .grid em { position: absolute; left: 0; transform: translateY(-110%); font: 10.5px var(--mono); color: var(--dim); font-style: normal; }
+  .chart .base { position: absolute; left: 0; right: 0; bottom: 26px; border-top: 1px solid var(--line2); }
+  .col { flex: 1; height: 100%; display: flex; align-items: flex-end; justify-content: center; position: relative; cursor: default; min-width: 0; }
+  .col .bar { width: min(70%, 34px); background: var(--bar); border-radius: 4px 4px 0 0; min-height: 2px; transition: background .12s; }
+  .col:hover .bar, .col:focus .bar { background: var(--bar-hi); }
+  .col .x { position: absolute; bottom: -22px; font: 10.5px var(--mono); color: var(--dim); white-space: nowrap; }
+  .col .v { position: absolute; font: 11px var(--mono); color: var(--muted); transform: translateY(-4px); }
+  .tip { position: absolute; z-index: 5; pointer-events: none; background: #111820; border: 1px solid var(--line2); border-radius: 10px; padding: 8px 10px; font-size: 12.5px; white-space: nowrap; box-shadow: 0 12px 30px -8px rgba(0,0,0,.7); opacity: 0; transition: opacity .1s; }
+  .tip b { display: block; font: 11px var(--mono); color: var(--muted); margin-bottom: 2px; font-weight: 500; }
+  table { width: 100%; border-collapse: collapse; font-size: 13.5px; margin-top: 12px; }
+  th, td { text-align: left; padding: 7px 10px; border-bottom: 1px solid var(--line); }
+  th { font: 11px var(--mono); color: var(--dim); text-transform: uppercase; letter-spacing: .08em; font-weight: 500; }
+  td.n, th.n { text-align: right; font-variant-numeric: tabular-nums; }
+  details > summary { cursor: pointer; color: var(--muted); font-size: 13px; margin-top: 14px; }
+
+  .flow { display: grid; grid-template-columns: 1fr 1fr 1fr; gap: 12px; margin-bottom: 16px; }
+  @media (max-width: 900px) { .flow { grid-template-columns: 1fr; } }
+  .step { border: 1px solid var(--line); border-radius: 14px; padding: 16px; background: var(--card); min-width: 0; }
+  .step h3 { margin: 0 0 10px; font: 500 11px var(--mono); letter-spacing: .12em; text-transform: uppercase; color: var(--aqua); display: flex; justify-content: space-between; gap: 8px; }
+  .step h3 span { color: var(--dim); letter-spacing: .04em; text-transform: none; }
+  .step p, .step pre { margin: 0; font-size: 14px; color: #c3cbd4; white-space: pre-wrap; font-family: var(--sans); }
+  .step q { color: #dfe5ea; font-style: italic; }
+  .kv { display: grid; grid-template-columns: auto 1fr; gap: 4px 12px; font-size: 13.5px; }
+  .kv dt { font: 11px var(--mono); color: var(--dim); text-transform: uppercase; letter-spacing: .06em; padding-top: 2px; }
+  .kv dd { margin: 0; color: #dfe5ea; min-width: 0; overflow-wrap: anywhere; }
+
+  .share { display: grid; grid-template-columns: 1.2fr 1fr; gap: 20px; align-items: start; }
+  @media (max-width: 860px) { .share { grid-template-columns: 1fr; } }
+  canvas { width: 100%; height: auto; border-radius: 14px; border: 1px solid var(--line); display: block; }
+  textarea { width: 100%; min-height: 150px; background: rgba(0,0,0,.3); color: var(--text); border: 1px solid var(--line); border-radius: 10px; padding: 12px; font: 14px/1.55 var(--sans); resize: vertical; }
+  .row { display: flex; gap: 10px; flex-wrap: wrap; align-items: center; margin-top: 12px; }
+  .zero { margin-top: 34px; display: grid; grid-template-columns: 1.1fr 1fr; gap: 28px; align-items: center; border: 1px solid var(--line2); border-radius: 22px; padding: 32px;
+    background: radial-gradient(420px 260px at 85% 0%, rgba(167,139,250,.14), transparent 70%), radial-gradient(420px 260px at 0% 100%, rgba(94,234,212,.12), transparent 70%), var(--panel); }
+  .zero h2 { font-size: 26px; margin: 10px 0 8px; }
+  .zero p { color: var(--muted); margin: 0 0 20px; }
+  .zero ul { list-style: none; margin: 0; padding: 0; display: grid; gap: 10px; }
+  .zero li { display: flex; gap: 12px; align-items: center; padding: 12px 14px; border: 1px solid var(--line); border-radius: 12px; background: var(--card); font-size: 14px; color: #c3cbd4; }
+  .zero li b { font: 600 22px var(--sans); color: var(--dim); min-width: 48px; letter-spacing: -.03em; }
+  @media (max-width: 800px) { .zero { grid-template-columns: 1fr; padding: 24px; } }
+  .owner { margin-top: 56px; border: 1px dashed rgba(167,139,250,.4); border-radius: 16px; padding: 18px; color: #d6d0f5; font-size: 14px; }
+  .owner b { color: var(--violet); font: 600 11px var(--mono); letter-spacing: .1em; }
+  .empty { color: var(--dim); border: 1px dashed var(--line2); border-radius: 14px; padding: 36px 20px; text-align: center; }
+  .empty b { display: block; color: var(--muted); font-size: 15px; margin-bottom: 4px; }
+  .toast { position: fixed; left: 50%; bottom: 24px; transform: translate(-50%, 20px); opacity: 0; background: #111820; border: 1px solid var(--line2); border-radius: 999px; padding: 10px 18px; font-size: 14px; transition: opacity .2s, transform .2s; pointer-events: none; z-index: 30; max-width: calc(100% - 32px); }
+  .toast.show { opacity: 1; transform: translate(-50%, 0); }
+</style>
+</head>
+<body>
+<header>
+  <div class="in">
+    <a class="logo" href="/"><i><svg viewBox="0 0 24 24" fill="none" stroke="#06080b" stroke-width="2.6" stroke-linecap="round"><path d="M5 10v4M9 6v12M13 8v8M17 11v2M21 9v6"/></svg></i>Debrief</a>
+    <nav><a href="/app">App</a><a class="cur" href="/proof">Proof</a></nav>
+    <span class="sp"></span>
+    <a class="btn sm primary" href="/app">Try it</a>
+  </div>
+</header>
+
+<main>
+  <div class="eyebrow">Proof of real use</div>
+  <h1 id="headline">Real calls. <span class="grad">Real time saved.</span></h1>
+  <p class="lede" id="lede">Every number on this page comes from sales calls logged with Debrief, by voice, during the No Hands challenge.</p>
+
+  <div class="zero" id="zero" hidden>
+    <div>
+      <div class="eyebrow">Nothing logged yet</div>
+      <h2>The proof fills in after the first real call.</h2>
+      <p>Recap a call in the app and this page starts counting: calls logged, minutes saved, fields filled and follow-ups sent, with a per-day chart and a share card.</p>
+      <div class="row"><a class="btn primary" href="/app">Log a call</a><a class="btn" href="/">See how it works</a></div>
+    </div>
+    <ul aria-label="What this page will show">
+      <li><b>—</b>calls logged by voice</li>
+      <li><b>—</b>minutes of typing saved</li>
+      <li><b>—%</b>of key CRM fields filled</li>
+      <li><b>—</b>follow-up emails drafted</li>
+    </ul>
+  </div>
+
+  <div class="tiles" id="tiles"></div>
+
+  <section id="chartSec">
+    <h2>Calls logged per day</h2>
+    <p class="sub" id="chartSub"></p>
+    <div class="panel">
+      <div class="chart" id="chart" role="img" aria-label="Calls logged per day"></div>
+      <details><summary>Show as table</summary><table id="table"></table></details>
+    </div>
+  </section>
+
+  <section id="featuredSec">
+    <h2>From voice to CRM to inbox</h2>
+    <p class="sub">Real calls, shown with permission. Contact names are shortened; emails and phone numbers are removed.</p>
+    <div id="featured"></div>
+  </section>
+
+  <section id="shareSec">
+    <h2>Share your progress</h2>
+    <p class="sub">A card and post text for your weekly #NoHandsChallenge check-in.</p>
+    <div class="share">
+      <canvas id="card" width="1200" height="630" aria-label="Share card with Debrief results"></canvas>
+      <div>
+        <textarea id="post"></textarea>
+        <div class="row">
+          <button class="btn primary" id="dlCard">Download card (PNG)</button>
+          <button class="btn" id="copyPost">Copy post text</button>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <div class="owner" id="owner" hidden>
+    <b>ONLY VISIBLE ON YOUR LOCAL COPY</b>
+    <p style="margin:8px 0 12px">This page shows your live data. To show it on the hosted demo, publish a snapshot (aggregate numbers plus the calls you featured), then commit <code>data/proof.json</code> and redeploy.</p>
+    <button class="btn" id="snapBtn">Publish proof snapshot</button>
+  </div>
+</main>
+<div class="toast" id="toast" role="status" aria-live="polite"></div>
+
+<script>
+const $ = (id) => document.getElementById(id);
+const esc = (s) => String(s ?? "").replace(/[&<>"']/g, (c) => ({ "&": "&amp;", "<": "&lt;", ">": "&gt;", '"': "&quot;", "'": "&#39;" })[c]);
+const fmtDay = (d) => new Date(d + "T00:00").toLocaleDateString(undefined, { day: "numeric", month: "short" });
+let toastTimer;
+function toast(t) { $("toast").textContent = t; $("toast").classList.add("show"); clearTimeout(toastTimer); toastTimer = setTimeout(() => $("toast").classList.remove("show"), 2400); }
+
+function render(p) {
+  const s = p.stats;
+  // With no real calls, a grid of zeros reads as broken: show what's coming instead.
+  const none = !s.calls_logged;
+  for (const id of ["tiles", "chartSec", "shareSec", "featuredSec"]) $(id).hidden = none;
+  $("zero").hidden = !none;
+  if (none) return;
+  if (s.calls_logged) {
+    $("headline").innerHTML = `${s.calls_logged} real call${s.calls_logged === 1 ? "" : "s"}. <span class="grad">${s.minutes_saved} minutes saved.</span>`;
+    $("lede").textContent = `Every number here comes from sales calls logged with Debrief by voice${p.first_call_at ? ` since ${new Date(p.first_call_at).toLocaleDateString(undefined, { day: "numeric", month: "long" })}` : ""}. Time saved assumes ${p.manual_minutes} minutes to write up a call by hand, minus the time spent talking.`;
+  }
+  const tiles = [
+    [s.calls_logged, "Calls logged", `avg ${s.avg_seconds_per_call}s of talking each`],
+    [s.minutes_saved, "Minutes saved", `vs ${p.manual_minutes} min typing per call`],
+    [`${s.avg_completeness}%`, "Key fields filled", "contact, company, email, role, value, next step…"],
+    [`${s.voice_share}%`, "Recaps by voice", `${s.wispr_recaps} dictated with Wispr Flow`],
+    [s.follow_ups_set, "Follow-ups scheduled", `${s.follow_ups_done} already done`],
+    [s.emails_drafted, "Follow-up emails drafted", "from the same recap"],
+    [s.words_dictated.toLocaleString(), "Words dictated", "into Debrief"],
+    [s.synced_to_hubspot, "Synced to HubSpot", "contacts, notes and tasks"],
+  ];
+  $("tiles").innerHTML = tiles.map(([v, l, n]) => `<div class="tile"><b>${v}</b><span>${l}</span><small>${n}</small></div>`).join("");
+
+  renderChart(p.timeline);
+  renderFeatured(p.featured);
+  drawCard(s);
+  $("post").value = postText(s);
+}
+
+function renderChart(rows) {
+  const chart = $("chart");
+  if (!rows.length) {
+    chart.outerHTML = '<div class="empty" id="chart"><b>No calls yet</b>The chart fills in as calls are logged.</div>';
+    $("chartSub").textContent = "";
+    $("table").innerHTML = "";
+    return;
+  }
+  // Fill gaps so every day from the first call to today has a column.
+  const byDate = new Map(rows.map((r) => [r.date, r]));
+  const days = [];
+  for (let d = new Date(rows[0].date + "T00:00"); d <= new Date(); d.setDate(d.getDate() + 1)) {
+    const key = d.toLocaleDateString("en-CA");
+    days.push(byDate.get(key) ?? { date: key, calls: 0, minutes_saved: 0 });
+  }
+  const max = Math.max(...days.map((d) => d.calls));
+  const top = Math.max(2, Math.ceil(max / 2) * 2);
+  const ticks = [top / 2, top];
+  const total = days.reduce((a, d) => a + d.calls, 0);
+  $("chartSub").textContent = `${total} call${total === 1 ? "" : "s"} over ${days.length} day${days.length === 1 ? "" : "s"}. Peak: ${max} in a day.`;
+  const every = Math.ceil(days.length / 10);
+  chart.innerHTML = `<div class="grid">${ticks.map((t) => `<i style="top:${100 - (t / top) * 100}%"><em>${t}</em></i>`).join("")}</div><div class="base"></div>` +
+    days.map((d, i) => `<div class="col" tabindex="0" data-i="${i}" aria-label="${fmtDay(d.date)}: ${d.calls} calls">
+      ${d.calls === max && max ? `<span class="v" style="bottom:${(d.calls / top) * 100}%">${d.calls}</span>` : ""}
+      <div class="bar" style="height:${(d.calls / top) * 100}%"></div>
+      ${i % every === 0 ? `<span class="x">${fmtDay(d.date)}</span>` : ""}
+    </div>`).join("") + '<div class="tip" id="tip"></div>';
+  const tip = $("tip");
+  const show = (col) => {
+    const d = days[col.dataset.i];
+    tip.innerHTML = `<b>${fmtDay(d.date)}</b>${d.calls} call${d.calls === 1 ? "" : "s"} · ${d.minutes_saved} min saved`;
+    const c = chart.getBoundingClientRect(), r = col.getBoundingClientRect();
+    tip.style.left = `${Math.min(Math.max(0, r.left - c.left + r.width / 2 - tip.offsetWidth / 2), c.width - tip.offsetWidth)}px`;
+    tip.style.top = "0px";
+    tip.style.opacity = 1;
+  };
+  for (const col of chart.querySelectorAll(".col")) {
+    col.addEventListener("mouseenter", () => show(col));
+    col.addEventListener("focus", () => show(col));
+    col.addEventListener("mouseleave", () => (tip.style.opacity = 0));
+    col.addEventListener("blur", () => (tip.style.opacity = 0));
+  }
+  $("table").innerHTML = `<tr><th>Date</th><th class="n">Calls</th><th class="n">Minutes saved</th></tr>` +
+    days.filter((d) => d.calls).map((d) => `<tr><td>${fmtDay(d.date)}</td><td class="n">${d.calls}</td><td class="n">${d.minutes_saved}</td></tr>`).join("");
+}
+
+function renderFeatured(list) {
+  if (!list.length) { $("featuredSec").hidden = true; return; }
+  $("featured").innerHTML = list.map((c) => `
+    <div class="flow">
+      <div class="step"><h3>1 · Spoken recap <span>${c.dictation_seconds ? `${c.dictation_seconds}s` : ""}${c.input_source === "wispr" ? " · Wispr Flow" : c.input_source === "mic" ? " · mic" : ""}</span></h3><p><q>${esc(c.transcript)}</q></p></div>
+      <div class="step"><h3>2 · CRM record</h3><dl class="kv">
+        ${[["Contact", c.contact], ["Company", c.company], ["Role", c.role], ["Stage", c.deal_stage], ["Value", c.deal_value], ["Next", c.next_step], ["Follow-up", c.follow_up_date]]
+          .filter(([, v]) => v).map(([k, v]) => `<dt>${k}</dt><dd>${esc(v)}</dd>`).join("")}
+      </dl></div>
+      <div class="step"><h3>3 · Follow-up email</h3>${c.followup_body ? `<p style="margin-bottom:8px"><b>${esc(c.followup_subject)}</b></p><pre>${esc(c.followup_body)}</pre>` : '<p style="color:var(--dim)">No email drafted for this call.</p>'}</div>
+    </div>`).join("");
+}
+
+function postText(s) {
+  return `Week ${weekNo()} of #NoHandsChallenge: I'm building Debrief, a voice-first CRM for sales calls.
+
+After every call I talk for ~30 seconds and it fills in the CRM record and drafts the follow-up email.
+
+So far: ${s.calls_logged} real calls logged, ${s.minutes_saved} minutes of typing saved, ${s.avg_completeness}% of key fields filled, ${s.emails_drafted} follow-ups drafted. Built entirely by voice with Wispr Flow.
+
+@WeMakeDevs @WisprFlow`;
+}
+function weekNo() { return Math.max(1, Math.min(3, Math.ceil((Date.now() - new Date("2026-10-16T00:00:00+05:30")) / (7 * 86400000)))); }
+
+function drawCard(s) {
+  const c = $("card"), g = c.getContext("2d");
+  const W = c.width, H = c.height;
+  g.fillStyle = "#06080b"; g.fillRect(0, 0, W, H);
+  const glow = (x, y, r, col) => { const gr = g.createRadialGradient(x, y, 0, x, y, r); gr.addColorStop(0, col); gr.addColorStop(1, "rgba(0,0,0,0)"); g.fillStyle = gr; g.fillRect(0, 0, W, H); };
+  glow(220, 80, 520, "rgba(94,234,212,.20)"); glow(1050, 120, 480, "rgba(167,139,250,.16)");
+  g.strokeStyle = "rgba(255,255,255,.05)"; g.lineWidth = 1;
+  for (let x = 0; x < W; x += 60) { g.beginPath(); g.moveTo(x, 0); g.lineTo(x, H); g.stroke(); }
+  for (let y = 0; y < H; y += 60) { g.beginPath(); g.moveTo(0, y); g.lineTo(W, y); g.stroke(); }
+  const font = (w, px) => `${w} ${px}px -apple-system, "Segoe UI", Roboto, sans-serif`;
+  // logo
+  g.fillStyle = "#5eead4"; roundRect(g, 64, 56, 44, 44, 11); g.fill();
+  g.strokeStyle = "#06080b"; g.lineWidth = 4; g.lineCap = "round";
+  [[74, 74, 82], [82, 66, 90], [90, 70, 86], [98, 76, 80]].forEach(([x, a, b]) => { g.beginPath(); g.moveTo(x, a); g.lineTo(x, b); g.stroke(); });
+  g.fillStyle = "#eef2f5"; g.font = font(700, 30); g.fillText("Debrief", 122, 88);
+  g.fillStyle = "#8b95a1"; g.font = font(500, 22); g.textAlign = "right"; g.fillText(`#NoHandsChallenge · week ${weekNo()}`, W - 64, 86); g.textAlign = "left";
+  g.fillStyle = "#eef2f5"; g.font = font(700, 58); g.fillText("Talk for 30 seconds.", 64, 200);
+  const grad = g.createLinearGradient(64, 0, 760, 0); grad.addColorStop(0, "#5eead4"); grad.addColorStop(.5, "#22d3ee"); grad.addColorStop(1, "#a78bfa");
+  g.fillStyle = grad; g.fillText("Your CRM updates itself.", 64, 268);
+  const items = [[s.calls_logged, "real calls logged"], [s.minutes_saved, "minutes saved"], [`${s.avg_completeness}%`, "fields filled"], [s.emails_drafted, "follow-ups drafted"]];
+  items.forEach(([v, l], i) => {
+    const x = 64 + i * 272, y = 360;
+    g.fillStyle = "rgba(255,255,255,.04)"; g.strokeStyle = "rgba(255,255,255,.1)"; g.lineWidth = 1.5;
+    roundRect(g, x, y, 248, 160, 18); g.fill(); g.stroke();
+    g.fillStyle = "#eef2f5"; g.font = font(700, 64); g.fillText(String(v), x + 24, y + 88);
+    g.fillStyle = "#8b95a1"; g.font = font(500, 22); g.fillText(l, x + 24, y + 128);
+  });
+  g.fillStyle = "#5d6773"; g.font = font(500, 20); g.fillText("Built by voice with Wispr Flow · @WeMakeDevs @WisprFlow", 64, 584);
+}
+function roundRect(g, x, y, w, h, r) { g.beginPath(); g.moveTo(x + r, y); g.arcTo(x + w, y, x + w, y + h, r); g.arcTo(x + w, y + h, x, y + h, r); g.arcTo(x, y + h, x, y, r); g.arcTo(x, y, x + w, y, r); g.closePath(); }
+
+$("dlCard").onclick = () => {
+  const a = document.createElement("a");
+  a.download = `debrief-week-${weekNo()}.png`;
+  a.href = $("card").toDataURL("image/png");
+  a.click();
+};
+$("copyPost").onclick = async () => {
+  try { await navigator.clipboard.writeText($("post").value); toast("Post text copied"); } catch { toast("Copy failed: select the text and copy it"); }
+};
+$("snapBtn").onclick = async () => {
+  try {
+    const r = await fetch("/api/proof/snapshot", { method: "POST" });
+    const body = await r.json();
+    if (!r.ok) throw new Error(body.error);
+    toast(`Saved ${body.file}. Commit it and redeploy.`);
+  } catch (err) { toast(err.message); }
+};
+
+Promise.all([fetch("/api/proof").then((r) => r.json()), fetch("/api/config").then((r) => r.json())])
+  .then(([proof, config]) => { render(proof); $("owner").hidden = config.public_mode; })
+  .catch((err) => toast(err.message));
+</script>
+</body>
+</html>

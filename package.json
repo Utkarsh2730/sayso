@@ -1,0 +1,34 @@
+{
+  "name": "debrief",
+  "version": "0.1.0",
+  "description": "Talk for 30 seconds after a sales call. Your CRM updates itself.",
+  "type": "module",
+  "scripts": {
+    "start": "node --env-file-if-exists=.env server.js",
+    "test": "node --test",
+    "demo": "node scripts/demo.js",
+    "start:public": "PUBLIC_MODE=1 node --env-file-if-exists=.env server.js",
+    "record:tour": "node scripts/record-tour.mjs",
+    "doctor": "node scripts/doctor.mjs",
+    "record:demo": "node scripts/record-demo.mjs"
+  },
+  "dependencies": {
+    "@anthropic-ai/sdk": "^0.135.0"
+  },
+  "engines": {
+    "node": ">=22"
+  },
+  "devDependencies": {
+    "playwright": "1.63.0"
+  },
+  "license": "MIT",
+  "private": true,
+  "keywords": [
+    "crm",
+    "voice",
+    "wispr-flow",
+    "claude",
+    "sales",
+    "hackathon"
+  ]
+}

@@ -1,0 +1,9 @@
+node_modules
+.env
+data/crm.json
+data/demo.json
+data/workspaces
+test
+*.local.md
+.claude
+.git

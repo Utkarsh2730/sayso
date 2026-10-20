@@ -1,0 +1,20 @@
+# One-click deploy on Render (render.com): New > Blueprint > pick this repo.
+services:
+  - type: web
+    name: debrief
+    runtime: node
+    plan: free
+    buildCommand: npm ci --omit=dev
+    startCommand: node server.js
+    healthCheckPath: /healthz
+    envVars:
+      - key: PUBLIC_MODE
+        value: "1"
+      - key: ANTHROPIC_API_KEY
+        sync: false   # set in the Render dashboard; never commit it
+      - key: NODE_VERSION
+        value: "22"
+      - key: LIMIT_PER_WORKSPACE
+        value: "40"
+      - key: LIMIT_GLOBAL
+        value: "1500"

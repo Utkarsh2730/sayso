@@ -1,0 +1,9 @@
+node_modules
+.env
+data/*.json
+!data/proof.json
+data/workspaces/
+# Your own notes: kept on this computer, never pushed
+*.local.md
+.DS_Store
+.claude/
