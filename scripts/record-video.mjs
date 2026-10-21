@@ -27,6 +27,8 @@ const server = spawn(process.execPath, ["scripts/try.js"], {
   cwd: ROOT, env: { ...process.env, PORT: String(PORT), CRM_FILE: path.join(work, "demo.json") }, stdio: ["ignore", "pipe", "inherit"],
 });
 await new Promise((resolve) => server.stdout.on("data", (d) => String(d).includes("running") && resolve()));
+// Recordings show the demo workspace, so skip the first-visit setup pop-up.
+await fetch(`${B}/api/profile`, { method: "POST", headers: { "Content-Type": "application/json" }, body: JSON.stringify({ mode: "example", reset: true }) });
 
 const browser = await chromium.launch();
 // 1280×720 layout rendered at 1.5× = 1920×1080 pixels: same composition, much sharper text.

@@ -6,6 +6,7 @@
   const MANUAL_MINUTES = 6;
   const MAX_TEXT = 6000;
   const KEY = "sayso_calls";
+  const PROFILE_KEY = "sayso_profile";
   const EDITABLE = new Set([
     "contact_name", "company", "email", "phone", "role", "deal_stage", "deal_value", "summary", "pain_points",
     "next_step", "follow_up_date", "sentiment", "action_items", "follow_up_done", "featured", "followup_subject", "followup_body",
@@ -18,6 +19,10 @@
   let memory = null;
   const read = () => { try { const v = localStorage.getItem(KEY); return v ? JSON.parse(v) : null; } catch { return memory; } };
   const write = (calls) => { memory = calls; try { localStorage.setItem(KEY, JSON.stringify(calls)); } catch {} };
+  let memoryProfile = null;
+  const readProfile = () => { try { const v = localStorage.getItem(PROFILE_KEY); return v ? JSON.parse(v) : null; } catch { return memoryProfile; } };
+  const writeProfile = (p) => { memoryProfile = p; try { localStorage.setItem(PROFILE_KEY, JSON.stringify(p)); } catch {} };
+
   async function calls() {
     let list = read();
     if (!list) { list = (await load("samples")).sampleCalls(); write(list); }
@@ -42,7 +47,14 @@
     const key = `${method} ${path}`;
     const idMatch = path.match(/^\/api\/calls\/([\w-]+)(\/sync)?$/);
 
-    if (key === "GET /api/config") return json(200, { hubspot: false, model: "built-in engine", manual_minutes: MANUAL_MINUTES, public_mode: true, demo_mode: false, can_reset: true, sender_name: "", static: true });
+    if (key === "GET /api/config") return json(200, { profile: readProfile(), can_demo: true, hubspot: false, model: "built-in engine", manual_minutes: MANUAL_MINUTES, public_mode: true, demo_mode: false, can_reset: true, sender_name: "", static: true });
+    if (key === "POST /api/profile") {
+      const profile = (await load("profile")).cleanProfile(body);
+      if (profile.mode === "own" && !profile.company) return fail(400, "Add your company name.");
+      if (body.reset) write(profile.mode === "example" ? (await load("samples")).sampleCalls() : []);
+      writeProfile(profile);
+      return json(200, { profile });
+    }
     if (key === "GET /api/proof") {
       const res = await realFetch("/proof.json").catch(() => null);
       if (res?.ok) return json(200, await res.json());
@@ -51,9 +63,13 @@
     if (key === "POST /api/proof/snapshot") return fail(403, "Snapshots can only be made from your local copy.");
 
     const rules = await load("rules");
-    if (key === "POST /api/extract") { const t = text(body.transcript, "recap"); return task(() => rules.extract(t)); }
+    if (key === "POST /api/extract") { const t = text(body.transcript, "recap"); return task(() => rules.extract(t, undefined, { currency: readProfile()?.currency ?? "₹" })); }
     if (key === "POST /api/revise") { const i = text(body.instruction, "correction", 1000); return task(() => rules.revise(body.record ?? {}, i)); }
-    if (key === "POST /api/followup") return task(() => rules.followup(pick(body.record), String(body.transcript ?? ""), String(body.sender_name ?? "").slice(0, 80)));
+    if (key === "POST /api/followup") {
+      const profile = readProfile();
+      const sender = (await load("profile")).signOff(profile, String(body.sender_name ?? "").slice(0, 80));
+      return task(() => rules.followup(pick(body.record), String(body.transcript ?? ""), sender, { product: profile?.mode === "own" ? profile.product : "" }));
+    }
     if (key === "POST /api/ask") {
       const q = text(body.question, "question", 500);
       const list = await calls();

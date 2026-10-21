@@ -117,6 +117,16 @@ describe("local mode", () => {
     }
   });
 
+  test("your own copy never offers the demo, and company details are used", async () => {
+    assert.equal((await post(`${s.base}/api/profile`, { mode: "example", reset: true })).status, 403);
+    assert.equal((await post(`${s.base}/api/profile`, { mode: "own", company: "" })).status, 400);
+    const { profile } = await post(`${s.base}/api/profile`, { mode: "own", company: "Zeta Software", your_name: "Sam Lee", currency: "$", reset: true }).then((r) => r.json());
+    assert.equal(profile.company, "Zeta Software");
+    const config = await fetch(`${s.base}/api/config`).then((r) => r.json());
+    assert.equal(config.profile.company, "Zeta Software");
+    assert.equal(config.can_demo, false);
+  });
+
   test("real local data can't be reset", async () => {
     assert.equal((await post(`${s.base}/api/reset`, {})).status, 403);
   });
@@ -161,6 +171,16 @@ describe("public mode", () => {
 
   test("restore is blocked on the public demo", async () => {
     assert.equal((await post(`${s.base}/api/restore`, { app: "sayso", calls: [] })).status, 403);
+  });
+
+  test("a visitor can switch between their company and the demo", async () => {
+    const { cookie } = await visitor();
+    const h = { Cookie: cookie };
+    const own = await post(`${s.base}/api/profile`, { mode: "own", company: "Acme Corp", your_name: "Riya", currency: "$", product: "fleet software", reset: true }, h).then((r) => r.json());
+    assert.equal(own.profile.mode, "own");
+    assert.equal((await fetch(`${s.base}/api/calls`, { headers: h }).then((r) => r.json())).calls.length, 0, "own company starts empty");
+    await post(`${s.base}/api/profile`, { mode: "example", reset: true }, h);
+    assert.equal((await fetch(`${s.base}/api/calls`, { headers: h }).then((r) => r.json())).calls.length, 6, "demo brings the example calls back");
   });
 
   test("HubSpot is off and snapshots are blocked", async () => {
@@ -241,6 +261,15 @@ describe("built-in engine (no API key)", () => {
     assert.equal(new Date(r.follow_up_date + "T00:00").getDay(), 4, "Thursday, not Tuesday");
   });
 
+  test("company currency and sign-off are used", async () => {
+    await post(`${s.base}/api/profile`, { mode: "own", company: "Zeta Software", your_name: "Sam Lee", product: "Zeta Dispatch", currency: "$" });
+    const r = (await ndjson(await post(`${s.base}/api/extract`, { transcript: "Call with Priya Nair at Acme Logistics. They lose hours on manual spreadsheets. Budget is about fifty thousand a year." }))).at(-1).data;
+    assert.equal(r.deal_value, "$50,000/yr");
+    const email = (await ndjson(await post(`${s.base}/api/followup`, { record: r, transcript: "" }))).at(-1).data;
+    assert.match(email.body, /Zeta Dispatch helps with/);
+    assert.match(email.body, /Sam Lee\nZeta Software$/);
+  });
+
   test("corrections, unclear corrections, emails and answers", async () => {
     const record = (await ndjson(await post(`${s.base}/api/extract`, { transcript: RECAP }))).at(-1).data;
     const fixed = (await ndjson(await post(`${s.base}/api/revise`, { record, instruction: "The value is five lakh a year" }))).at(-1).data;
@@ -250,7 +279,7 @@ describe("built-in engine (no API key)", () => {
     assert.equal(unclear.type, "error");
     const email = (await ndjson(await post(`${s.base}/api/followup`, { record, transcript: RECAP, sender_name: "Sam" }))).at(-1).data;
     assert.match(email.body, /^Hi Priya,/);
-    assert.match(email.body, /Sam$/);
+    assert.match(email.body, /Sam\nZeta Software$/, "typed name, then the company from the profile");
     await post(`${s.base}/api/calls`, { record, transcript: RECAP });
     const ans = (await ndjson(await post(`${s.base}/api/ask`, { question: "Who should I follow up with this week?" }))).at(-1).data;
     assert.match(ans.answer, /Priya Nair/);

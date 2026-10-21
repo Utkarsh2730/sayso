@@ -160,6 +160,27 @@
   .hist .close { display: flex; gap: 8px; align-items: center; margin-top: 10px; color: var(--muted); cursor: pointer; }
   .hist .close input { width: auto; margin: 0; }
   .carried > :is(input, select, textarea) { border-style: dashed; border-color: rgba(255,138,107,.55); }
+  /* First-visit setup: your company, or the demo */
+  dialog.setup { width: min(860px, calc(100vw - 32px)); padding: 0; border: 1px solid var(--line2); border-radius: 22px; background: var(--panel); color: var(--text); box-shadow: 0 40px 120px -20px rgba(0,0,0,.85); }
+  dialog.setup::backdrop { background: rgba(3,5,8,.78); backdrop-filter: blur(6px); }
+  .setup .sh { padding: 24px 26px 6px; display: flex; justify-content: space-between; align-items: flex-start; gap: 16px; }
+  .setup .sh h2 { margin: 0 0 4px; font-size: 24px; letter-spacing: -.02em; }
+  .setup .sh p { margin: 0; color: var(--muted); }
+  .setup .choices { display: grid; grid-template-columns: 1.25fr 1fr; gap: 14px; padding: 18px 26px 26px; }
+  .setup .choices.single { grid-template-columns: 1fr; }
+  @media (max-width: 720px) { .setup .choices { grid-template-columns: 1fr; } }
+  .setup .choice { border: 1px solid var(--line); border-radius: 16px; padding: 18px; background: var(--card); display: flex; flex-direction: column; gap: 12px; }
+  .setup .choice.main { border-color: rgba(200,242,90,.35); background: linear-gradient(180deg, rgba(200,242,90,.06), rgba(255,255,255,.02)); }
+  .setup .choice h3 { margin: 0; font-size: 16px; }
+  .setup .choice p { margin: 0; color: var(--muted); font-size: 13.5px; }
+  .setup label { display: block; font: 10.5px var(--mono); color: var(--dim); text-transform: uppercase; letter-spacing: .08em; }
+  .setup label > :is(input, select) { margin-top: 5px; font: 14px var(--sans); text-transform: none; letter-spacing: normal; }
+  .setup .two { display: grid; grid-template-columns: 1fr 1fr; gap: 10px; }
+  .setup .choice .btn { align-self: flex-start; margin-top: auto; }
+  .setup .ex { list-style: none; margin: 0; padding: 0; display: grid; gap: 6px; font-size: 13.5px; color: #c3cbd4; }
+  .setup .ex li::before { content: "✓ "; color: var(--brand); }
+  #wsBtn { max-width: 220px; overflow: hidden; text-overflow: ellipsis; }
+  #wsBtn b { color: var(--brand); font-weight: 600; }
   .email { margin-top: 16px; border: 1px solid var(--line); border-radius: 14px; padding: 14px; background: rgba(0,0,0,.2); }
   .email h3 { margin: 0 0 10px; font: 500 11px var(--mono); letter-spacing: .12em; text-transform: uppercase; color: var(--brand); display: flex; justify-content: space-between; align-items: center; gap: 10px; }
   .email textarea { min-height: 170px; margin-top: 8px; line-height: 1.55; }
@@ -226,6 +247,7 @@
     <a class="logo" href="/"><i><svg viewBox="0 0 24 24" fill="none" stroke="#06080b" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"><path d="M4 6.5A2.5 2.5 0 0 1 6.5 4h11A2.5 2.5 0 0 1 20 6.5v8a2.5 2.5 0 0 1-2.5 2.5H11l-4.5 3.5V17A2.5 2.5 0 0 1 4 14.5z"/><path d="M9.5 9v3M12 7.5v6M14.5 9v3"/></svg></i>Sayso</a>
     <nav><a class="cur" href="/app">App</a><a href="/proof">Proof</a></nav>
     <span class="sp"></span>
+    <button class="btn sm" id="wsBtn" title="Workspace: your company details, or the demo">Workspace</button>
     <span class="chip model" id="modelChip">claude</span>
     <span class="chip hs" id="hsChip">HubSpot off</span>
     <a class="btn sm" href="/api/backup.json" title="Download every call as a backup file">Backup</a>
@@ -294,6 +316,31 @@
     </section>
   </div>
 </main>
+<dialog class="setup" id="setup" aria-labelledby="setupTitle">
+  <div class="sh">
+    <div><h2 id="setupTitle">Welcome to Sayso</h2><p id="setupSub">Set up your company to log your own calls, or explore the demo first.</p></div>
+    <button class="link" id="setupClose" aria-label="Close" style="font-size:20px">✕</button>
+  </div>
+  <div class="choices" id="choices">
+    <form class="choice main" id="ownForm">
+      <h3>Set up my company</h3>
+      <p id="ownNote">Starts an empty workspace for your own calls. Follow-up emails are signed with your name and company.</p>
+      <label>Company name<input id="pCompany" required maxlength="80" placeholder="e.g. Zeta Software" autocomplete="organization"></label>
+      <div class="two">
+        <label>Your name<input id="pName" maxlength="80" placeholder="e.g. Sam Lee" autocomplete="name"></label>
+        <label>Currency<select id="pCurrency"><option value="₹">₹ Rupee</option><option value="$">$ Dollar</option><option value="€">€ Euro</option><option value="£">£ Pound</option></select></label>
+      </div>
+      <label>What you sell<input id="pProduct" maxlength="120" placeholder="e.g. dispatch software for logistics teams"></label>
+      <button class="btn primary" type="submit" id="ownBtn">Start with my company</button>
+    </form>
+    <div class="choice" id="demoChoice">
+      <h3>Explore the demo</h3>
+      <p>A ready-made workspace, nothing to set up.</p>
+      <ul class="ex"><li>6 example calls across every deal stage</li><li>Contact history and follow-ups due</li><li>Ask your pipeline with citations</li></ul>
+      <button class="btn" type="button" id="demoBtn">Open the demo</button>
+    </div>
+  </div>
+</dialog>
 <div class="toast" id="toast" role="status" aria-live="polite"></div>
 
 <script>
@@ -1040,16 +1087,71 @@ $("restoreFile").addEventListener("change", async (e) => {
 let searchTimer;
 $("search").addEventListener("input", () => { clearTimeout(searchTimer); searchTimer = setTimeout(renderCalls, 80); });
 
+// ---------- Workspace: your company, or the demo ----------
+function renderWorkspace() {
+  const p = state.profile;
+  $("wsBtn").innerHTML = p?.mode === "own" ? `🏢 <b>${esc(p.company)}</b>` : p?.mode === "example" ? "Demo workspace" : "Workspace";
+}
+function openSetup() {
+  const p = state.profile, first = !p, canDemo = state.config.can_demo;
+  $("setupTitle").textContent = first ? "Welcome to Sayso" : "Your workspace";
+  $("setupSub").textContent = canDemo ? (first ? "Set up your company to log your own calls, or explore the demo first." : "Edit your company details, or switch between your company and the demo.") : "Tell Sayso about your company. Follow-up emails are signed with these details.";
+  $("demoChoice").hidden = !canDemo;
+  $("choices").classList.toggle("single", !canDemo);
+  $("pCompany").value = p?.mode === "own" ? p.company : "";
+  $("pName").value = p?.your_name || state.sender || "";
+  $("pProduct").value = p?.mode === "own" ? p.product : "";
+  $("pCurrency").value = p?.currency || "₹";
+  const editing = p?.mode === "own";
+  $("ownBtn").textContent = editing ? "Save company details" : "Start with my company";
+  $("ownNote").textContent = editing ? "Your calls stay as they are." : canDemo ? "Starts an empty workspace for your own calls. Follow-up emails are signed with your name and company." : "Follow-up emails are signed with your name and company, and amounts default to your currency.";
+  $("demoBtn").textContent = p?.mode === "example" ? "Keep exploring the demo" : "Open the demo";
+  $("setup").showModal();
+  if (!editing) $("pCompany").focus();
+}
+async function saveProfile(body) {
+  const { profile } = await api("/api/profile", { method: "POST", body: JSON.stringify(body) });
+  state.profile = profile;
+  if (profile.your_name) { state.sender = profile.your_name; store.set("sayso_sender", profile.your_name); }
+  renderWorkspace();
+  $("setup").close();
+  discard();
+  await refresh();
+  return profile;
+}
+$("ownForm").addEventListener("submit", async (e) => {
+  e.preventDefault();
+  const wasOwn = state.profile?.mode === "own";
+  try {
+    await saveProfile({ mode: "own", company: $("pCompany").value, your_name: $("pName").value, product: $("pProduct").value, currency: $("pCurrency").value, reset: !wasOwn && state.config.can_demo });
+    toast(wasOwn ? "Company details saved" : `Workspace ready for ${state.profile.company}`);
+  } catch (err) { toast(err.message); }
+});
+$("demoBtn").onclick = async () => {
+  if (state.profile?.mode === "example") return $("setup").close();
+  const own = state.calls.filter((c) => !c.is_sample).length;
+  if (own && !confirm(`Switch to the demo? Its example calls replace the ${own} call${own === 1 ? "" : "s"} in this browser's workspace.`)) return;
+  try { await saveProfile({ mode: "example", reset: true }); toast("Demo workspace with example calls"); } catch (err) { toast(err.message); }
+};
+$("setupClose").onclick = () => $("setup").close();
+// Closing the first-visit pop-up without choosing means "just look around": the demo, where it's available.
+$("setup").addEventListener("close", () => {
+  if (!state.profile && state.config.can_demo) saveProfile({ mode: "example", reset: false }).catch(() => {});
+});
+$("wsBtn").onclick = openSetup;
+
 // ---------- Boot: config first (decides which stats to show), then data ----------
 api("/api/config").then((c) => {
   state.config = c;
-  state.sender = store.get("sayso_sender") ?? c.sender_name ?? "";
+  state.profile = c.profile ?? null;
+  state.sender = store.get("sayso_sender") ?? c.profile?.your_name ?? c.sender_name ?? "";
+  renderWorkspace();
   $("modelChip").textContent = c.model;
   $("hsChip").textContent = c.hubspot ? "HubSpot connected" : "HubSpot off";
   $("hsChip").classList.toggle("on", c.hubspot);
   $("restoreBtn").hidden = c.public_mode;
   micIdle();
-}).then(refresh).catch((err) => toast(err.message));
+}).then(refresh).then(() => { if (!state.profile) openSetup(); }).catch((err) => toast(err.message));
 
 </script>
 </body>

@@ -13,7 +13,7 @@ fixes it by voice, drafts the follow-up email, and answers questions about your 
 ![Wispr Flow](https://img.shields.io/badge/Wispr%20Flow-hands--free%20input-ff8a6b)
 ![API key](https://img.shields.io/badge/API%20key-not%20needed-c8f25a)
 ![Live](https://img.shields.io/badge/live-sayso--xi.vercel.app-c8f25a)
-![Tests](https://img.shields.io/badge/tests-34%20passing-3f9d78)
+![Tests](https://img.shields.io/badge/tests-37%20passing-3f9d78)
 ![Licence](https://img.shields.io/badge/licence-MIT-64748b)
 
 **WeMakeDevs × Wispr Flow · No Hands: The Wispr Challenge · Builders track**
@@ -28,7 +28,7 @@ fixes it by voice, drafts the follow-up email, and answers questions about your 
 
 **Watch:** [60-second product tour](public/media/sayso-tour.webm), captioned and recorded straight from the app.
 
-**Try it live:** **https://sayso-xi.vercel.app** → **Open app**. No sign-in, no API key: every visitor gets a private workspace with 6 example calls. Suggested path (about 2 minutes):
+**Try it live:** **https://sayso-xi.vercel.app** → **Open app**. No sign-in, no API key. A pop-up asks how to start: **Open the demo** (6 example calls) or **Set up my company** (an empty workspace with your company name, your name, what you sell and your currency). Suggested path with the demo (about 2 minutes):
 1. Click **Try an example** and watch the record fill in. It's a second call with Priya, so you'll see her history and her phone number carried over.
 2. In the correction bar, say or type **"change the stage to proposal"**, then **"write the follow-up"**, then **"save"**.
 3. In **Ask your pipeline**, click **"Who should I follow up with this week?"**, then click a citation to jump to the call.
@@ -77,6 +77,11 @@ Sayso replaces the form with your voice. You talk; it writes the record.
 - **Voice corrections** change only the field you name.
 - **Voice commands:** "save", "discard", "write the follow-up".
 - **A floating action bar** keeps the correction input and Save in view while you review.
+
+**Your company, or the demo**
+- **First-visit choice.** Set up your company (company name, your name, what you sell, currency) to log your own calls, or explore the demo's example calls. Switch any time from the workspace button in the header.
+- **Your details are used.** Follow-up emails are signed with your name and company and mention what you sell; amounts without a currency use yours ("forty thousand a year" → `$40,000/yr`), while "four lakh" stays in rupees.
+- **Safe on your own copy.** Locally, Sayso only offers company setup, so example calls can never replace your real call log.
 
 **Pipeline**
 - **Contact history.** A recap about someone you've spoken to before shows "2nd call with Priya", fills in details you didn't repeat (email, phone, company, role) from the last call, and offers to mark the earlier follow-up done, since this call *is* that follow-up.
@@ -216,7 +221,7 @@ For HubSpot sync and optional Claude: on [Render](https://dashboard.render.com) 
 
 | Check | Result |
 |---|---|
-| Automated tests (`npm test`) | **34 passing**: the built-in engine on realistic recaps (lakh/crore/dollar amounts, spoken emails and phone numbers, "no wait" corrections, stages, departments vs companies), streaming extraction, corrections, follow-up emails, cited answers, workspace isolation, usage caps, reset rules, backup/restore, proof privacy scrubbing, CSV formula safety, partial-JSON parsing, page caching, and recovery when the API rejects the refusal-fallback beta. Runs the real server against a mocked Claude, so no key is needed. |
+| Automated tests (`npm test`) | **37 passing**: company setup vs demo, currency defaults and sign-off, the built-in engine on realistic recaps (lakh/crore/dollar amounts, spoken emails and phone numbers, "no wait" corrections, stages, departments vs companies), streaming extraction, corrections, follow-up emails, cited answers, workspace isolation, usage caps, reset rules, backup/restore, proof privacy scrubbing, CSV formula safety, partial-JSON parsing, page caching, and recovery when the API rejects the refusal-fallback beta. Runs the real server against a mocked Claude, so no key is needed. |
 | Judge walkthrough | Run against the live site in a fresh, signed-out browser: landing → tour video → app → example recap → correction → follow-up email → save → reload (calls kept) → Ask with citations → CSV and backup downloads → proof. Passes on desktop and phone with no page errors, failed requests or sideways scrolling. |
 | Wispr Flow input | Dictation inserted as a paste, a long insert or text set through accessibility is detected and auto-extracted; typing by hand is not. |
 | Speed | The built-in engine fills a record in about 0.03 s; saves are instant; pages are single files with no framework, served from Vercel's CDN. |
@@ -238,7 +243,7 @@ For HubSpot sync and optional Claude: on [Render](https://dashboard.render.com) 
 | `lib/extract.js` · `lib/claude.js` | Engine switch, Claude prompts and schemas · streaming structured-output helper |
 | `lib/partial-json.js` | Parses incomplete JSON while it streams |
 | `lib/store.js` · `lib/proof.js` | Workspace store · proof snapshot files |
-| `lib/stats.js` · `lib/csv.js` | Stats, proof data and contact scrubbing · CSV export (shared by server and browser) |
+| `lib/stats.js` · `lib/csv.js` · `lib/profile.js` | Stats, proof data and contact scrubbing · CSV export · company profile and email sign-off (shared by server and browser) |
 | `lib/hubspot.js` · `lib/limits.js` · `lib/samples.js` | HubSpot sync · usage caps · example calls |
 | `public/` | Landing page, app, proof page, `static-api.js` (in-browser API for the live site) and `media/` |
 | `scripts/` | `try.js` (example calls), `build-static.mjs` (live site), video recorders, doctor, Claude mock for tests |

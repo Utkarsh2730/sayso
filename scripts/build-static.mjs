@@ -21,7 +21,7 @@ for (const page of ["index.html", "app.html", "proof.html"]) {
 }
 cpSync(path.join(ROOT, "public", "static-api.js"), path.join(OUT, "static-api.js"));
 cpSync(path.join(ROOT, "public", "media"), path.join(OUT, "media"), { recursive: true });
-for (const mod of ["rules", "stats", "samples", "csv"]) cpSync(path.join(ROOT, "lib", `${mod}.js`), path.join(OUT, "lib", `${mod}.js`));
+for (const mod of ["rules", "stats", "samples", "csv", "profile"]) cpSync(path.join(ROOT, "lib", `${mod}.js`), path.join(OUT, "lib", `${mod}.js`));
 const proof = path.join(ROOT, "data", "proof.json");
 if (existsSync(proof)) cpSync(proof, path.join(OUT, "proof.json"));
 

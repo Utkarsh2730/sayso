@@ -9,6 +9,7 @@ import { extractCall, reviseCall, draftFollowup, askPipeline, warmUp, engineName
 import { workspace, isWorkspaceId, flush, pruneWorkspaces, toCsv } from "./lib/store.js";
 import { syncToHubSpot } from "./lib/hubspot.js";
 import { sampleCalls } from "./lib/samples.js";
+import { cleanProfile, signOff } from "./lib/profile.js";
 import { allowAiCall } from "./lib/limits.js";
 import { stats, buildProof, readProofSnapshot, writeProofSnapshot } from "./lib/proof.js";
 
@@ -185,11 +186,13 @@ async function route(req, res, url) {
   const idMatch = url.pathname.match(/^\/api\/calls\/([\w-]+)(\/sync)?$/);
 
   if (key === "GET /api/config") {
-    return json(res, 200, { hubspot: Boolean(HUBSPOT_TOKEN), model: engineName(), manual_minutes: MANUAL_MINUTES, public_mode: PUBLIC, demo_mode: DEMO, can_reset: PUBLIC || DEMO, sender_name: SENDER_NAME });
+    const profile = await ws.getProfile();
+    return json(res, 200, { profile, can_demo: PUBLIC || DEMO, hubspot: Boolean(HUBSPOT_TOKEN), model: engineName(), manual_minutes: MANUAL_MINUTES, public_mode: PUBLIC, demo_mode: DEMO, can_reset: PUBLIC || DEMO, sender_name: SENDER_NAME });
   }
   if (key === "POST /api/extract") {
     const transcript = text((await readBody(req)).transcript, "recap");
-    return streamTask(req, res, ctx, (opts) => extractCall(transcript, opts));
+    const currency = (await ws.getProfile())?.currency ?? "₹";
+    return streamTask(req, res, ctx, (opts) => extractCall(transcript, { ...opts, currency }));
   }
   if (key === "POST /api/revise") {
     const body = await readBody(req);
@@ -201,8 +204,9 @@ async function route(req, res, url) {
     const body = await readBody(req);
     if (!body.record || typeof body.record !== "object") throw httpError(400, "Missing record.");
     const transcript = typeof body.transcript === "string" ? body.transcript.slice(0, MAX_TEXT) : "";
-    const sender = String(body.sender_name || SENDER_NAME).slice(0, 80);
-    return streamTask(req, res, ctx, (opts) => draftFollowup(pick(body.record), transcript, sender, opts));
+    const profile = await ws.getProfile();
+    const sender = signOff(profile, String(body.sender_name || SENDER_NAME).slice(0, 80));
+    return streamTask(req, res, ctx, (opts) => draftFollowup(pick(body.record), transcript, sender, { ...opts, product: profile?.mode === "own" ? profile.product : "" }));
   }
 
   if (key === "POST /api/ask") {
@@ -218,6 +222,17 @@ async function route(req, res, url) {
       );
       return { ...result, refs, searched: Math.min(calls.length, 200) };
     });
+  }
+  // First-visit choice: set up your own company (start empty) or explore the demo (example calls). On your own
+  // local copy the demo is never offered, so example calls can't replace a real call log.
+  if (key === "POST /api/profile") {
+    const body = await readBody(req);
+    const profile = cleanProfile(body);
+    const canDemo = PUBLIC || DEMO;
+    if (profile.mode === "example" && !canDemo) throw httpError(403, "The demo isn't available on your own copy. Run npm run try to explore it.");
+    if (profile.mode === "own" && !profile.company) throw httpError(400, "Add your company name.");
+    if (body.reset && canDemo) await ws.replaceCalls(profile.mode === "example" ? sampleCalls() : []);
+    return json(res, 200, { profile: await ws.setProfile(profile) });
   }
   if (key === "POST /api/reset") {
     if (!PUBLIC && !DEMO) throw httpError(403, "Your real call log can't be reset from the app.");
