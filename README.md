@@ -28,7 +28,7 @@ fixes it by voice, drafts the follow-up email, and answers questions about your 
 
 ## For judges
 
-**Watch:** [demo video, 1:45](docs/debrief-demo.webm) · [60-second product tour](public/media/debrief-tour.webm) (both captioned, recorded from the app on sample data).
+**Watch:** [demo video, 1:39, 1080p](docs/debrief-demo.webm) · [60-second product tour](public/media/debrief-tour.webm) (both captioned, recorded from the app on sample data).
 
 **Try it live:** _add Render URL_. No sign-in: every visitor gets a private workspace with 6 sample calls. Suggested path:
 1. **Try a sample recap** and watch the fields fill in while Claude writes. It's a second call with Priya, so you'll see her history and her phone number carried over.
@@ -98,7 +98,7 @@ Debrief replaces the form with your voice. You talk; it writes the record.
 | Does it solve a real problem in your work? | Built for the author's own post-call admin; `/proof` shows real calls, minutes saved and field completeness. |
 | Was Wispr used meaningfully? | Built by dictating to an AI coding tool with Wispr Flow, and Wispr Flow is the product's main input (see below). |
 | Does it work? | A live link that opens without sign-in, with a private sample workspace per visitor and usage caps. |
-| Is the demo clear? | A 1:45 captioned demo video plus a 60-second tour, both recorded straight from the app by script (`npm run record:demo`). |
+| Is the demo clear? | A 1:39 captioned 1080p demo video plus a 60-second tour, both recorded straight from the app by script (`npm run record:demo`). |
 
 ## How Wispr Flow is used
 
