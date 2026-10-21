@@ -186,11 +186,13 @@ npm start             # http://localhost:3000, your real call log
 npm run doctor        # checks your setup and prints the fix for anything wrong
 ```
 
-### Deploy (Render, free)
-1. Push this repo to GitHub.
-2. On [Render](https://dashboard.render.com): **New → Blueprint →** pick the repo (`render.yaml` is included).
-3. Deploy. No keys needed; optionally set `ANTHROPIC_API_KEY` to use Claude.
-4. To show real results on the hosted `/proof`: on your local copy open `/proof` → **Publish proof snapshot**, commit `data/proof.json`, push.
+### Deploy on Vercel (static, free)
+The online demo needs no server: `npm run build:static` builds `dist/`, where `public/static-api.js` answers the app's `/api` calls in the browser with the built-in engine, and each visitor's calls stay in their own browser (seeded with the sample calls).
+1. On [Vercel](https://vercel.com/new): **Import** this GitHub repo. `vercel.json` sets the build; no settings or keys needed.
+2. To show your real results on `/proof`: on your local copy open `/proof` → **Publish proof snapshot**, commit `data/proof.json`, push. Vercel redeploys.
+
+### Deploy the full server (Render, free)
+For HubSpot sync and optional Claude: on [Render](https://dashboard.render.com) choose **New → Blueprint** and pick this repo (`render.yaml` is included). No keys needed.
 
 ### Configuration
 
@@ -230,8 +232,8 @@ npm run doctor        # checks your setup and prints the fix for anything wrong
 | `lib/partial-json.js` | Parses incomplete JSON while it streams |
 | `lib/store.js` · `lib/proof.js` | Workspace store and CSV · stats, proof data, scrubbing |
 | `lib/hubspot.js` · `lib/limits.js` · `lib/samples.js` | HubSpot sync · usage caps · sample calls |
-| `public/` | Landing page, app, proof page and `media/` (tour video, screenshots) |
-| `scripts/` | Demo mode, Claude mock (tests), video recorders, doctor |
+| `public/` | Landing page, app, proof page, `static-api.js` (in-browser API for the static build) and `media/` |
+| `scripts/` | Demo mode, static build, Claude mock (tests), video recorders, doctor |
 | `test/` | Unit and end-to-end tests |
 
 ## Limitations and roadmap
