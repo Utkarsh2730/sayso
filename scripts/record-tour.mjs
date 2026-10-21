@@ -3,10 +3,11 @@
  *
  *   npm run record:tour
  *
- * Starts Debrief in demo mode (mock Claude, sample data, throwaway data file), drives it with Playwright
+ * Starts Sayso in demo mode (built-in engine, sample data, throwaway data file), drives it with Playwright
  * (visible cursor + captions) and writes to public/media/:
- *   debrief-tour.webm   the tour video          tour-poster.jpg  its poster frame
- *   app-review.jpg      record + email          app-ask.jpg      Ask your pipeline
+ *   sayso-tour.webm   the tour video          tour-poster.jpg  its poster frame
+ *   app-review.jpg      record            app-dictate.jpg  Wispr Flow dictation
+ *   app-email.jpg       correction + email         app-ask.jpg      Ask your pipeline
  *   proof.jpg           proof page              og.png           1200×630 link-preview image
  * Needs Playwright's Chromium (`npx playwright install chromium` if it isn't cached yet).
  */
@@ -20,10 +21,10 @@ const ROOT = path.join(import.meta.dirname, "..");
 const MEDIA = path.join(ROOT, "public", "media");
 const PORT = 4400;
 const B = `http://localhost:${PORT}`;
-const work = mkdtempSync(path.join(tmpdir(), "debrief-tour-"));
+const work = mkdtempSync(path.join(tmpdir(), "sayso-tour-"));
 mkdirSync(MEDIA, { recursive: true });
 
-console.log("Starting Debrief in demo mode…");
+console.log("Starting Sayso in demo mode…");
 const server = spawn(process.execPath, ["scripts/demo.js"], {
   cwd: ROOT, env: { ...process.env, PORT: String(PORT), CRM_FILE: path.join(work, "tour.json") }, stdio: ["ignore", "pipe", "inherit"],
 });
@@ -38,16 +39,17 @@ const SIZE = { width: 1280, height: 720 };
   const page = await ctx.newPage();
   await ctx.addInitScript(() => addEventListener("DOMContentLoaded", () => {
     const st = document.createElement("style");
-    // Timings come from the mock Claude and would overstate real speed, so they're hidden in recordings.
-    st.textContent = "#banner{display:none!important} .rv{opacity:1!important;transform:none!important} .timing{visibility:hidden!important} header,.actions,.grid>.panel{position:static!important}";
+    st.textContent = "#banner{display:none!important} .rv{opacity:1!important;transform:none!important} header,.actions,.grid>.panel{position:static!important}";
     document.head.appendChild(st);
   }));
 
   await page.goto(`${B}/app`, { waitUntil: "networkidle" });
-  // Mid-stream: some fields filled, the rest still loading.
-  await page.getByRole("button", { name: "Try a sample recap" }).click();
-  await page.waitForFunction(() => document.querySelector('[data-k="deal_value"]')?.value && document.querySelectorAll("#review label.pending").length >= 3);
-  await page.locator(".grid").screenshot({ path: path.join(MEDIA, "app-stream.jpg"), type: "jpeg", quality: 82 });
+  // Dictation: the recap arrives in whole phrases, the way Wispr Flow types, and the Wispr bar lights up.
+  await page.locator("#transcript").click();
+  for (const phrase of (await page.evaluate(() => SAMPLE)).match(/[^,.]+[,.]?/g)) await page.keyboard.insertText(phrase);
+  await page.waitForFunction(() => document.getElementById("wfBar").classList.contains("hit"));
+  await page.locator(".grid").screenshot({ path: path.join(MEDIA, "app-dictate.jpg"), type: "jpeg", quality: 82 });
+  await page.getByRole("button", { name: "Extract CRM fields" }).click();
   await page.waitForFunction(() => document.getElementById("liveTag").textContent.includes("ready"));
   await page.evaluate(() => scrollTo(0, 0));
   await page.waitForTimeout(800); // let the field highlight fade
@@ -91,14 +93,14 @@ await fetch(`${B}/api/reset`, { method: "POST" });
 const ctx = await browser.newContext({ viewport: SIZE, recordVideo: { dir: work, size: SIZE } });
 await ctx.addInitScript(() => {
   const css = `
-    #banner{display:none!important} .rv{opacity:1!important;transform:none!important} .timing{visibility:hidden!important}
+    #banner{display:none!important} .rv{opacity:1!important;transform:none!important}
     #tour-cap{position:fixed;left:50%;bottom:26px;transform:translateX(-50%);z-index:99999;max-width:1180px;width:max-content;
-      display:flex;align-items:center;gap:14px;padding:14px 24px;border-radius:18px;background:rgba(6,8,11,.92);border:1px solid rgba(94,234,212,.35);
+      display:flex;align-items:center;gap:14px;padding:14px 24px;border-radius:18px;background:rgba(6,8,11,.92);border:1px solid rgba(200,242,90,.35);
       color:#eef2f5;font:650 27px/1.25 ui-sans-serif,-apple-system,"Segoe UI",Roboto,sans-serif;box-shadow:0 14px 40px rgba(0,0,0,.5)}
-    #tour-cap b{flex:none;display:inline-flex;align-items:center;justify-content:center;min-width:40px;height:40px;padding:0 10px;border-radius:12px;background:#5eead4;color:#04110f;font-size:21px}
+    #tour-cap b{flex:none;display:inline-flex;align-items:center;justify-content:center;min-width:40px;height:40px;padding:0 10px;border-radius:12px;background:#c8f25a;color:#151b04;font-size:21px}
     #tour-cur{position:fixed;z-index:100000;width:22px;height:22px;margin:-11px 0 0 -11px;border-radius:50%;
-      background:rgba(94,234,212,.3);border:2px solid #5eead4;pointer-events:none;transition:transform .12s}
-    #tour-cur.down{transform:scale(.6);background:rgba(94,234,212,.7)}`;
+      background:rgba(200,242,90,.3);border:2px solid #c8f25a;pointer-events:none;transition:transform .12s}
+    #tour-cur.down{transform:scale(.6);background:rgba(200,242,90,.7)}`;
   const mount = () => {
     if (document.getElementById("tour-cur")) return;
     const st = document.createElement("style"); st.textContent = css; document.head.appendChild(st);
@@ -148,7 +150,7 @@ for (const phrase of RECAP.match(/[^,.]+[,.]?/g)) {
 await sleep(700);
 
 // 2 · streaming extraction
-await cap("2", "Claude fills in the CRM record while it's still writing.");
+await cap("2", "Sayso fills in the whole CRM record in a moment.");
 await click(page.getByRole("button", { name: "Extract CRM fields" }));
 await page.waitForFunction(() => document.getElementById("liveTag").textContent.includes("ready"));
 await sleep(1800);
@@ -195,7 +197,7 @@ await sleep(3500);
 
 const video = page.video();
 await ctx.close();
-renameSync(await video.path(), path.join(MEDIA, "debrief-tour.webm"));
+renameSync(await video.path(), path.join(MEDIA, "sayso-tour.webm"));
 
 // poster: the record mid-review, from the still screenshots context
 {
@@ -215,13 +217,13 @@ function card(title, accent, foot) {
   return `<!doctype html><html><head><meta charset="utf-8"><style>
     body{margin:0;height:100vh;display:flex;flex-direction:column;align-items:center;justify-content:center;gap:18px;
     font-family:ui-sans-serif,-apple-system,"Segoe UI",Roboto,sans-serif;color:#eef2f5;
-    background:radial-gradient(600px 380px at 25% 25%,rgba(94,234,212,.18),transparent 70%),radial-gradient(520px 360px at 80% 20%,rgba(167,139,250,.16),transparent 70%),#06080b}
+    background:radial-gradient(600px 380px at 25% 25%,rgba(200,242,90,.18),transparent 70%),radial-gradient(520px 360px at 80% 20%,rgba(255,138,107,.16),transparent 70%),#06080b}
     .logo{display:flex;align-items:center;gap:12px;font-size:28px;font-weight:700}
-    .logo i{width:40px;height:40px;border-radius:11px;background:#5eead4;display:grid;place-items:center}
+    .logo i{width:40px;height:40px;border-radius:11px;background:#c8f25a;display:grid;place-items:center}
     h1{margin:0;font-size:72px;letter-spacing:-2px;text-align:center;line-height:1.05}
-    h1 span{display:block;background:linear-gradient(100deg,#5eead4 10%,#22d3ee 45%,#a78bfa 90%);-webkit-background-clip:text;background-clip:text;color:transparent}
+    h1 span{display:block;background:linear-gradient(100deg,#c8f25a 10%,#f9d65c 45%,#ff8a6b 90%);-webkit-background-clip:text;background-clip:text;color:transparent}
     .foot{margin-top:14px;font:500 20px ui-monospace,Menlo,monospace;color:#8b95a1}
-    </style></head><body><div class="logo"><i><svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="#06080b" stroke-width="2.6" stroke-linecap="round"><path d="M5 10v4M9 6v12M13 8v8M17 11v2M21 9v6"/></svg></i>Debrief</div>
+    </style></head><body><div class="logo"><i><svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="#06080b" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"><path d="M4 6.5A2.5 2.5 0 0 1 6.5 4h11A2.5 2.5 0 0 1 20 6.5v8a2.5 2.5 0 0 1-2.5 2.5H11l-4.5 3.5V17A2.5 2.5 0 0 1 4 14.5z"/><path d="M9.5 9v3M12 7.5v6M14.5 9v3"/></svg></i>Sayso</div>
     <h1>${title}<span>${accent}</span></h1><div class="foot">${foot}</div></body></html>`;
 }
 

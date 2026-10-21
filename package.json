@@ -1,5 +1,5 @@
 {
-  "name": "debrief",
+  "name": "sayso",
   "version": "0.1.0",
   "description": "Talk for 30 seconds after a sales call. Your CRM updates itself.",
   "type": "module",

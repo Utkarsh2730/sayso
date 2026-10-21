@@ -12,7 +12,7 @@ before(async () => { mock = await startMock(); });
 after(() => mock.close());
 
 async function startApp(port, env = {}) {
-  const dir = mkdtempSync(path.join(tmpdir(), "debrief-"));
+  const dir = mkdtempSync(path.join(tmpdir(), "sayso-"));
   const app = spawn(process.execPath, ["server.js"], {
     cwd: path.join(import.meta.dirname, ".."),
     env: {
@@ -92,7 +92,7 @@ describe("local mode", () => {
   test("backup and restore round-trip without duplicates", async () => {
     await post(`${s.base}/api/calls`, { record: MOCK_RECORD, transcript: "backup me" });
     const backup = await fetch(`${s.base}/api/backup.json`).then((r) => r.json());
-    assert.equal(backup.app, "debrief");
+    assert.equal(backup.app, "sayso");
     assert.ok(backup.calls.length >= 1);
     const again = await post(`${s.base}/api/restore`, backup).then((r) => r.json());
     assert.equal(again.added, 0, "restoring the same backup adds nothing");
@@ -160,7 +160,7 @@ describe("public mode", () => {
   });
 
   test("restore is blocked on the public demo", async () => {
-    assert.equal((await post(`${s.base}/api/restore`, { app: "debrief", calls: [] })).status, 403);
+    assert.equal((await post(`${s.base}/api/restore`, { app: "sayso", calls: [] })).status, 403);
   });
 
   test("HubSpot is off and snapshots are blocked", async () => {
@@ -215,5 +215,45 @@ describe("API compatibility", () => {
     const lines = await ndjson(await post(`${s.base}/api/extract`, { transcript: "recap" }));
     assert.equal(lines.at(-1).type, "done");
     assert.deepEqual(lines.at(-1).data, MOCK_RECORD);
+  });
+});
+
+describe("built-in engine (no API key)", () => {
+  let s;
+  before(async () => { s = await startApp(3994, { ANTHROPIC_API_KEY: "", ANTHROPIC_BASE_URL: "" }); });
+  after(() => s.app.kill());
+  const RECAP = "Just got off a call with Priya Nair, she's head of ops at Acme Logistics. Her email is priya at acme logistics dot in. Budget is roughly four lakh rupees a year. She wants a demo for her three team leads. I'll send the invite today and follow up Tuesday, no wait, Thursday.";
+
+  test("config reports the built-in engine", async () => {
+    assert.equal((await fetch(`${s.base}/api/config`).then((r) => r.json())).model, "built-in engine");
+  });
+
+  test("extracts a real record from a recap", async () => {
+    const done = (await ndjson(await post(`${s.base}/api/extract`, { transcript: RECAP }))).at(-1);
+    assert.equal(done.type, "done");
+    const r = done.data;
+    assert.equal(r.contact_name, "Priya Nair");
+    assert.equal(r.company, "Acme Logistics");
+    assert.equal(r.email, "priya@acmelogistics.in");
+    assert.equal(r.role, "Head of Ops");
+    assert.equal(r.deal_value, "₹4,00,000/yr");
+    assert.equal(r.deal_stage, "demo");
+    assert.equal(new Date(r.follow_up_date + "T00:00").getDay(), 4, "Thursday, not Tuesday");
+  });
+
+  test("corrections, unclear corrections, emails and answers", async () => {
+    const record = (await ndjson(await post(`${s.base}/api/extract`, { transcript: RECAP }))).at(-1).data;
+    const fixed = (await ndjson(await post(`${s.base}/api/revise`, { record, instruction: "The value is five lakh a year" }))).at(-1).data;
+    assert.equal(fixed.deal_value, "₹5,00,000/yr");
+    assert.equal(fixed.email, record.email);
+    const unclear = (await ndjson(await post(`${s.base}/api/revise`, { record, instruction: "hmm okay" }))).at(-1);
+    assert.equal(unclear.type, "error");
+    const email = (await ndjson(await post(`${s.base}/api/followup`, { record, transcript: RECAP, sender_name: "Sam" }))).at(-1).data;
+    assert.match(email.body, /^Hi Priya,/);
+    assert.match(email.body, /Sam$/);
+    await post(`${s.base}/api/calls`, { record, transcript: RECAP });
+    const ans = (await ndjson(await post(`${s.base}/api/ask`, { question: "Who should I follow up with this week?" }))).at(-1).data;
+    assert.match(ans.answer, /Priya Nair/);
+    assert.equal(Object.keys(ans.refs).length, 1);
   });
 });

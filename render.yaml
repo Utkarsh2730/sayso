@@ -1,7 +1,8 @@
-# One-click deploy on Render (render.com): New > Blueprint > pick this repo.
+# One-click deploy on Render (render.com): New > Blueprint > pick this repo. No keys needed.
+# Optional: add ANTHROPIC_API_KEY in the dashboard to use Claude instead of the built-in engine.
 services:
   - type: web
-    name: debrief
+    name: sayso
     runtime: node
     plan: free
     buildCommand: npm ci --omit=dev
@@ -10,8 +11,6 @@ services:
     envVars:
       - key: PUBLIC_MODE
         value: "1"
-      - key: ANTHROPIC_API_KEY
-        sync: false   # set in the Render dashboard; never commit it
       - key: NODE_VERSION
         value: "22"
       - key: LIMIT_PER_WORKSPACE

@@ -1,9 +1,9 @@
 /**
  * Records the ~2-minute captioned demo video for the hackathon submission.
  *
- *   npm run record:demo        → docs/debrief-demo.webm
+ *   npm run record:demo        → docs/sayso-demo.webm
  *
- * Runs Debrief in demo mode (simulated Claude, sample data, throwaway data file) and walks through the whole
+ * Runs Sayso in demo mode (built-in engine, sample data, throwaway data file) and walks through the whole
  * story with a visible cursor, large captions and chapter cards. No audio.
  *
  * Quality: the page is captured at 1920×1080 with Chrome's screencast (JPEG quality 95, real timestamps), then
@@ -17,11 +17,11 @@ import path from "node:path";
 import { chromium } from "playwright";
 
 const ROOT = path.join(import.meta.dirname, "..");
-const OUT = path.join(ROOT, "docs", "debrief-demo.webm");
+const OUT = path.join(ROOT, "docs", "sayso-demo.webm");
 const PORT = 4410;
 const B = `http://localhost:${PORT}`;
 const SIZE = { width: 1280, height: 720 };
-const work = mkdtempSync(path.join(tmpdir(), "debrief-demo-"));
+const work = mkdtempSync(path.join(tmpdir(), "sayso-demo-"));
 mkdirSync(path.dirname(OUT), { recursive: true });
 
 const server = spawn(process.execPath, ["scripts/demo.js"], {
@@ -45,13 +45,13 @@ await ctx.addInitScript(() => {
 });
 await ctx.addInitScript(() => {
   const css = `
-    #banner{display:none!important} .rv{opacity:1!important;transform:none!important} .timing{visibility:hidden!important}
+    #banner{display:none!important} .rv{opacity:1!important;transform:none!important}
     #cap{position:fixed;left:50%;bottom:24px;transform:translateX(-50%);z-index:99999;max-width:1200px;width:max-content;
-      display:flex;align-items:center;gap:14px;padding:14px 24px;border-radius:18px;background:rgba(6,8,11,.94);border:1px solid rgba(94,234,212,.4);
+      display:flex;align-items:center;gap:14px;padding:14px 24px;border-radius:18px;background:rgba(6,8,11,.94);border:1px solid rgba(200,242,90,.4);
       color:#eef2f5;font:650 26px/1.3 ui-sans-serif,-apple-system,"Segoe UI",Roboto,sans-serif;box-shadow:0 14px 40px rgba(0,0,0,.6)}
-    #cap b{flex:none;display:inline-flex;align-items:center;justify-content:center;min-width:40px;height:40px;padding:0 10px;border-radius:12px;background:#5eead4;color:#04110f;font-size:20px}
-    #cur{position:fixed;z-index:100000;width:22px;height:22px;margin:-11px 0 0 -11px;border-radius:50%;background:rgba(94,234,212,.3);border:2px solid #5eead4;pointer-events:none;transition:transform .12s}
-    #cur.down{transform:scale(.6);background:rgba(94,234,212,.7)}`;
+    #cap b{flex:none;display:inline-flex;align-items:center;justify-content:center;min-width:40px;height:40px;padding:0 10px;border-radius:12px;background:#c8f25a;color:#151b04;font-size:20px}
+    #cur{position:fixed;z-index:100000;width:22px;height:22px;margin:-11px 0 0 -11px;border-radius:50%;background:rgba(200,242,90,.3);border:2px solid #c8f25a;pointer-events:none;transition:transform .12s}
+    #cur.down{transform:scale(.6);background:rgba(200,242,90,.7)}`;
   const mount = () => {
     if (document.getElementById("cur")) return;
     const st = document.createElement("style"); st.textContent = css; document.head.appendChild(st);
@@ -91,7 +91,10 @@ await cdp.send("Page.startScreencast", { format: "jpeg", quality: 95, maxWidth: 
 const t0 = Date.now();
 const PACE = 1.4; // stretch every pause so each caption can be read comfortably
 const sleep = (ms) => page.waitForTimeout(ms * PACE);
-const cap = (step, text) => page.evaluate(([s, t]) => window.__cap?.(s, t), [step, text]);
+const cap = (step, text) => {
+  if (text) console.log(`[${((Date.now() - t0) / 1000).toFixed(0)}s] ${step ?? ""} ${text}`);
+  return page.evaluate(([s, t]) => window.__cap?.(s, t), [step, text]);
+};
 const moveTo = async (loc) => {
   await loc.scrollIntoViewIfNeeded();
   const box = await loc.boundingBox();
@@ -103,12 +106,12 @@ const scrollTo = (sel) => page.evaluate((s) => document.querySelector(s).scrollI
 const chapter = async (title, accent, foot, ms = 4200) => { await page.setContent(card(title, accent, foot)); await sleep(ms); };
 
 // 0:00 · the problem
-await chapter("Nobody updates the CRM.", "Writing up a call takes longer than the call.", "Debrief · No Hands: The Wispr Challenge · product walkthrough on sample data", 5200);
+await chapter("Nobody updates the CRM.", "Writing up a call takes longer than the call.", "Sayso · No Hands: The Wispr Challenge · product walkthrough on sample data", 5200);
 await chapter("So I stopped typing.", "I talk for 30 seconds instead.", "Built and used with Wispr Flow", 3800);
 
 // 0:09 · landing
 await page.goto(B, { waitUntil: "networkidle" });
-await cap(null, "Debrief: a voice-first CRM for founders and small sales teams.");
+await cap(null, "Sayso: a voice-first CRM for founders and small sales teams.");
 await sleep(3200);
 
 // 0:13 · dictate with Wispr Flow
@@ -122,12 +125,12 @@ for (const phrase of recap.match(/[^,.]+[,.]?/g)) {
   await page.keyboard.insertText(phrase);
   await sleep(230);
 }
-await cap("1", "Wispr Flow types it in; Debrief spots the dictation.");
+await cap("1", "Wispr Flow types it in; Sayso spots the dictation.");
 await moveTo(page.locator("#wfBar"));
 await sleep(2600);
 
 // 0:35 · streaming extraction
-await cap("2", "Claude turns the ramble into a complete CRM record, field by field.");
+await cap("2", "Sayso turns the ramble into a complete CRM record. No API key needed.");
 await click(page.getByRole("button", { name: "Extract CRM fields" }));
 await page.waitForFunction(() => document.getElementById("liveTag").textContent.includes("ready"));
 await sleep(1800);
@@ -185,9 +188,9 @@ await cap("8", "The proof page tracks real use: calls, minutes saved, fields fil
 await sleep(4200);
 
 // 1:27 · why it works
-await chapter("30 seconds instead of 6 minutes.", "Every field. Every follow-up.", "Streaming Claude · Wispr Flow first · Ask with citations · HubSpot & CSV", 5000);
+await chapter("30 seconds instead of 6 minutes.", "Every field. Every follow-up.", "Built-in engine, no API key · Wispr Flow first · Ask with citations · HubSpot & CSV", 5000);
 await cap(null, null);
-await chapter("Debrief", "Talk for 30 seconds. Your CRM updates itself.", "Built hands-free with Wispr Flow · #NoHandsChallenge", 4500);
+await chapter("Sayso", "Talk for 30 seconds. Your CRM updates itself.", "Built hands-free with Wispr Flow · #NoHandsChallenge", 4500);
 
 await cdp.send("Page.stopScreencast").catch(() => {});
 await ctx.close();
@@ -230,12 +233,12 @@ function card(title, accent, foot) {
   return `<!doctype html><html><head><meta charset="utf-8"><style>
     body{margin:0;height:100vh;display:flex;flex-direction:column;align-items:center;justify-content:center;gap:18px;padding:0 60px;
     font-family:ui-sans-serif,-apple-system,"Segoe UI",Roboto,sans-serif;color:#eef2f5;text-align:center;
-    background:radial-gradient(600px 380px at 25% 25%,rgba(94,234,212,.18),transparent 70%),radial-gradient(520px 360px at 80% 20%,rgba(167,139,250,.16),transparent 70%),#06080b}
+    background:radial-gradient(600px 380px at 25% 25%,rgba(200,242,90,.18),transparent 70%),radial-gradient(520px 360px at 80% 20%,rgba(255,138,107,.16),transparent 70%),#06080b}
     .logo{display:flex;align-items:center;gap:12px;font-size:26px;font-weight:700}
-    .logo i{width:38px;height:38px;border-radius:11px;background:#5eead4;display:grid;place-items:center}
+    .logo i{width:38px;height:38px;border-radius:11px;background:#c8f25a;display:grid;place-items:center}
     h1{margin:0;font-size:64px;letter-spacing:-2px;line-height:1.08;max-width:1100px}
-    h1 span{display:block;font-size:46px;margin-top:10px;background:linear-gradient(100deg,#5eead4 10%,#22d3ee 45%,#a78bfa 90%);-webkit-background-clip:text;background-clip:text;color:transparent}
+    h1 span{display:block;font-size:46px;margin-top:10px;background:linear-gradient(100deg,#c8f25a 10%,#f9d65c 45%,#ff8a6b 90%);-webkit-background-clip:text;background-clip:text;color:transparent}
     .foot{margin-top:14px;font:500 19px ui-monospace,Menlo,monospace;color:#8b95a1}
-    </style></head><body><div class="logo"><i><svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="#06080b" stroke-width="2.6" stroke-linecap="round"><path d="M5 10v4M9 6v12M13 8v8M17 11v2M21 9v6"/></svg></i>Debrief</div>
+    </style></head><body><div class="logo"><i><svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="#06080b" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"><path d="M4 6.5A2.5 2.5 0 0 1 6.5 4h11A2.5 2.5 0 0 1 20 6.5v8a2.5 2.5 0 0 1-2.5 2.5H11l-4.5 3.5V17A2.5 2.5 0 0 1 4 14.5z"/><path d="M9.5 9v3M12 7.5v6M14.5 9v3"/></svg></i>Sayso</div>
     <h1>${title}<span>${accent}</span></h1><div class="foot">${foot}</div></body></html>`;
 }

@@ -5,7 +5,7 @@ import { gzipSync } from "node:zlib";
 import { createHash, randomUUID } from "node:crypto";
 import path from "node:path";
 import { Anthropic } from "./lib/claude.js";
-import { extractCall, reviseCall, draftFollowup, askPipeline, warmUp, MODEL } from "./lib/extract.js";
+import { extractCall, reviseCall, draftFollowup, askPipeline, warmUp, engineName } from "./lib/extract.js";
 import { workspace, isWorkspaceId, flush, pruneWorkspaces, toCsv } from "./lib/store.js";
 import { syncToHubSpot } from "./lib/hubspot.js";
 import { sampleCalls } from "./lib/samples.js";
@@ -82,8 +82,6 @@ async function readBody(req) {
 }
 
 function friendlyError(err) {
-  if (err instanceof Anthropic.AuthenticationError || /ANTHROPIC_API_KEY|apiKey/.test(err.message))
-    return [401, "Claude API key missing or invalid. Set ANTHROPIC_API_KEY in .env."];
   if (err instanceof Anthropic.RateLimitError) return [429, "Claude is rate-limiting requests; try again in a moment."];
   if (err instanceof Anthropic.APIConnectionError) return [502, "Could not reach the Claude API. Check your connection."];
   if (err instanceof Anthropic.APIError) return [502, `Claude API error: ${err.message}`];
@@ -97,10 +95,10 @@ const clientIp = (req) => (PUBLIC && req.headers["x-forwarded-for"]?.split(",")[
 // Locally everything lives in one workspace. In public mode each browser gets its own, pre-filled with samples.
 async function resolveWorkspace(req, res) {
   if (!PUBLIC) return { id: "default", ws: workspace("default") };
-  let id = cookies(req).debrief_ws;
+  let id = cookies(req).sayso_ws;
   if (id && isWorkspaceId(id) && id !== "default") return { id, ws: workspace(id) };
   id = randomUUID();
-  res.setHeader("Set-Cookie", `debrief_ws=${id}; Path=/; Max-Age=${60 * 60 * 24 * 30}; HttpOnly; SameSite=Lax${req.headers["x-forwarded-proto"] === "https" ? "; Secure" : ""}`);
+  res.setHeader("Set-Cookie", `sayso_ws=${id}; Path=/; Max-Age=${60 * 60 * 24 * 30}; HttpOnly; SameSite=Lax${req.headers["x-forwarded-proto"] === "https" ? "; Secure" : ""}`);
   const ws = workspace(id);
   await ws.load();
   ws.calls.push(...sampleCalls());
@@ -126,7 +124,7 @@ async function streamTask(req, res, ctx, run) {
   } catch (err) {
     if (abort.signal.aborted) return;
     const [, message] = friendlyError(err);
-    if (!(err instanceof Anthropic.APIError)) console.error(err);
+    if (!(err instanceof Anthropic.APIError) && !(err.status < 500)) console.error(err);
     send({ type: "error", error: message });
   }
   res.end();
@@ -187,7 +185,7 @@ async function route(req, res, url) {
   const idMatch = url.pathname.match(/^\/api\/calls\/([\w-]+)(\/sync)?$/);
 
   if (key === "GET /api/config") {
-    return json(res, 200, { hubspot: Boolean(HUBSPOT_TOKEN), model: MODEL, manual_minutes: MANUAL_MINUTES, public_mode: PUBLIC, demo_mode: DEMO, can_reset: PUBLIC || DEMO, sender_name: SENDER_NAME });
+    return json(res, 200, { hubspot: Boolean(HUBSPOT_TOKEN), model: engineName(), manual_minutes: MANUAL_MINUTES, public_mode: PUBLIC, demo_mode: DEMO, can_reset: PUBLIC || DEMO, sender_name: SENDER_NAME });
   }
   if (key === "POST /api/extract") {
     const transcript = text((await readBody(req)).transcript, "recap");
@@ -260,13 +258,14 @@ async function route(req, res, url) {
   if (idMatch && req.method === "DELETE" && !idMatch[2]) return json(res, 200, { deleted: await ws.remove(idMatch[1]) });
 
   if (key === "GET /api/backup.json") {
-    res.writeHead(200, { "Content-Type": "application/json", "Content-Disposition": `attachment; filename="debrief-backup-${new Date().toISOString().slice(0, 10)}.json"` });
-    return res.end(JSON.stringify({ app: "debrief", version: 1, exported_at: new Date().toISOString(), calls: await ws.list() }, null, 2));
+    res.writeHead(200, { "Content-Type": "application/json", "Content-Disposition": `attachment; filename="sayso-backup-${new Date().toISOString().slice(0, 10)}.json"` });
+    return res.end(JSON.stringify({ app: "sayso", version: 1, exported_at: new Date().toISOString(), calls: await ws.list() }, null, 2));
   }
   if (key === "POST /api/restore") {
     if (PUBLIC) throw httpError(403, "Restore is only available on your own copy.");
     const body = await readBody(req);
-    if (body.app !== "debrief" || !Array.isArray(body.calls)) throw httpError(400, "That isn't a Debrief backup file.");
+    // "debrief" is the app's earlier name, so older backups still restore.
+    if (!["sayso", "debrief"].includes(body.app) || !Array.isArray(body.calls)) throw httpError(400, "That isn't a Sayso backup file.");
     const existing = new Set((await ws.list()).map((c) => c.id));
     let added = 0;
     for (const c of body.calls) {
@@ -313,7 +312,7 @@ if (DEMO && !own.calls.length) {
   own.persist();
 }
 server.listen(PORT, () => {
-  console.log(`Debrief running at http://localhost:${PORT} (model: ${MODEL}${PUBLIC ? ", PUBLIC MODE" : ""})`);
+  console.log(`Sayso running at http://localhost:${PORT} (engine: ${engineName()}${PUBLIC ? ", PUBLIC MODE" : ""})`);
   warmUp();
 });
 

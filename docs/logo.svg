@@ -1,4 +1,6 @@
-<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 64 64" width="64" height="64" role="img" aria-label="Debrief">
-  <rect width="64" height="64" rx="16" fill="#5eead4"/>
-  <path d="M14 27v10M23 19v26M32 23v18M41 29v6M50 24v16" stroke="#06080b" stroke-width="5.5" stroke-linecap="round" fill="none"/>
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 64 64" width="64" height="64" role="img" aria-label="Sayso">
+  <rect width="64" height="64" rx="16" fill="#c8f25a"/>
+  <g transform="translate(8 8) scale(2)" fill="none" stroke="#06080b" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round">
+    <path d="M4 6.5A2.5 2.5 0 0 1 6.5 4h11A2.5 2.5 0 0 1 20 6.5v8a2.5 2.5 0 0 1-2.5 2.5H11l-4.5 3.5V17A2.5 2.5 0 0 1 4 14.5z"/><path d="M9.5 9v3M12 7.5v6M14.5 9v3"/>
+  </g>
 </svg>

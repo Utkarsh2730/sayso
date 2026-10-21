@@ -3,22 +3,22 @@
 <head>
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width, initial-scale=1">
-<title>Debrief · Voice CRM</title>
-<meta name="description" content="Talk for 30 seconds after a sales call. Debrief turns your voice recap into a complete CRM record, follow-up included.">
+<title>Sayso · Voice CRM</title>
+<meta name="description" content="Talk for 30 seconds after a sales call. Sayso turns your voice recap into a complete CRM record, follow-up included.">
 <meta name="theme-color" content="#06080b">
 <meta property="og:type" content="website">
-<meta property="og:title" content="Debrief: talk for 30 seconds, your CRM updates itself">
+<meta property="og:title" content="Sayso: talk for 30 seconds, your CRM updates itself">
 <meta property="og:description" content="A voice-first CRM for sales calls. Dictate a recap and get a complete record, a follow-up email and answers about your pipeline.">
 <meta property="og:image" content="__ORIGIN__/media/og.jpg">
 <meta property="og:image:width" content="1200">
 <meta property="og:image:height" content="630">
 <meta name="twitter:card" content="summary_large_image">
 <meta name="twitter:image" content="__ORIGIN__/media/og.jpg">
-<link rel="icon" href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 32 32'%3E%3Crect width='32' height='32' rx='8' fill='%235eead4'/%3E%3Cpath d='M9 13v6M13 9v14M17 11v10M21 14v4M25 12v8' stroke='%2306080b' stroke-width='2.4' stroke-linecap='round'/%3E%3C/svg%3E">
+<link rel="icon" href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 32 32'%3E%3Crect width='32' height='32' rx='8' fill='%23c8f25a'/%3E%3Cg transform='translate(4 4)' fill='none' stroke='%2306080b' stroke-width='2.2' stroke-linecap='round' stroke-linejoin='round'%3E%3Cpath d='M4 6.5A2.5 2.5 0 0 1 6.5 4h11A2.5 2.5 0 0 1 20 6.5v8a2.5 2.5 0 0 1-2.5 2.5H11l-4.5 3.5V17A2.5 2.5 0 0 1 4 14.5z'/%3E%3Cpath d='M9.5 9v3M12 7.5v6M14.5 9v3'/%3E%3C/g%3E%3C/svg%3E">
 <link rel="prefetch" href="/app">
-<dialog class="tour" id="tour" aria-label="Debrief product tour">
-  <div class="th"><div><b>How Debrief works</b><small>Recap → record → voice fix → follow-up email → save → ask your pipeline · sample data</small></div><button class="btn" id="tourClose" style="padding:8px 14px">✕ Close</button></div>
-  <video id="tourVideo" controls playsinline preload="none" poster="/media/tour-poster.jpg"><source src="/media/debrief-tour.webm" type="video/webm"></video>
+<dialog class="tour" id="tour" aria-label="Sayso product tour">
+  <div class="th"><div><b>How Sayso works</b><small>Recap → record → voice fix → follow-up email → save → ask your pipeline · sample data</small></div><button class="btn" id="tourClose" style="padding:8px 14px">✕ Close</button></div>
+  <video id="tourVideo" controls playsinline preload="none" poster="/media/tour-poster.jpg"><source src="/media/sayso-tour.webm" type="video/webm"></video>
 </dialog>
 
 <script>document.documentElement.classList.add("js")</script>
@@ -26,7 +26,7 @@
   :root {
     --bg: #06080b; --bg2: #0b0f14; --card: rgba(255,255,255,.035); --line: rgba(255,255,255,.08); --line2: rgba(255,255,255,.14);
     --text: #eef2f5; --muted: #8b95a1; --dim: #5d6773;
-    --aqua: #5eead4; --aqua2: #22d3ee; --violet: #a78bfa; --warn: #fbbf24;
+    --brand: #c8f25a; --brand2: #f9d65c; --accent: #ff8a6b; --warn: #fbbf24;
     --r: 16px; --max: 1160px;
     --sans: ui-sans-serif, -apple-system, "Segoe UI", Roboto, "Helvetica Neue", sans-serif;
     --mono: ui-monospace, "SF Mono", "Cascadia Code", Menlo, monospace;
@@ -37,8 +37,8 @@
   body { margin: 0; background: var(--bg); color: var(--text); font: 16px/1.6 var(--sans); -webkit-font-smoothing: antialiased; overflow-x: clip; }
   a { color: inherit; text-decoration: none; }
   .wrap { max-width: var(--max); margin: 0 auto; padding: 0 20px; }
-  .grad { background: linear-gradient(100deg, var(--aqua) 10%, var(--aqua2) 45%, var(--violet) 90%); -webkit-background-clip: text; background-clip: text; color: transparent; }
-  .eyebrow { font: 500 12px/1 var(--mono); letter-spacing: .14em; text-transform: uppercase; color: var(--aqua); }
+  .grad { background: linear-gradient(100deg, var(--brand) 10%, var(--brand2) 45%, var(--accent) 90%); -webkit-background-clip: text; background-clip: text; color: transparent; }
+  .eyebrow { font: 500 12px/1 var(--mono); letter-spacing: .14em; text-transform: uppercase; color: var(--brand); }
   h2 { font-size: clamp(30px, 4.4vw, 48px); line-height: 1.08; letter-spacing: -.03em; margin: 14px 0 14px; font-weight: 650; }
   .lede { color: var(--muted); font-size: 18px; max-width: 620px; margin: 0; }
   section { padding: 110px 0; position: relative; }
@@ -46,8 +46,8 @@
   /* Buttons */
   .btn { display: inline-flex; align-items: center; gap: 10px; padding: 13px 22px; border-radius: 999px; font-weight: 600; font-size: 15px; border: 1px solid var(--line2); transition: transform .15s, background .15s, border-color .15s; will-change: transform; }
   .btn:hover { transform: translateY(-1px); border-color: rgba(255,255,255,.3); }
-  .btn.primary { background: var(--aqua); color: #04110f; border-color: var(--aqua); box-shadow: 0 8px 30px -8px rgba(94,234,212,.55); }
-  .btn.primary:hover { background: #7ff0de; }
+  .btn.primary { background: var(--brand); color: #151b04; border-color: var(--brand); box-shadow: 0 8px 30px -8px rgba(200,242,90,.55); }
+  .btn.primary:hover { background: #d9f78a; }
   .btn svg { width: 16px; height: 16px; }
 
   /* Nav */
@@ -55,7 +55,7 @@
   nav.scrolled { background: rgba(6,8,11,.72); backdrop-filter: saturate(1.4) blur(14px); -webkit-backdrop-filter: saturate(1.4) blur(14px); border-color: var(--line); }
   nav .wrap { display: flex; align-items: center; height: 68px; gap: 28px; }
   .logo { display: flex; align-items: center; gap: 10px; font-weight: 700; letter-spacing: -.02em; font-size: 18px; }
-  .logo i { width: 28px; height: 28px; border-radius: 8px; background: var(--aqua); display: grid; place-items: center; }
+  .logo i { width: 28px; height: 28px; border-radius: 8px; background: var(--brand); display: grid; place-items: center; }
   .logo i svg { width: 18px; height: 18px; }
   .navlinks { display: flex; gap: 26px; margin-left: 12px; font-size: 14px; color: var(--muted); }
   .navlinks a:hover { color: var(--text); }
@@ -65,20 +65,20 @@
   /* Hero */
   .hero { padding: 150px 0 90px; overflow: hidden; position: relative; }
   .hero::before { content: ""; position: absolute; inset: -20% -10% auto; height: 900px; pointer-events: none;
-    background: radial-gradient(600px 380px at 25% 30%, rgba(94,234,212,.16), transparent 70%), radial-gradient(520px 360px at 80% 20%, rgba(167,139,250,.14), transparent 70%); }
+    background: radial-gradient(600px 380px at 25% 30%, rgba(200,242,90,.16), transparent 70%), radial-gradient(520px 360px at 80% 20%, rgba(255,138,107,.14), transparent 70%); }
   .hero::after { content: ""; position: absolute; inset: 0; pointer-events: none; opacity: .5;
     background-image: linear-gradient(var(--line) 1px, transparent 1px), linear-gradient(90deg, var(--line) 1px, transparent 1px);
     background-size: 64px 64px; mask-image: radial-gradient(ellipse 70% 60% at 50% 30%, #000 30%, transparent 75%); -webkit-mask-image: radial-gradient(ellipse 70% 60% at 50% 30%, #000 30%, transparent 75%); }
   .hero .wrap { position: relative; z-index: 1; display: grid; grid-template-columns: 1.05fr 1fr; gap: 56px; align-items: center; }
   @media (max-width: 960px) { .hero .wrap { grid-template-columns: 1fr; } .hero { padding-top: 120px; } }
   .pill { display: inline-flex; align-items: center; gap: 8px; padding: 6px 14px 6px 8px; border: 1px solid var(--line2); border-radius: 999px; font-size: 13px; color: var(--muted); background: rgba(255,255,255,.03); }
-  .pill b { background: rgba(94,234,212,.14); color: var(--aqua); font: 600 11px/1 var(--mono); padding: 5px 8px; border-radius: 999px; letter-spacing: .06em; }
+  .pill b { background: rgba(200,242,90,.14); color: var(--brand); font: 600 11px/1 var(--mono); padding: 5px 8px; border-radius: 999px; letter-spacing: .06em; }
   h1 { font-size: clamp(40px, 6.4vw, 74px); line-height: 1.02; letter-spacing: -.045em; margin: 22px 0 20px; font-weight: 700; }
   .hero p.lede { font-size: 19px; }
   .ctas { display: flex; gap: 12px; flex-wrap: wrap; margin-top: 32px; }
   .trust { display: flex; gap: 22px; flex-wrap: wrap; margin-top: 30px; color: var(--dim); font-size: 13px; }
   .trust span { display: inline-flex; align-items: center; gap: 7px; }
-  .trust svg { width: 14px; height: 14px; color: var(--aqua); }
+  .trust svg { width: 14px; height: 14px; color: var(--brand); }
 
   /* Hero demo */
   .demo { position: relative; border: 1px solid var(--line2); border-radius: 22px; background: linear-gradient(180deg, rgba(255,255,255,.05), rgba(255,255,255,.015)); padding: 18px; box-shadow: 0 40px 120px -30px rgba(0,0,0,.8), inset 0 1px 0 rgba(255,255,255,.06); }
@@ -86,28 +86,28 @@
   .demo .bar i { width: 10px; height: 10px; border-radius: 50%; background: #2a3038; }
   .demo .bar span { margin-left: auto; font: 11px var(--mono); color: var(--dim); }
   .voice { display: flex; gap: 14px; align-items: flex-start; padding: 16px; border: 1px solid var(--line); border-radius: 14px; background: rgba(0,0,0,.25); min-height: 112px; }
-  .orb { flex: none; width: 44px; height: 44px; border-radius: 50%; background: radial-gradient(circle at 35% 35%, #a5f3e6, var(--aqua) 45%, #0e7490); box-shadow: 0 0 0 0 rgba(94,234,212,.5); animation: orb 1.6s infinite; }
-  @keyframes orb { 70% { box-shadow: 0 0 0 14px rgba(94,234,212,0); } }
+  .orb { flex: none; width: 44px; height: 44px; border-radius: 50%; background: radial-gradient(circle at 35% 35%, #ecfbbf, var(--brand) 45%, #4d7c0f); box-shadow: 0 0 0 0 rgba(200,242,90,.5); animation: orb 1.6s infinite; }
+  @keyframes orb { 70% { box-shadow: 0 0 0 14px rgba(200,242,90,0); } }
   .voice p { margin: 0; font-size: 14px; color: #cbd5df; min-height: 66px; }
-  .caret { display: inline-block; width: 2px; height: 1em; background: var(--aqua); vertical-align: -2px; margin-left: 2px; animation: blink 1s steps(1) infinite; }
+  .caret { display: inline-block; width: 2px; height: 1em; background: var(--brand); vertical-align: -2px; margin-left: 2px; animation: blink 1s steps(1) infinite; }
   @keyframes blink { 50% { opacity: 0; } }
   .wave { display: flex; gap: 3px; align-items: center; height: 18px; margin-top: 8px; }
-  .wave i { width: 3px; border-radius: 2px; background: var(--aqua); height: 30%; animation: wv 1s ease-in-out infinite; }
+  .wave i { width: 3px; border-radius: 2px; background: var(--brand); height: 30%; animation: wv 1s ease-in-out infinite; }
   @keyframes wv { 50% { height: 100%; } }
   .record { margin-top: 12px; display: grid; grid-template-columns: 1fr 1fr; gap: 8px; }
   .fld { border: 1px solid var(--line); border-radius: 12px; padding: 10px 12px; background: rgba(255,255,255,.02); min-width: 0; transition: border-color .3s, background .3s; }
   .fld.wide { grid-column: 1 / -1; }
   .fld small { display: block; font: 10px var(--mono); letter-spacing: .1em; text-transform: uppercase; color: var(--dim); }
   .fld div { font-size: 14px; min-height: 21px; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
-  .fld.on { border-color: rgba(94,234,212,.45); background: rgba(94,234,212,.06); }
+  .fld.on { border-color: rgba(200,242,90,.45); background: rgba(200,242,90,.06); }
   .fld .sk { display: block; height: 10px; margin-top: 6px; border-radius: 4px; width: 70%; background: linear-gradient(90deg, rgba(255,255,255,.04), rgba(255,255,255,.1), rgba(255,255,255,.04)); background-size: 200% 100%; animation: sh 1.4s infinite; }
   @keyframes sh { to { background-position: -200% 0; } }
   .demo .foot { display: flex; justify-content: space-between; margin-top: 12px; font: 11px var(--mono); color: var(--dim); }
-  .demo .foot b { color: var(--aqua); font-weight: 500; }
+  .demo .foot b { color: var(--brand); font-weight: 500; }
 
   /* Watch demo */
-  .watch { display: inline-flex; align-items: center; gap: 8px; background: none; border: 0; color: var(--aqua); font: 600 14px var(--sans); cursor: pointer; padding: 8px 10px; border-radius: 999px; }
-  .watch:hover { background: rgba(94,234,212,.08); }
+  .watch { display: inline-flex; align-items: center; gap: 8px; background: none; border: 0; color: var(--brand); font: 600 14px var(--sans); cursor: pointer; padding: 8px 10px; border-radius: 999px; }
+  .watch:hover { background: rgba(200,242,90,.08); }
   .watch svg { width: 20px; height: 20px; }
   dialog.tour { width: min(1100px, calc(100vw - 32px)); padding: 0; border: 0; background: transparent; overflow: visible; color: var(--text); }
   dialog.tour::backdrop { background: rgba(3,5,8,.82); backdrop-filter: blur(6px); }
@@ -124,10 +124,10 @@
   .preview { padding: 10px 0 40px; }
   .preview .wrap { position: relative; max-width: 1040px; }
   .float { position: absolute; width: 240px; padding: 14px 16px; border-radius: 14px; background: rgba(11,15,20,.92); border: 1px solid var(--line2); box-shadow: 0 20px 50px -10px rgba(0,0,0,.7); font-size: 13.5px; color: #cbd5df; animation: bob 6s ease-in-out infinite; backdrop-filter: blur(8px); }
-  .float b { display: flex; align-items: center; gap: 8px; color: var(--aqua); font-size: 13px; margin-bottom: 4px; }
+  .float b { display: flex; align-items: center; gap: 8px; color: var(--brand); font-size: 13px; margin-bottom: 4px; }
   .float.l { left: -110px; top: 38%; }
   .float.r { right: -110px; bottom: 14%; animation-delay: -3s; }
-  .float.r b { color: var(--violet); }
+  .float.r b { color: var(--accent); }
   @keyframes bob { 50% { transform: translateY(-8px); } }
   @media (max-width: 1320px) { .float { display: none; } }
 
@@ -137,18 +137,18 @@
   .row2.flip > :first-child { order: 2; }
   .row2 h3 { font-size: clamp(24px, 3vw, 32px); letter-spacing: -.03em; line-height: 1.15; margin: 16px 0 12px; }
   .row2 p { color: var(--muted); margin: 0; font-size: 16.5px; }
-  .tagp { display: inline-block; font: 600 11px var(--mono); letter-spacing: .1em; text-transform: uppercase; color: var(--aqua); background: rgba(94,234,212,.1); border: 1px solid rgba(94,234,212,.25); padding: 5px 10px; border-radius: 999px; }
+  .tagp { display: inline-block; font: 600 11px var(--mono); letter-spacing: .1em; text-transform: uppercase; color: var(--brand); background: rgba(200,242,90,.1); border: 1px solid rgba(200,242,90,.25); padding: 5px 10px; border-radius: 999px; }
   .ticks { list-style: none; padding: 0; margin: 22px 0 0; display: grid; gap: 10px; font-size: 15px; color: #c3cbd4; }
   .ticks li { display: flex; gap: 10px; align-items: flex-start; }
-  .ticks svg { width: 16px; height: 16px; color: var(--aqua); flex: none; margin-top: 4px; }
+  .ticks svg { width: 16px; height: 16px; color: var(--brand); flex: none; margin-top: 4px; }
   @media (max-width: 900px) { .row2 { grid-template-columns: 1fr; gap: 28px; margin-bottom: 70px; } .row2.flip > :first-child { order: 0; } }
   .trio { display: grid; grid-template-columns: repeat(3, 1fr); gap: 16px; margin-top: 90px; }
   @media (max-width: 860px) { .trio { grid-template-columns: 1fr; } }
 
   /* Wispr Flow strip */
   .wispr { display: grid; grid-template-columns: auto 1fr; gap: 22px; align-items: center; padding: 24px 28px; margin-bottom: 80px; border-radius: 20px;
-    border: 1px solid rgba(167,139,250,.35); background: radial-gradient(420px 200px at 0% 50%, rgba(167,139,250,.16), transparent 70%), var(--card); }
-  .wispr .ico { margin: 0; width: 52px; height: 52px; border-radius: 14px; background: rgba(167,139,250,.14); border-color: rgba(167,139,250,.35); color: var(--violet); }
+    border: 1px solid rgba(255,138,107,.35); background: radial-gradient(420px 200px at 0% 50%, rgba(255,138,107,.16), transparent 70%), var(--card); }
+  .wispr .ico { margin: 0; width: 52px; height: 52px; border-radius: 14px; background: rgba(255,138,107,.14); border-color: rgba(255,138,107,.35); color: var(--accent); }
   .wispr .ico svg { width: 26px; height: 26px; }
   .wispr h3 { margin: 0 0 6px; font-size: 19px; letter-spacing: -.01em; }
   .wispr p { margin: 0; color: var(--muted); font-size: 15px; }
@@ -159,8 +159,8 @@
   .ba { display: grid; grid-template-columns: 1fr 1fr; gap: 16px; }
   @media (max-width: 800px) { .ba { grid-template-columns: 1fr; } }
   .ba .card h3 { font: 600 12px var(--mono); letter-spacing: .1em; text-transform: uppercase; color: var(--muted); margin-bottom: 16px; }
-  .ba .after { border-color: rgba(94,234,212,.35); background: linear-gradient(180deg, rgba(94,234,212,.06), rgba(255,255,255,.02)); }
-  .ba .after h3 { color: var(--aqua); }
+  .ba .after { border-color: rgba(200,242,90,.35); background: linear-gradient(180deg, rgba(200,242,90,.06), rgba(255,255,255,.02)); }
+  .ba .after h3 { color: var(--brand); }
   .kv { display: grid; grid-template-columns: 110px 1fr; gap: 9px 14px; font-size: 14.5px; margin: 0; }
   .kv dt { font: 11px var(--mono); color: var(--dim); text-transform: uppercase; letter-spacing: .06em; padding-top: 3px; }
   .kv dd { margin: 0; color: #dfe5ea; }
@@ -179,9 +179,9 @@
   .calc label { display: block; }
   .calc .lt { display: flex; justify-content: space-between; gap: 12px; font-size: 14.5px; color: #c3cbd4; }
   .calc .lt b { color: var(--text); font-variant-numeric: tabular-nums; }
-  .calc input[type=range] { width: 100%; margin-top: 10px; accent-color: var(--aqua); }
-  .calc .out { padding: 32px; display: flex; flex-direction: column; justify-content: center; gap: 22px; background: radial-gradient(400px 260px at 80% 0%, rgba(167,139,250,.18), transparent 70%), linear-gradient(160deg, rgba(94,234,212,.16), rgba(34,211,238,.06)); }
-  .calc .out small { display: block; font: 600 11px var(--mono); letter-spacing: .1em; text-transform: uppercase; color: var(--aqua); }
+  .calc input[type=range] { width: 100%; margin-top: 10px; accent-color: var(--brand); }
+  .calc .out { padding: 32px; display: flex; flex-direction: column; justify-content: center; gap: 22px; background: radial-gradient(400px 260px at 80% 0%, rgba(255,138,107,.18), transparent 70%), linear-gradient(160deg, rgba(200,242,90,.16), rgba(34,211,238,.06)); }
+  .calc .out small { display: block; font: 600 11px var(--mono); letter-spacing: .1em; text-transform: uppercase; color: var(--brand); }
   .calc .out big { display: block; font-size: 44px; font-weight: 700; letter-spacing: -.04em; font-variant-numeric: tabular-nums; }
   .calc .note { font-size: 12.5px; color: var(--dim); }
   .calc .box { border-radius: 14px; background: rgba(0,0,0,.25); padding: 14px 16px; font-size: 14px; color: #cbd5df; }
@@ -190,7 +190,7 @@
   .head { display: flex; justify-content: space-between; align-items: flex-end; gap: 30px; flex-wrap: wrap; margin-bottom: 52px; }
   .card { border: 1px solid var(--line); border-radius: var(--r); background: var(--card); padding: 28px; position: relative; overflow: hidden; transition: border-color .2s, transform .2s; }
   .card:hover { border-color: var(--line2); }
-  .ico { width: 40px; height: 40px; border-radius: 11px; display: grid; place-items: center; background: rgba(94,234,212,.1); color: var(--aqua); margin-bottom: 18px; border: 1px solid rgba(94,234,212,.2); }
+  .ico { width: 40px; height: 40px; border-radius: 11px; display: grid; place-items: center; background: rgba(200,242,90,.1); color: var(--brand); margin-bottom: 18px; border: 1px solid rgba(200,242,90,.2); }
   .ico svg { width: 20px; height: 20px; }
   .card h3 { margin: 0 0 8px; font-size: 18px; letter-spacing: -.01em; }
   .card p { margin: 0; color: var(--muted); font-size: 15px; }
@@ -210,7 +210,7 @@
   @media (max-width: 640px) { .bento .card, .bento .card.big { grid-column: span 6; } }
   .mini { margin-top: 20px; font: 12px/1.7 var(--mono); color: var(--muted); background: rgba(0,0,0,.3); border: 1px solid var(--line); border-radius: 10px; padding: 12px 14px; }
   .mini s { color: var(--dim); }
-  .mini em { color: var(--aqua); font-style: normal; }
+  .mini em { color: var(--brand); font-style: normal; }
 
   /* Compare */
   .compare { display: grid; grid-template-columns: 1fr 1fr; gap: 16px; }
@@ -218,7 +218,7 @@
   .track { height: 10px; border-radius: 999px; background: rgba(255,255,255,.05); overflow: hidden; margin: 18px 0 10px; }
   .track i { display: block; height: 100%; border-radius: inherit; width: 0; transition: width 1.4s cubic-bezier(.2,.8,.2,1); }
   .compare .slow i { background: #4b5563; }
-  .compare .fast i { background: linear-gradient(90deg, var(--aqua), var(--aqua2)); }
+  .compare .fast i { background: linear-gradient(90deg, var(--brand), var(--brand2)); }
   .compare.in .slow i { width: 100%; } .compare.in .fast i { width: 9%; }
   .compare big { font-size: 40px; font-weight: 700; letter-spacing: -.04em; }
 
@@ -231,19 +231,19 @@
   @media (max-width: 760px) { .stats { grid-template-columns: 1fr 1fr; } .stats div:nth-child(2) { border-right: 0; } .stats div:nth-child(-n+2) { border-bottom: 1px solid var(--line); } }
   .note { margin-top: 14px; font-size: 13px; color: var(--dim); }
   .live { display: inline-flex; align-items: center; gap: 8px; }
-  .live::before { content: ""; width: 7px; height: 7px; border-radius: 50%; background: var(--aqua); box-shadow: 0 0 10px var(--aqua); }
+  .live::before { content: ""; width: 7px; height: 7px; border-radius: 50%; background: var(--brand); box-shadow: 0 0 10px var(--brand); }
 
   /* Pricing */
   .plans { display: grid; grid-template-columns: repeat(3, 1fr); gap: 16px; align-items: stretch; }
   @media (max-width: 900px) { .plans { grid-template-columns: 1fr; } }
   .plan { display: flex; flex-direction: column; }
-  .plan.hot { border-color: rgba(94,234,212,.45); background: linear-gradient(180deg, rgba(94,234,212,.08), rgba(255,255,255,.02)); }
-  .plan .tag { position: absolute; right: 20px; top: 20px; font: 600 10px var(--mono); letter-spacing: .1em; color: #04110f; background: var(--aqua); padding: 4px 9px; border-radius: 999px; }
+  .plan.hot { border-color: rgba(200,242,90,.45); background: linear-gradient(180deg, rgba(200,242,90,.08), rgba(255,255,255,.02)); }
+  .plan .tag { position: absolute; right: 20px; top: 20px; font: 600 10px var(--mono); letter-spacing: .1em; color: #151b04; background: var(--brand); padding: 4px 9px; border-radius: 999px; }
   .price { font-size: 44px; font-weight: 700; letter-spacing: -.04em; margin: 10px 0 2px; }
   .price small { font-size: 15px; color: var(--muted); font-weight: 400; letter-spacing: 0; }
   .plan ul { list-style: none; padding: 0; margin: 20px 0 26px; display: grid; gap: 10px; font-size: 15px; color: #c3cbd4; }
   .plan li { display: flex; gap: 10px; }
-  .plan li::before { content: "✓"; color: var(--aqua); font-weight: 700; }
+  .plan li::before { content: "✓"; color: var(--brand); font-weight: 700; }
   .plan .btn { margin-top: auto; justify-content: center; }
 
   /* FAQ */
@@ -251,13 +251,13 @@
   details { border-bottom: 1px solid var(--line); padding: 20px 0; }
   summary { cursor: pointer; list-style: none; display: flex; justify-content: space-between; gap: 20px; font-weight: 600; font-size: 17px; }
   summary::-webkit-details-marker { display: none; }
-  summary::after { content: "+"; color: var(--aqua); font: 400 22px/1 var(--mono); transition: transform .2s; }
+  summary::after { content: "+"; color: var(--brand); font: 400 22px/1 var(--mono); transition: transform .2s; }
   details[open] summary::after { transform: rotate(45deg); }
   details p { color: var(--muted); margin: 12px 0 0; max-width: 700px; }
 
   /* CTA + footer */
   .final { text-align: center; border: 1px solid var(--line2); border-radius: 28px; padding: 80px 24px; overflow: hidden; position: relative;
-    background: radial-gradient(500px 260px at 50% 0%, rgba(94,234,212,.18), transparent 70%), radial-gradient(400px 260px at 80% 100%, rgba(167,139,250,.12), transparent 70%), var(--bg2); }
+    background: radial-gradient(500px 260px at 50% 0%, rgba(200,242,90,.18), transparent 70%), radial-gradient(400px 260px at 80% 100%, rgba(255,138,107,.12), transparent 70%), var(--bg2); }
   .final h2 { max-width: 720px; margin: 0 auto 16px; }
   .final .lede { margin: 0 auto; }
   .final .ctas { justify-content: center; }
@@ -277,7 +277,7 @@
 
 <nav id="nav">
   <div class="wrap">
-    <a class="logo" href="/"><i><svg viewBox="0 0 24 24" fill="none" stroke="#06080b" stroke-width="2.6" stroke-linecap="round"><path d="M5 10v4M9 6v12M13 8v8M17 11v2M21 9v6"/></svg></i>Debrief</a>
+    <a class="logo" href="/"><i><svg viewBox="0 0 24 24" fill="none" stroke="#06080b" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"><path d="M4 6.5A2.5 2.5 0 0 1 6.5 4h11A2.5 2.5 0 0 1 20 6.5v8a2.5 2.5 0 0 1-2.5 2.5H11l-4.5 3.5V17A2.5 2.5 0 0 1 4 14.5z"/><path d="M9.5 9v3M12 7.5v6M14.5 9v3"/></svg></i>Sayso</a>
     <div class="navlinks"><a href="#how">How it works</a><a href="#features">Features</a><a href="/proof">Proof</a><a href="#pricing">Pricing</a><a href="#faq">FAQ</a></div>
     <button class="watch" data-tour style="margin-left:auto"><svg viewBox="0 0 24 24" aria-hidden="true"><circle cx="12" cy="12" r="11" fill="currentColor" opacity=".15"/><path d="M10 8.5v7l6-3.5z" fill="currentColor"/></svg><span>Watch demo</span></button>
     <a class="btn primary" href="/app" style="margin-left:0">Open app</a>
@@ -289,7 +289,7 @@
     <div>
       <span class="pill"><b>NEW</b> Built by voice for #NoHandsChallenge</span>
       <h1>Talk for 30 seconds.<br><span class="grad">Your CRM updates itself.</span></h1>
-      <p class="lede">Right after a sales call, just say what happened. Debrief turns your recap into a complete CRM record with contact details, deal stage, next step and follow-up date, before you've reached your next meeting.</p>
+      <p class="lede">Right after a sales call, just say what happened. Sayso turns your recap into a complete CRM record with contact details, deal stage, next step and follow-up date, before you've reached your next meeting.</p>
       <div class="ctas">
         <a class="btn primary" href="/app">Log your first call <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.4" stroke-linecap="round"><path d="M5 12h14M13 6l6 6-6 6"/></svg></a>
         <button class="btn" data-tour style="background:none;color:inherit;font:inherit;font-weight:600"><svg viewBox="0 0 24 24" aria-hidden="true" style="width:18px;height:18px"><circle cx="12" cy="12" r="11" fill="currentColor" opacity=".15"/><path d="M10 8.5v7l6-3.5z" fill="currentColor"/></svg> Watch the tour</button>
@@ -311,14 +311,14 @@
         </div>
       </div>
       <div class="record" id="demoRecord"></div>
-      <div class="foot"><span>claude · structured output</span><span id="demoTime">waiting for recap…</span></div>
+      <div class="foot"><span>sayso · built-in engine</span><span id="demoTime">waiting for recap…</span></div>
     </div>
   </div>
 </header>
 
 <section class="preview" aria-label="Product preview">
   <div class="wrap">
-    <figure class="frame rv"><div class="fbar"><i></i><i></i><i></i><span>debrief.app/app</span></div><img src="/media/app-review.jpg" width="2560" height="1440" alt="Debrief app: a spoken recap on the left, the CRM record it produced on the right" fetchpriority="high"></figure>
+    <figure class="frame rv"><div class="fbar"><i></i><i></i><i></i><span>sayso.app/app</span></div><img src="/media/app-review.jpg" width="2560" height="1440" alt="Sayso app: a spoken recap on the left, the CRM record it produced on the right" fetchpriority="high"></figure>
     <div class="float l"><b>● Self-correction caught</b>“Tuesday, no wait, Thursday” → follow-up on Thu 22 Oct.</div>
     <div class="float r"><b>✉ Follow-up drafted</b>“Demo for your team leads on Thursday”, written from the same call.</div>
   </div>
@@ -346,7 +346,7 @@
     </div>
     <div class="steps">
       <div class="card rv"><div class="ico"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="9" y="3" width="6" height="12" rx="3"/><path d="M5 11a7 7 0 0 0 14 0M12 18v3"/></svg></div><h3>Talk it out</h3><p>Tap the mic or dictate with Wispr Flow. Ramble, correct yourself, spell out emails. It's fine.</p></div>
-      <div class="card rv"><div class="ico"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M12 3l1.9 5.6L19.5 10l-5.6 1.9L12 17.5l-1.9-5.6L4.5 10l5.6-1.4z"/></svg></div><h3>Watch it fill in</h3><p>Claude streams the record field by field as it understands your recap. You see them land in real time.</p></div>
+      <div class="card rv"><div class="ico"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M12 3l1.9 5.6L19.5 10l-5.6 1.9L12 17.5l-1.9-5.6L4.5 10l5.6-1.4z"/></svg></div><h3>Watch it fill in</h3><p>Sayso turns your recap into a full CRM record: contact, company, deal stage, value, next step and follow-up date, in a moment.</p></div>
       <div class="card rv"><div class="ico"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M20 6 9 17l-5-5"/></svg></div><h3>Correct, email, save</h3><p>Fix anything by voice, say "write the follow-up" for a ready-to-send email, then "save". HubSpot syncs in the background.</p></div>
     </div>
   </div>
@@ -361,29 +361,29 @@
     <div class="wispr rv">
       <div class="ico"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><path d="M3 10v4M7 7v10M11 4v16M15 8v8M19 10v4"/></svg></div>
       <div><h3>Made for Wispr Flow</h3>
-        <p>Hold your <b>Wispr Flow</b> key and talk into the recap box, the correction bar or Ask. Debrief spots dictated recaps, tags them, and counts how much of your CRM was written by voice. No Wispr Flow? The mic button uses your browser's speech recognition instead.</p>
+        <p>Hold your <b>Wispr Flow</b> key and talk into the recap box, the correction bar or Ask. Sayso spots dictated recaps, tags them, and counts how much of your CRM was written by voice. No Wispr Flow? The mic button uses your browser's speech recognition instead.</p>
         <p style="margin-top:12px"><a class="btn" href="https://wisprflow.ai" target="_blank" rel="noopener" style="padding:8px 14px;font-size:13.5px">Get Wispr Flow ↗</a></p></div>
     </div>
       <div class="row2 ">
-        <div class="rv"><span class="tagp">Streaming extraction</span><h3>Watch the record fill itself in</h3><p>Dictate a messy, natural recap. Claude turns it into clean fields while it's still writing, so there's no spinner and nothing to wait for. Extraction starts the moment you stop talking.</p><ul class="ticks"><li><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.4"><path d="M20 6 9 17l-5-5"/></svg>Self-corrections understood: “Tuesday, no wait, Thursday”</li><li><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.4"><path d="M20 6 9 17l-5-5"/></svg>Spoken emails normalised: “priya at acme dot in”</li><li><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.4"><path d="M20 6 9 17l-5-5"/></svg>Blank stays blank: nothing is invented</li></ul></div>
-        <figure class="frame rv"><div class="fbar"><i></i><i></i><i></i><span>debrief.app/app</span></div><img src="/media/app-stream.jpg" width="2400" height="1656" alt="Debrief filling in a CRM record from a spoken recap, some fields still loading" loading="lazy" decoding="async"></figure>
+        <div class="rv"><span class="tagp">Talk, don't type</span><h3>Hold your Wispr Flow key and talk</h3><p>Dictate a messy, natural recap with Wispr Flow. Sayso spots the dictation, and one click (or stopping the mic) turns it into clean CRM fields, with no API key needed.</p><ul class="ticks"><li><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.4"><path d="M20 6 9 17l-5-5"/></svg>Self-corrections understood: “Tuesday, no wait, Thursday”</li><li><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.4"><path d="M20 6 9 17l-5-5"/></svg>Spoken emails normalised: “priya at acme dot in”</li><li><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.4"><path d="M20 6 9 17l-5-5"/></svg>Blank stays blank: nothing is invented</li></ul></div>
+        <figure class="frame rv"><div class="fbar"><i></i><i></i><i></i><span>sayso.app/app</span></div><img src="/media/app-dictate.jpg" width="2400" height="1224" alt="A recap dictated with Wispr Flow, with the Wispr Flow bar confirming the dictation" loading="lazy" decoding="async"></figure>
       </div>
       <div class="row2 flip">
         <div class="rv"><span class="tagp">Hands-free review</span><h3>Fix it by voice. Get the email for free.</h3><p>Say what's wrong and only that field changes. Say “write the follow-up” and a short, specific email appears, drafted from the same call. Say “save” and you're done.</p><ul class="ticks"><li><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.4"><path d="M20 6 9 17l-5-5"/></svg>Voice corrections and commands, no mouse needed</li><li><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.4"><path d="M20 6 9 17l-5-5"/></svg>Follow-up email you can copy or open in your mail app</li><li><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.4"><path d="M20 6 9 17l-5-5"/></svg>Saved with the call, so nothing gets lost</li></ul></div>
-        <figure class="frame rv"><div class="fbar"><i></i><i></i><i></i><span>debrief.app/app</span></div><img src="/media/app-email.jpg" width="1216" height="1162" alt="Voice correction bar and a drafted follow-up email" loading="lazy" decoding="async"></figure>
+        <figure class="frame rv"><div class="fbar"><i></i><i></i><i></i><span>sayso.app/app</span></div><img src="/media/app-email.jpg" width="1216" height="1162" alt="Voice correction bar and a drafted follow-up email" loading="lazy" decoding="async"></figure>
       </div>
       <div class="row2 ">
         <div class="rv"><span class="tagp">Ask your pipeline</span><h3>Ask your calls anything</h3><p>Who needs a follow-up this week? Which deals are stuck? What do prospects keep complaining about? Ask by voice or text and get a straight answer that cites the calls it came from.</p><ul class="ticks"><li><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.4"><path d="M20 6 9 17l-5-5"/></svg>Answers grounded only in your own call log</li><li><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.4"><path d="M20 6 9 17l-5-5"/></svg>Numbered citations jump to the exact call</li><li><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.4"><path d="M20 6 9 17l-5-5"/></svg>Says so when the answer isn't in your data</li></ul></div>
-        <figure class="frame rv"><div class="fbar"><i></i><i></i><i></i><span>debrief.app/app</span></div><img src="/media/app-ask.jpg" width="2400" height="702" alt="Ask your pipeline answering with cited calls" loading="lazy" decoding="async"></figure>
+        <figure class="frame rv"><div class="fbar"><i></i><i></i><i></i><span>sayso.app/app</span></div><img src="/media/app-ask.jpg" width="2400" height="798" alt="Ask your pipeline answering with cited calls" loading="lazy" decoding="async"></figure>
       </div>
       <div class="row2 flip">
         <div class="rv"><span class="tagp">Proof</span><h3>See the time you're getting back</h3><p>Every call adds to a live proof page: calls logged, minutes saved, fields filled and follow-ups sent, plus a share card for your weekly update.</p><ul class="ticks"><li><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.4"><path d="M20 6 9 17l-5-5"/></svg>Per-day chart of real usage</li><li><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.4"><path d="M20 6 9 17l-5-5"/></svg>Feature your best calls with contact details scrubbed</li><li><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.4"><path d="M20 6 9 17l-5-5"/></svg>One-click share card for #NoHandsChallenge</li></ul></div>
-        <figure class="frame rv"><div class="fbar"><i></i><i></i><i></i><span>debrief.app/proof</span></div><img src="/media/proof.jpg" width="2560" height="1440" alt="Proof page with stats and a calls-per-day chart" loading="lazy" decoding="async"></figure>
+        <figure class="frame rv"><div class="fbar"><i></i><i></i><i></i><span>sayso.app/proof</span></div><img src="/media/proof.jpg" width="2560" height="1440" alt="Proof page with stats and a calls-per-day chart" loading="lazy" decoding="async"></figure>
       </div>
     <div class="trio">
       <div class="card rv"><div class="ico"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="12" r="9"/><path d="M12 7v5l3 2"/></svg></div><h3>Follow-ups that surface</h3><p>"Next Friday" becomes a real date, and due follow-ups sit at the top until you mark them done.</p></div>
       <div class="card rv"><div class="ico"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M4 4h16v16H4zM4 10h16M10 4v16"/></svg></div><h3>HubSpot &amp; CSV</h3><p>Sync contacts, notes and tasks to HubSpot, or export a CSV that opens straight in Sheets or Excel.</p></div>
-      <div class="card rv"><div class="ico"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="4" y="10" width="16" height="11" rx="2"/><path d="M8 10V7a4 4 0 0 1 8 0v3"/></svg></div><h3>Remembers every contact</h3><p>Call Priya again and Debrief shows your history with her, fills in what you didn't repeat, and closes the old follow-up.</p></div>
+      <div class="card rv"><div class="ico"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="4" y="10" width="16" height="11" rx="2"/><path d="M8 10V7a4 4 0 0 1 8 0v3"/></svg></div><h3>Remembers every contact</h3><p>Call Priya again and Sayso shows your history with her, fills in what you didn't repeat, and closes the old follow-up.</p></div>
     </div>
   </div>
 </section>
@@ -398,7 +398,7 @@
       <div class="card rv"><h3>Typed between meetings</h3>
         <dl class="kv"><dt>Contact</dt><dd>Priya</dd><dt>Company</dt><dd>Acme</dd><dt>Email</dt><dd class="miss">missing</dd><dt>Stage</dt><dd class="miss">missing</dd><dt>Value</dt><dd class="miss">missing</dd><dt>Next step</dt><dd>follow up</dd><dt>Follow-up</dt><dd class="miss">no date</dd><dt>Notes</dt><dd>good call, interested</dd></dl>
         <p class="foot">3 of 8 key fields, no date, no email sent. Typical when it's written up hours later.</p></div>
-      <div class="card after rv"><h3>Debrief · 30 seconds of talking</h3>
+      <div class="card after rv"><h3>Sayso · 30 seconds of talking</h3>
         <dl class="kv"><dt>Contact</dt><dd>Priya Nair · Head of Ops</dd><dt>Company</dt><dd>Acme Logistics</dd><dt>Email</dt><dd>priya@acmelogistics.in</dd><dt>Stage</dt><dd>Demo</dd><dt>Value</dt><dd>₹4,00,000/yr</dd><dt>Next step</dt><dd>Send demo invite to her three team leads</dd><dt>Follow-up</dt><dd>Thu, 22 Oct</dd><dt>Notes</dt><dd>Loses ~2 hrs/day on dispatch spreadsheets; drivers double-booked.</dd></dl>
         <p class="foot">Every key field, a dated follow-up, and the email already drafted.</p></div>
     </div>
@@ -409,7 +409,7 @@
   <div class="wrap">
     <div class="head rv"><div><div class="eyebrow">Who it's for</div><h2>Anyone who sells<br>and hates admin.</h2></div></div>
     <div class="people">
-      <div class="card rv"><div class="ico"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M12 2l3 7h7l-5.5 4 2 7L12 16l-6.5 4 2-7L2 9h7z"/></svg></div><h3>Founders doing their own sales</h3><p>Ten calls a week between building the product. Debrief keeps the pipeline honest without a sales ops hire.</p></div>
+      <div class="card rv"><div class="ico"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M12 2l3 7h7l-5.5 4 2 7L12 16l-6.5 4 2-7L2 9h7z"/></svg></div><h3>Founders doing their own sales</h3><p>Ten calls a week between building the product. Sayso keeps the pipeline honest without a sales ops hire.</p></div>
       <div class="card rv"><div class="ico"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="8" r="4"/><path d="M4 21c1.5-4 4.5-6 8-6s6.5 2 8 6"/></svg></div><h3>Freelancers &amp; consultants</h3><p>Client calls turn into tidy notes, a dated next step and a follow-up email, so nothing slips while you do the work.</p></div>
       <div class="card rv"><div class="ico"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="9" cy="8" r="3.5"/><circle cx="17" cy="9" r="2.5"/><path d="M2.5 20c1-3.5 3.5-5.5 6.5-5.5s5.5 2 6.5 5.5M15 14.5c2.8 0 4.8 1.6 6 4.5"/></svg></div><h3>Small sales teams</h3><p>Reps talk, HubSpot fills itself, and the manager finally sees next steps and deal values on every record.</p></div>
     </div>
@@ -423,7 +423,7 @@
     </div>
     <div class="compare rv" id="compare">
       <div class="card slow"><small class="eyebrow" style="color:var(--muted)">Typing it up</small><div class="track"><i></i></div><big>~6:00</big><p>Open the CRM, find the contact, fill fields, write notes, create a task.</p></div>
-      <div class="card fast"><small class="eyebrow">Debrief</small><div class="track"><i></i></div><big class="grad">~0:35</big><p>Thirty seconds of talking, a few seconds of review, one keystroke to save.</p></div>
+      <div class="card fast"><small class="eyebrow">Sayso</small><div class="track"><i></i></div><big class="grad">~0:35</big><p>Thirty seconds of talking, a few seconds of review, one keystroke to save.</p></div>
     </div>
 
     <div class="head rv" style="margin:90px 0 26px">
@@ -436,7 +436,7 @@
       <div><b data-k="avg_completeness" data-suffix="%">0</b><span>Key fields filled</span></div>
       <div><b data-k="follow_ups_set">0</b><span>Follow-ups set</span></div>
     </div>
-    <p class="note" id="statsNote">These come from real sales calls logged with Debrief.</p>
+    <p class="note" id="statsNote">These come from real sales calls logged with Sayso.</p>
   </div>
 </section>
 
@@ -452,7 +452,7 @@
         <label><div class="lt"><span>Minutes to write up a call by hand</span><b id="cMinV"></b></div><input id="cMin" type="range" min="2" max="20" step="1" value="6"></label>
         <label><div class="lt"><span>People on your team</span><b id="cPeopleV"></b></div><input id="cPeople" type="range" min="1" max="25" step="1" value="1"></label>
         <label><div class="lt"><span>What an hour of their time is worth</span><b id="cRateV"></b></div><input id="cRate" type="range" min="200" max="5000" step="100" value="800"></label>
-        <p class="note">Assumes about 35 seconds per call with Debrief (30s talking, a few seconds to review) and 48 working weeks a year.</p>
+        <p class="note">Assumes about 35 seconds per call with Sayso (30s talking, a few seconds to review) and 48 working weeks a year.</p>
       </div>
       <div class="out">
         <div><small>Hours back a year</small><big id="cHours"></big></div>
@@ -467,7 +467,7 @@
   <div class="wrap">
     <div class="head rv">
       <div><div class="eyebrow">Pricing</div><h2>Free while in beta.</h2></div>
-      <p class="lede">Bring your own Claude API key. A typical recap costs under a cent to process.</p>
+      <p class="lede">No API key, no account, nothing to pay. The built-in engine runs on your own machine.</p>
     </div>
     <div class="plans">
       <div class="card plan rv"><h3>Solo</h3><div class="price">₹0</div><p>For founders and freelancers doing their own sales.</p>
@@ -484,11 +484,12 @@
   <div class="wrap">
     <div class="head rv"><div><div class="eyebrow">FAQ</div><h2>Questions, answered.</h2></div></div>
     <div class="faq rv">
-      <details open><summary>How does Debrief work with Wispr Flow?</summary><p>Hold your Wispr Flow key and talk into any field in Debrief, just like any other app. Debrief recognises dictated recaps and shows on the proof page how much was written by voice. Without Wispr Flow, the mic button uses your browser's speech recognition.</p></details>
-      <details><summary>What if it gets something wrong?</summary><p>Say the correction ("her email is actually…") or edit the field directly before you save. Debrief is told never to guess: if you didn't mention an email or amount, that field stays blank instead of being made up.</p></details>
-      <details><summary>Where is my data stored?</summary><p>In a JSON file on the machine running Debrief. Your recap is sent to the Claude API for extraction, and to HubSpot only if you turn sync on.</p></details>
+      <details open><summary>How does Sayso work with Wispr Flow?</summary><p>Hold your Wispr Flow key and talk into any field in Sayso, just like any other app. Sayso recognises dictated recaps and shows on the proof page how much was written by voice. Without Wispr Flow, the mic button uses your browser's speech recognition.</p></details>
+      <details><summary>What if it gets something wrong?</summary><p>Say the correction ("her email is actually…") or edit the field directly before you save. Sayso is told never to guess: if you didn't mention an email or amount, that field stays blank instead of being made up.</p></details>
+      <details><summary>Do I need an API key?</summary><p>No. Sayso's built-in engine pulls out names, companies, emails, phone numbers, amounts in lakh, crore or dollars, deal stages, dates and next steps, handles spoken corrections and answers pipeline questions, all without an API key. If you add an Anthropic key, Claude takes over for even better accuracy.</p></details>
+      <details><summary>Where is my data stored?</summary><p>In a JSON file on the machine running Sayso. Recaps are processed on that machine by Sayso's built-in engine; nothing leaves it unless you turn on HubSpot sync or add an optional Claude key.</p></details>
       <details><summary>Which CRMs does it work with?</summary><p>It has a built-in CRM, a CSV export for Google Sheets or Excel, and HubSpot sync (contacts, call notes and follow-up tasks). The free HubSpot CRM works.</p></details>
-      <details><summary>How fast is it?</summary><p>Extraction streams, so fields appear while Claude is still writing, and the app shows exactly how long each one took. Saving is instant; HubSpot syncs afterwards without making you wait.</p></details>
+      <details><summary>How fast is it?</summary><p>The built-in engine fills the record in a fraction of a second, and the app shows exactly how long it took. Saving is instant; HubSpot syncs afterwards without making you wait.</p></details>
     </div>
   </div>
 </section>
@@ -499,15 +500,15 @@
       <div class="eyebrow">Your next call is the first one</div>
       <h2>Stop typing up calls.<br><span class="grad">Start talking them down.</span></h2>
       <p class="lede">Open the app, hit the mic and say what happened. That's the whole setup.</p>
-      <div class="ctas"><a class="btn primary" href="/app">Open Debrief</a></div>
+      <div class="ctas"><a class="btn primary" href="/app">Open Sayso</a></div>
     </div>
   </div>
 </section>
 
 <footer>
   <div class="wrap">
-    <a class="logo" href="/"><i><svg viewBox="0 0 24 24" fill="none" stroke="#06080b" stroke-width="2.6" stroke-linecap="round"><path d="M5 10v4M9 6v12M13 8v8M17 11v2M21 9v6"/></svg></i>Debrief</a>
-    <span>Built hands-free with <a href="https://wisprflow.ai" target="_blank" rel="noopener" style="color:var(--violet)">Wispr Flow</a> for No Hands: The Wispr Challenge · #NoHandsChallenge</span>
+    <a class="logo" href="/"><i><svg viewBox="0 0 24 24" fill="none" stroke="#06080b" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"><path d="M4 6.5A2.5 2.5 0 0 1 6.5 4h11A2.5 2.5 0 0 1 20 6.5v8a2.5 2.5 0 0 1-2.5 2.5H11l-4.5 3.5V17A2.5 2.5 0 0 1 4 14.5z"/><path d="M9.5 9v3M12 7.5v6M14.5 9v3"/></svg></i>Sayso</a>
+    <span>Built hands-free with <a href="https://wisprflow.ai" target="_blank" rel="noopener" style="color:var(--accent)">Wispr Flow</a> for No Hands: The Wispr Challenge · #NoHandsChallenge</span>
   </div>
 </footer>
 
@@ -592,7 +593,7 @@ fetch("/api/proof").then((r) => r.json()).then(({ stats }) => {
     document.getElementById("statsNote").textContent = "No calls logged yet. Your numbers appear here after your first recap.";
     return;
   }
-  document.getElementById("statsNote").textContent = `Based on ${stats.calls_logged} real call${stats.calls_logged === 1 ? "" : "s"} logged with Debrief during the challenge.`;
+  document.getElementById("statsNote").textContent = `Based on ${stats.calls_logged} real call${stats.calls_logged === 1 ? "" : "s"} logged with Sayso during the challenge.`;
   const countUp = () => statsEl.querySelectorAll("b[data-k]").forEach((b) => {
     const target = stats[b.dataset.k] ?? 0, suffix = b.dataset.suffix || "", t0 = performance.now();
     const step = (t) => {

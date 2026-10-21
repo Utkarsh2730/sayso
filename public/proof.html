@@ -3,15 +3,15 @@
 <head>
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width, initial-scale=1">
-<title>Debrief · Proof</title>
-<meta name="description" content="Real results from using Debrief on real sales calls.">
+<title>Sayso · Proof</title>
+<meta name="description" content="Real results from using Sayso on real sales calls.">
 <meta name="theme-color" content="#06080b">
-<link rel="icon" href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 32 32'%3E%3Crect width='32' height='32' rx='8' fill='%235eead4'/%3E%3Cpath d='M9 13v6M13 9v14M17 11v10M21 14v4M25 12v8' stroke='%2306080b' stroke-width='2.4' stroke-linecap='round'/%3E%3C/svg%3E">
+<link rel="icon" href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 32 32'%3E%3Crect width='32' height='32' rx='8' fill='%23c8f25a'/%3E%3Cg transform='translate(4 4)' fill='none' stroke='%2306080b' stroke-width='2.2' stroke-linecap='round' stroke-linejoin='round'%3E%3Cpath d='M4 6.5A2.5 2.5 0 0 1 6.5 4h11A2.5 2.5 0 0 1 20 6.5v8a2.5 2.5 0 0 1-2.5 2.5H11l-4.5 3.5V17A2.5 2.5 0 0 1 4 14.5z'/%3E%3Cpath d='M9.5 9v3M12 7.5v6M14.5 9v3'/%3E%3C/g%3E%3C/svg%3E">
 <style>
   :root {
     --bg: #06080b; --panel: #0b0f14; --card: rgba(255,255,255,.03); --line: rgba(255,255,255,.08); --line2: rgba(255,255,255,.14);
     --text: #eef2f5; --muted: #8b95a1; --dim: #5d6773;
-    --aqua: #5eead4; --aqua2: #22d3ee; --violet: #a78bfa; --bar: #0d9488; --bar-hi: #14b8a6;
+    --brand: #c8f25a; --brand2: #f9d65c; --accent: #ff8a6b; --bar: #65a30d; --bar-hi: #4d7c0f;
     --sans: ui-sans-serif, -apple-system, "Segoe UI", Roboto, "Helvetica Neue", sans-serif;
     --mono: ui-monospace, "SF Mono", "Cascadia Code", Menlo, monospace;
   }
@@ -20,26 +20,26 @@
   html { overflow-x: clip; }
   body { margin: 0; background: var(--bg); color: var(--text); font: 15px/1.55 var(--sans); -webkit-font-smoothing: antialiased; }
   body::before { content: ""; position: fixed; inset: 0; pointer-events: none; z-index: -1;
-    background: radial-gradient(700px 420px at 20% -5%, rgba(94,234,212,.1), transparent 70%), radial-gradient(600px 400px at 90% 0%, rgba(167,139,250,.08), transparent 70%); }
+    background: radial-gradient(700px 420px at 20% -5%, rgba(200,242,90,.1), transparent 70%), radial-gradient(600px 400px at 90% 0%, rgba(255,138,107,.08), transparent 70%); }
   a { color: inherit; text-decoration: none; }
   button { font: inherit; color: inherit; }
   header { position: sticky; top: 0; z-index: 20; background: rgba(6,8,11,.75); backdrop-filter: blur(14px); -webkit-backdrop-filter: blur(14px); border-bottom: 1px solid var(--line); }
   header .in { max-width: 1120px; margin: 0 auto; padding: 0 20px; height: 60px; display: flex; align-items: center; gap: 14px; }
   .logo { display: flex; align-items: center; gap: 10px; font-weight: 700; letter-spacing: -.02em; font-size: 17px; }
-  .logo i { width: 26px; height: 26px; border-radius: 7px; background: var(--aqua); display: grid; place-items: center; }
+  .logo i { width: 26px; height: 26px; border-radius: 7px; background: var(--brand); display: grid; place-items: center; }
   .logo i svg { width: 16px; height: 16px; }
   header nav { display: flex; gap: 18px; font-size: 14px; color: var(--muted); margin-left: 10px; }
   header nav a:hover, header nav a.cur { color: var(--text); }
   header .sp { flex: 1; }
   .btn { display: inline-flex; align-items: center; gap: 8px; padding: 10px 16px; border-radius: 999px; font-weight: 600; font-size: 14px; border: 1px solid var(--line2); background: transparent; cursor: pointer; white-space: nowrap; }
   .btn:hover { border-color: rgba(255,255,255,.3); }
-  .btn.primary { background: var(--aqua); color: #04110f; border-color: var(--aqua); }
+  .btn.primary { background: var(--brand); color: #151b04; border-color: var(--brand); }
   .btn.sm { padding: 6px 12px; font-size: 12.5px; }
 
   main { max-width: 1120px; margin: 0 auto; padding: 48px 20px 90px; }
-  .eyebrow { font: 500 12px/1 var(--mono); letter-spacing: .14em; text-transform: uppercase; color: var(--aqua); }
+  .eyebrow { font: 500 12px/1 var(--mono); letter-spacing: .14em; text-transform: uppercase; color: var(--brand); }
   h1 { font-size: clamp(32px, 5vw, 54px); line-height: 1.05; letter-spacing: -.04em; margin: 14px 0 12px; }
-  .grad { background: linear-gradient(100deg, var(--aqua) 10%, var(--aqua2) 45%, var(--violet) 90%); -webkit-background-clip: text; background-clip: text; color: transparent; }
+  .grad { background: linear-gradient(100deg, var(--brand) 10%, var(--brand2) 45%, var(--accent) 90%); -webkit-background-clip: text; background-clip: text; color: transparent; }
   .lede { color: var(--muted); font-size: 17px; max-width: 680px; margin: 0; }
   h2 { font-size: 22px; letter-spacing: -.02em; margin: 0 0 6px; }
   section { margin-top: 56px; }
@@ -74,7 +74,7 @@
   .flow { display: grid; grid-template-columns: 1fr 1fr 1fr; gap: 12px; margin-bottom: 16px; }
   @media (max-width: 900px) { .flow { grid-template-columns: 1fr; } }
   .step { border: 1px solid var(--line); border-radius: 14px; padding: 16px; background: var(--card); min-width: 0; }
-  .step h3 { margin: 0 0 10px; font: 500 11px var(--mono); letter-spacing: .12em; text-transform: uppercase; color: var(--aqua); display: flex; justify-content: space-between; gap: 8px; }
+  .step h3 { margin: 0 0 10px; font: 500 11px var(--mono); letter-spacing: .12em; text-transform: uppercase; color: var(--brand); display: flex; justify-content: space-between; gap: 8px; }
   .step h3 span { color: var(--dim); letter-spacing: .04em; text-transform: none; }
   .step p, .step pre { margin: 0; font-size: 14px; color: #c3cbd4; white-space: pre-wrap; font-family: var(--sans); }
   .step q { color: #dfe5ea; font-style: italic; }
@@ -88,15 +88,15 @@
   textarea { width: 100%; min-height: 150px; background: rgba(0,0,0,.3); color: var(--text); border: 1px solid var(--line); border-radius: 10px; padding: 12px; font: 14px/1.55 var(--sans); resize: vertical; }
   .row { display: flex; gap: 10px; flex-wrap: wrap; align-items: center; margin-top: 12px; }
   .zero { margin-top: 34px; display: grid; grid-template-columns: 1.1fr 1fr; gap: 28px; align-items: center; border: 1px solid var(--line2); border-radius: 22px; padding: 32px;
-    background: radial-gradient(420px 260px at 85% 0%, rgba(167,139,250,.14), transparent 70%), radial-gradient(420px 260px at 0% 100%, rgba(94,234,212,.12), transparent 70%), var(--panel); }
+    background: radial-gradient(420px 260px at 85% 0%, rgba(255,138,107,.14), transparent 70%), radial-gradient(420px 260px at 0% 100%, rgba(200,242,90,.12), transparent 70%), var(--panel); }
   .zero h2 { font-size: 26px; margin: 10px 0 8px; }
   .zero p { color: var(--muted); margin: 0 0 20px; }
   .zero ul { list-style: none; margin: 0; padding: 0; display: grid; gap: 10px; }
   .zero li { display: flex; gap: 12px; align-items: center; padding: 12px 14px; border: 1px solid var(--line); border-radius: 12px; background: var(--card); font-size: 14px; color: #c3cbd4; }
   .zero li b { font: 600 22px var(--sans); color: var(--dim); min-width: 48px; letter-spacing: -.03em; }
   @media (max-width: 800px) { .zero { grid-template-columns: 1fr; padding: 24px; } }
-  .owner { margin-top: 56px; border: 1px dashed rgba(167,139,250,.4); border-radius: 16px; padding: 18px; color: #d6d0f5; font-size: 14px; }
-  .owner b { color: var(--violet); font: 600 11px var(--mono); letter-spacing: .1em; }
+  .owner { margin-top: 56px; border: 1px dashed rgba(255,138,107,.4); border-radius: 16px; padding: 18px; color: #ffe0d6; font-size: 14px; }
+  .owner b { color: var(--accent); font: 600 11px var(--mono); letter-spacing: .1em; }
   .empty { color: var(--dim); border: 1px dashed var(--line2); border-radius: 14px; padding: 36px 20px; text-align: center; }
   .empty b { display: block; color: var(--muted); font-size: 15px; margin-bottom: 4px; }
   .toast { position: fixed; left: 50%; bottom: 24px; transform: translate(-50%, 20px); opacity: 0; background: #111820; border: 1px solid var(--line2); border-radius: 999px; padding: 10px 18px; font-size: 14px; transition: opacity .2s, transform .2s; pointer-events: none; z-index: 30; max-width: calc(100% - 32px); }
@@ -106,7 +106,7 @@
 <body>
 <header>
   <div class="in">
-    <a class="logo" href="/"><i><svg viewBox="0 0 24 24" fill="none" stroke="#06080b" stroke-width="2.6" stroke-linecap="round"><path d="M5 10v4M9 6v12M13 8v8M17 11v2M21 9v6"/></svg></i>Debrief</a>
+    <a class="logo" href="/"><i><svg viewBox="0 0 24 24" fill="none" stroke="#06080b" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"><path d="M4 6.5A2.5 2.5 0 0 1 6.5 4h11A2.5 2.5 0 0 1 20 6.5v8a2.5 2.5 0 0 1-2.5 2.5H11l-4.5 3.5V17A2.5 2.5 0 0 1 4 14.5z"/><path d="M9.5 9v3M12 7.5v6M14.5 9v3"/></svg></i>Sayso</a>
     <nav><a href="/app">App</a><a class="cur" href="/proof">Proof</a></nav>
     <span class="sp"></span>
     <a class="btn sm primary" href="/app">Try it</a>
@@ -116,7 +116,7 @@
 <main>
   <div class="eyebrow">Proof of real use</div>
   <h1 id="headline">Real calls. <span class="grad">Real time saved.</span></h1>
-  <p class="lede" id="lede">Every number on this page comes from sales calls logged with Debrief, by voice, during the No Hands challenge.</p>
+  <p class="lede" id="lede">Every number on this page comes from sales calls logged with Sayso, by voice, during the No Hands challenge.</p>
 
   <div class="zero" id="zero" hidden>
     <div>
@@ -154,7 +154,7 @@
     <h2>Share your progress</h2>
     <p class="sub">A card and post text for your weekly #NoHandsChallenge check-in.</p>
     <div class="share">
-      <canvas id="card" width="1200" height="630" aria-label="Share card with Debrief results"></canvas>
+      <canvas id="card" width="1200" height="630" aria-label="Share card with Sayso results"></canvas>
       <div>
         <textarea id="post"></textarea>
         <div class="row">
@@ -189,7 +189,7 @@ function render(p) {
   if (none) return;
   if (s.calls_logged) {
     $("headline").innerHTML = `${s.calls_logged} real call${s.calls_logged === 1 ? "" : "s"}. <span class="grad">${s.minutes_saved} minutes saved.</span>`;
-    $("lede").textContent = `Every number here comes from sales calls logged with Debrief by voice${p.first_call_at ? ` since ${new Date(p.first_call_at).toLocaleDateString(undefined, { day: "numeric", month: "long" })}` : ""}. Time saved assumes ${p.manual_minutes} minutes to write up a call by hand, minus the time spent talking.`;
+    $("lede").textContent = `Every number here comes from sales calls logged with Sayso by voice${p.first_call_at ? ` since ${new Date(p.first_call_at).toLocaleDateString(undefined, { day: "numeric", month: "long" })}` : ""}. Time saved assumes ${p.manual_minutes} minutes to write up a call by hand, minus the time spent talking.`;
   }
   const tiles = [
     [s.calls_logged, "Calls logged", `avg ${s.avg_seconds_per_call}s of talking each`],
@@ -198,7 +198,7 @@ function render(p) {
     [`${s.voice_share}%`, "Recaps by voice", `${s.wispr_recaps} dictated with Wispr Flow`],
     [s.follow_ups_set, "Follow-ups scheduled", `${s.follow_ups_done} already done`],
     [s.emails_drafted, "Follow-up emails drafted", "from the same recap"],
-    [s.words_dictated.toLocaleString(), "Words dictated", "into Debrief"],
+    [s.words_dictated.toLocaleString(), "Words dictated", "into Sayso"],
     [s.synced_to_hubspot, "Synced to HubSpot", "contacts, notes and tasks"],
   ];
   $("tiles").innerHTML = tiles.map(([v, l, n]) => `<div class="tile"><b>${v}</b><span>${l}</span><small>${n}</small></div>`).join("");
@@ -269,7 +269,7 @@ function renderFeatured(list) {
 }
 
 function postText(s) {
-  return `Week ${weekNo()} of #NoHandsChallenge: I'm building Debrief, a voice-first CRM for sales calls.
+  return `Week ${weekNo()} of #NoHandsChallenge: I'm building Sayso, a voice-first CRM for sales calls.
 
 After every call I talk for ~30 seconds and it fills in the CRM record and drafts the follow-up email.
 
@@ -284,19 +284,19 @@ function drawCard(s) {
   const W = c.width, H = c.height;
   g.fillStyle = "#06080b"; g.fillRect(0, 0, W, H);
   const glow = (x, y, r, col) => { const gr = g.createRadialGradient(x, y, 0, x, y, r); gr.addColorStop(0, col); gr.addColorStop(1, "rgba(0,0,0,0)"); g.fillStyle = gr; g.fillRect(0, 0, W, H); };
-  glow(220, 80, 520, "rgba(94,234,212,.20)"); glow(1050, 120, 480, "rgba(167,139,250,.16)");
+  glow(220, 80, 520, "rgba(200,242,90,.20)"); glow(1050, 120, 480, "rgba(255,138,107,.16)");
   g.strokeStyle = "rgba(255,255,255,.05)"; g.lineWidth = 1;
   for (let x = 0; x < W; x += 60) { g.beginPath(); g.moveTo(x, 0); g.lineTo(x, H); g.stroke(); }
   for (let y = 0; y < H; y += 60) { g.beginPath(); g.moveTo(0, y); g.lineTo(W, y); g.stroke(); }
   const font = (w, px) => `${w} ${px}px -apple-system, "Segoe UI", Roboto, sans-serif`;
   // logo
-  g.fillStyle = "#5eead4"; roundRect(g, 64, 56, 44, 44, 11); g.fill();
+  g.fillStyle = "#c8f25a"; roundRect(g, 64, 56, 44, 44, 11); g.fill();
   g.strokeStyle = "#06080b"; g.lineWidth = 4; g.lineCap = "round";
   [[74, 74, 82], [82, 66, 90], [90, 70, 86], [98, 76, 80]].forEach(([x, a, b]) => { g.beginPath(); g.moveTo(x, a); g.lineTo(x, b); g.stroke(); });
-  g.fillStyle = "#eef2f5"; g.font = font(700, 30); g.fillText("Debrief", 122, 88);
+  g.fillStyle = "#eef2f5"; g.font = font(700, 30); g.fillText("Sayso", 122, 88);
   g.fillStyle = "#8b95a1"; g.font = font(500, 22); g.textAlign = "right"; g.fillText(`#NoHandsChallenge · week ${weekNo()}`, W - 64, 86); g.textAlign = "left";
   g.fillStyle = "#eef2f5"; g.font = font(700, 58); g.fillText("Talk for 30 seconds.", 64, 200);
-  const grad = g.createLinearGradient(64, 0, 760, 0); grad.addColorStop(0, "#5eead4"); grad.addColorStop(.5, "#22d3ee"); grad.addColorStop(1, "#a78bfa");
+  const grad = g.createLinearGradient(64, 0, 760, 0); grad.addColorStop(0, "#c8f25a"); grad.addColorStop(.5, "#f9d65c"); grad.addColorStop(1, "#ff8a6b");
   g.fillStyle = grad; g.fillText("Your CRM updates itself.", 64, 268);
   const items = [[s.calls_logged, "real calls logged"], [s.minutes_saved, "minutes saved"], [`${s.avg_completeness}%`, "fields filled"], [s.emails_drafted, "follow-ups drafted"]];
   items.forEach(([v, l], i) => {
@@ -312,7 +312,7 @@ function roundRect(g, x, y, w, h, r) { g.beginPath(); g.moveTo(x + r, y); g.arcT
 
 $("dlCard").onclick = () => {
   const a = document.createElement("a");
-  a.download = `debrief-week-${weekNo()}.png`;
+  a.download = `sayso-week-${weekNo()}.png`;
   a.href = $("card").toDataURL("image/png");
   a.click();
 };

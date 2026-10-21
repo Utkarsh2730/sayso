@@ -1,4 +1,4 @@
-// `npm run doctor`: checks everything Debrief needs on this computer and prints the fix for each problem.
+// `npm run doctor`: checks everything Sayso needs on this computer and prints the fix for each problem.
 import { execSync } from "node:child_process";
 import { existsSync, readFileSync } from "node:fs";
 import path from "node:path";
@@ -19,7 +19,7 @@ if (existsSync(path.join(ROOT, ".env"))) {
   }
 }
 
-console.log("\nDebrief check-up\n");
+console.log("\nSayso check-up\n");
 
 // 1. Node
 const major = Number(process.versions.node.split(".")[0]);
@@ -33,10 +33,10 @@ if (missing.length) bad(`Missing packages: ${missing.join(", ")}`, "npm install"
 else ok("Packages installed");
 
 // 3. Claude API key (models.retrieve costs no tokens)
-if (!existsSync(path.join(ROOT, ".env"))) warn("No .env file", "cp .env.example .env   then add your ANTHROPIC_API_KEY");
+if (!existsSync(path.join(ROOT, ".env"))) ok("No .env file (not needed: everything works with the built-in engine)");
 const model = env.CLAUDE_MODEL || "claude-opus-5-5";
 if (!env.ANTHROPIC_API_KEY) {
-  bad("ANTHROPIC_API_KEY is not set", "Add it to .env (get one at https://console.anthropic.com), or run `npm run demo` to try the app without one.");
+  ok("Using the built-in engine (no API key needed). Optional: add ANTHROPIC_API_KEY to .env to use Claude.");
 } else {
   try {
     const res = await fetch(`https://api.anthropic.com/v1/models/${model}`, {
@@ -76,7 +76,7 @@ try {
 }
 
 // 6. Landing-page media and proof snapshot
-const media = ["debrief-tour.webm", "app-review.jpg", "app-stream.jpg", "app-email.jpg", "app-ask.jpg", "proof.jpg", "og.jpg"];
+const media = ["sayso-tour.webm", "app-review.jpg", "app-dictate.jpg", "app-email.jpg", "app-ask.jpg", "proof.jpg", "og.jpg"];
 const noMedia = media.filter((f) => !existsSync(path.join(ROOT, "public", "media", f)));
 if (noMedia.length) bad(`Landing-page media missing: ${noMedia.join(", ")}`, "npm run record:tour");
 else ok("Tour video, screenshots and link-preview image present");
@@ -90,8 +90,8 @@ if (existsSync(path.join(ROOT, "data", "proof.json"))) {
 // 7. Git (needed to deploy)
 const inRepo = sh("git rev-parse --is-inside-work-tree") === "true";
 const branch = inRepo && sh("git rev-parse --abbrev-ref HEAD");
-if (!inRepo) warn("Not a git repository yet", "git init && git add -A && git commit -m \"Debrief\"   (needed to deploy from GitHub)");
-else if (!branch) warn("Git repository has no commits yet", "git add -A && git commit -m \"Debrief\"   then push to GitHub");
+if (!inRepo) warn("Not a git repository yet", "git init && git add -A && git commit -m \"Sayso\"   (needed to deploy from GitHub)");
+else if (!branch) warn("Git repository has no commits yet", "git add -A && git commit -m \"Sayso\"   then push to GitHub");
 else {
   const remote = sh("git remote get-url origin");
   const dirty = (sh("git status --porcelain") ?? "").split("\n").filter(Boolean).length;
