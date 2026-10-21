@@ -460,6 +460,26 @@ $("transcript").addEventListener("input", (e) => {
   updateSource();
 });
 
+// Diagnostics: /app?debug lists every key, paste and text event the recap box receives, to tell whether
+// a dictation tool's text reaches the page at all.
+if (new URLSearchParams(location.search).has("debug")) {
+  const log = document.createElement("pre");
+  log.id = "debugLog";
+  log.style.cssText = "position:fixed;right:12px;bottom:12px;z-index:50;width:min(420px,calc(100% - 24px));max-height:40vh;overflow:auto;margin:0;padding:10px 12px;border-radius:12px;background:#000;border:1px solid var(--line2);color:#cbd5df;font:11.5px/1.5 var(--mono);white-space:pre-wrap";
+  log.textContent = "Debug: click the recap box, then dictate.\n";
+  document.body.appendChild(log);
+  const write = (msg) => { log.textContent += `${new Date().toLocaleTimeString()} ${msg}\n`; log.scrollTop = log.scrollHeight; };
+  const box = $("transcript");
+  for (const type of ["focus", "blur"]) box.addEventListener(type, () => write(type));
+  box.addEventListener("keydown", (e) => write(`keydown key="${e.key}"${e.metaKey ? " +cmd" : ""}${e.ctrlKey ? " +ctrl" : ""}`));
+  box.addEventListener("paste", (e) => write(`paste (${(e.clipboardData?.getData("text") ?? "").length} chars)`));
+  box.addEventListener("beforeinput", (e) => write(`beforeinput ${e.inputType || "(none)"} ${(e.data ?? "").length} chars`));
+  box.addEventListener("input", (e) => write(`input ${e.inputType || "(no type)"} → box now ${box.value.length} chars`));
+  document.addEventListener("visibilitychange", () => write(`page ${document.visibilityState}`));
+  addEventListener("focus", () => write("window focus"));
+  addEventListener("blur", () => write("window blur (another app took focus)"));
+}
+
 // Hands-free: once dictation stops arriving for a moment, extract without a click.
 function scheduleAutoExtract() {
   cancelAutoExtract();
