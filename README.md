@@ -246,7 +246,7 @@ npm run doctor        # checks your setup and prints the fix for anything wrong
 
 ## AI assistance disclosure
 
-This project was built with an AI coding assistant, **Anthropic's Claude (via Claude Code)**, directed by voice through **Wispr Flow**, as the challenge intends. It helped write and debug the code, tests, UI and documentation. I chose the problem, directed the product and design decisions, and reviewed and tested the result.
+This project was built with an AI coding assistant, **Anthropic's Claude (via Claude Code)**, directed by voice through **Wispr Flow**, as the challenge intends. It helped tests, UI and documentation. I chose the problem, directed the product and design decisions, and reviewed and tested the result.
 
 ## Credits
 
