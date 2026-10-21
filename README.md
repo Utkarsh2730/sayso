@@ -33,7 +33,7 @@ fixes it by voice, drafts the follow-up email, and answers questions about your 
 2. In the correction bar, say or type **"change the stage to proposal"**, then **"write the follow-up"**, then **"save"**.
 3. In **Ask your pipeline**, click **"Who should I follow up with this week?"**, then click a citation to jump to the call.
 4. With [Wispr Flow](https://wisprflow.ai) installed: click the recap box, hold **fn** and talk through a call of your own. Release, pause, and it extracts by itself.
-5. Open **Proof** for the usage stats from real calls logged with Sayso.
+5. Open **Proof**: the page that tracks real use of Sayso (calls logged, minutes saved, fields filled, Wispr Flow recaps), with a per-day chart and a share card.
 
 **Run it yourself, no API key needed:**
 ```bash
@@ -79,7 +79,7 @@ Sayso replaces the form with your voice. You talk; it writes the record.
 - **A floating action bar** keeps the correction input and Save in view while you review.
 
 **Your company, or the demo**
-- **First-visit choice.** Set up your company (company name, your name, what you sell, currency) to log your own calls, or explore the demo's example calls. Switch any time from the workspace button in the header.
+- **First-visit choice.** Set up your company (company name, your name, what you sell, currency) to log your own calls, or explore the demo's example calls. Once set up, **Open app** goes straight to your calls; the workspace button in the header edits your details or switches to the demo.
 - **Your details are used.** Follow-up emails are signed with your name and company and mention what you sell; amounts without a currency use yours ("forty thousand a year" → `$40,000/yr`), while "four lakh" stays in rupees.
 - **Safe on your own copy.** Locally, Sayso only offers company setup, so example calls can never replace your real call log.
 
@@ -99,7 +99,7 @@ Sayso replaces the form with your voice. You talk; it writes the record.
 
 | Judging question | How Sayso answers it |
 |---|---|
-| Does it solve a real problem in your work? | Built for the author's own post-call admin; `/proof` shows real calls, minutes saved and field completeness. |
+| Does it solve a real problem in your work? | Built for the author's own post-call admin. `/proof` tracks real use: calls logged, minutes saved, field completeness and Wispr Flow recaps. |
 | Was Wispr used meaningfully? | Built by dictating to an AI coding tool with Wispr Flow, and Wispr Flow is the product's main input (see below). |
 | Does it work? | A live link that opens without sign-in or an API key. A pop-up offers **Open the demo** (6 example calls) or **Set up my company**, and each visitor's workspace is private to their browser. |
 | Is the video clear? | A captioned 1080p walkthrough video (linked in the submission) and the 30-second tour above, both recorded straight from the app by script (`npm run record:video`, `npm run record:tour`). |

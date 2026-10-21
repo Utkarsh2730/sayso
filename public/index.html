@@ -347,7 +347,7 @@
     <div class="steps">
       <div class="card rv"><div class="ico"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="9" y="3" width="6" height="12" rx="3"/><path d="M5 11a7 7 0 0 0 14 0M12 18v3"/></svg></div><h3>Talk it out</h3><p>Tap the mic or dictate with Wispr Flow. Ramble, correct yourself, spell out emails. It's fine.</p></div>
       <div class="card rv"><div class="ico"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M12 3l1.9 5.6L19.5 10l-5.6 1.9L12 17.5l-1.9-5.6L4.5 10l5.6-1.4z"/></svg></div><h3>Watch it fill in</h3><p>Sayso turns your recap into a full CRM record: contact, company, deal stage, value, next step and follow-up date, in a moment.</p></div>
-      <div class="card rv"><div class="ico"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M20 6 9 17l-5-5"/></svg></div><h3>Correct, email, save</h3><p>Fix anything by voice, say "write the follow-up" for a ready-to-send email, then "save". HubSpot syncs in the background.</p></div>
+      <div class="card rv"><div class="ico"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M20 6 9 17l-5-5"/></svg></div><h3>Correct, email, save</h3><p>Fix anything by voice, say "write the follow-up" for a ready-to-send email, then "save". The follow-up date lands in your list.</p></div>
     </div>
   </div>
 </section>
@@ -365,7 +365,7 @@
         <p style="margin-top:12px"><a class="btn" href="https://wisprflow.ai" target="_blank" rel="noopener" style="padding:8px 14px;font-size:13.5px">Get Wispr Flow ↗</a></p></div>
     </div>
       <div class="row2 ">
-        <div class="rv"><span class="tagp">Talk, don't type</span><h3>Hold your Wispr Flow key and talk</h3><p>Dictate a messy, natural recap with Wispr Flow. Sayso spots the dictation, and one click (or stopping the mic) turns it into clean CRM fields, with no API key needed.</p><ul class="ticks"><li><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.4"><path d="M20 6 9 17l-5-5"/></svg>Self-corrections understood: “Tuesday, no wait, Thursday”</li><li><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.4"><path d="M20 6 9 17l-5-5"/></svg>Spoken emails normalised: “priya at acme dot in”</li><li><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.4"><path d="M20 6 9 17l-5-5"/></svg>Blank stays blank: nothing is invented</li></ul></div>
+        <div class="rv"><span class="tagp">Talk, don't type</span><h3>Hold your Wispr Flow key and talk</h3><p>Dictate a messy, natural recap with Wispr Flow. Sayso spots the dictation, and two seconds after you stop talking it turns it into clean CRM fields by itself, with no API key needed.</p><ul class="ticks"><li><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.4"><path d="M20 6 9 17l-5-5"/></svg>Self-corrections understood: “Tuesday, no wait, Thursday”</li><li><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.4"><path d="M20 6 9 17l-5-5"/></svg>Spoken emails normalised: “priya at acme dot in”</li><li><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.4"><path d="M20 6 9 17l-5-5"/></svg>Blank stays blank: nothing is invented</li></ul></div>
         <figure class="frame rv"><div class="fbar"><i></i><i></i><i></i><span>sayso.app/app</span></div><img src="/media/app-dictate.jpg" width="2400" height="1224" alt="A recap dictated with Wispr Flow, with the Wispr Flow bar confirming the dictation" loading="lazy" decoding="async"></figure>
       </div>
       <div class="row2 flip">
@@ -467,7 +467,7 @@
   <div class="wrap">
     <div class="head rv">
       <div><div class="eyebrow">Pricing</div><h2>Free while in beta.</h2></div>
-      <p class="lede">No API key, no account, nothing to pay. The built-in engine runs on your own machine.</p>
+      <p class="lede">No API key, no account, nothing to pay. The built-in engine runs right in your browser.</p>
     </div>
     <div class="plans">
       <div class="card plan rv"><h3>Solo</h3><div class="price">₹0</div><p>For founders and freelancers doing their own sales.</p>
@@ -486,9 +486,10 @@
     <div class="faq rv">
       <details open><summary>How does Sayso work with Wispr Flow?</summary><p>Hold your Wispr Flow key and talk into any field in Sayso, just like any other app. Sayso recognises dictated recaps and shows on the proof page how much was written by voice. Without Wispr Flow, the mic button uses your browser's speech recognition.</p></details>
       <details><summary>What if it gets something wrong?</summary><p>Say the correction ("her email is actually…") or edit the field directly before you save. Sayso is told never to guess: if you didn't mention an email or amount, that field stays blank instead of being made up.</p></details>
+      <details><summary>Can I use it for my own company?</summary><p>Yes. Click <b>Open app</b> and choose <b>Set up my company</b>: add your company name, your name, what you sell and your currency. You get an empty workspace for your own calls, follow-up emails are signed with your details, and amounts default to your currency. Prefer to look around first? Choose <b>Open the demo</b>.</p></details>
       <details><summary>Do I need an API key?</summary><p>No. Sayso's built-in engine pulls out names, companies, emails, phone numbers, amounts in lakh, crore or dollars, deal stages, dates and next steps, handles spoken corrections and answers pipeline questions, all without an API key. If you add an Anthropic key, Claude takes over for even better accuracy.</p></details>
-      <details><summary>Where is my data stored?</summary><p>In a JSON file on the machine running Sayso. Recaps are processed on that machine by Sayso's built-in engine; nothing leaves it unless you turn on HubSpot sync or add an optional Claude key.</p></details>
-      <details><summary>Which CRMs does it work with?</summary><p>It has a built-in CRM, a CSV export for Google Sheets or Excel, and HubSpot sync (contacts, call notes and follow-up tasks). The free HubSpot CRM works.</p></details>
+      <details><summary>Where is my data stored?</summary><p>On this website, in your own browser: your company details and calls never reach a server. If you run Sayso yourself, they're kept in a file on that machine, and nothing leaves it unless you turn on HubSpot sync or add an optional Claude key.</p></details>
+      <details><summary>Which CRMs does it work with?</summary><p>It has a built-in CRM and a CSV export for Google Sheets or Excel. When you run Sayso yourself, it can also sync contacts, call notes and follow-up tasks to HubSpot.</p></details>
       <details><summary>How fast is it?</summary><p>The built-in engine fills the record in a fraction of a second, and the app shows exactly how long it took. Saving is instant; HubSpot syncs afterwards without making you wait.</p></details>
     </div>
   </div>
