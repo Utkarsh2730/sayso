@@ -10,3 +10,4 @@ data/workspaces/
 # Demo video: kept locally for uploading, not committed
 docs/*.webm
 dist/
+.vercel

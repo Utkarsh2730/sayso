@@ -22,7 +22,7 @@ fixes it by voice, drafts the follow-up email, and answers questions about your 
 
 </div>
 
-<!-- TODO: add the live demo URL and the 2-minute video link once published -->
+<!-- TODO: add the demo video link once published -->
 
 ![Sayso: a spoken recap on the left, the CRM record it produced on the right](public/media/app-review.jpg)
 
@@ -30,7 +30,7 @@ fixes it by voice, drafts the follow-up email, and answers questions about your 
 
 **Watch:** demo video (1:35, 1080p): _add YouTube link_ · [60-second product tour](public/media/sayso-tour.webm) (captioned, recorded from the app on sample data).
 
-**Try it live:** _add Render URL_. No sign-in: every visitor gets a private workspace with 6 sample calls. Suggested path:
+**Try it live:** **https://sayso-xi.vercel.app**. No sign-in: every visitor gets a private workspace with 6 sample calls. Suggested path:
 1. **Try a sample recap** and watch the record fill in. It's a second call with Priya, so you'll see her history and her phone number carried over.
 2. In the correction bar, say or type **"change the stage to proposal"**, then **"write the follow-up"**, then **"save"**.
 3. In **Ask your pipeline**, click **"Who should I follow up with this week?"** and click a citation.

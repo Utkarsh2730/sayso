@@ -1,0 +1,13 @@
+# Keep CLI uploads to what the static build needs
+node_modules
+.env
+.claude
+dist
+data/*.json
+!data/proof.json
+data/workspaces
+docs/*.webm
+*.local.md
+test
+# The full Node server runs locally or on Render; Vercel serves only the static build
+server.js
