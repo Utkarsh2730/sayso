@@ -10,18 +10,17 @@ A voice-first CRM for sales calls. Dictate a recap with Wispr Flow and Sayso fil
 fixes it by voice, drafts the follow-up email, and answers questions about your pipeline with citations.
 
 ![Node.js](https://img.shields.io/badge/Node.js-22+-339933?logo=nodedotjs&logoColor=white)
-![Wispr Flow](https://img.shields.io/badge/Wispr%20Flow-voice%20input-a78bfa)
+![Wispr Flow](https://img.shields.io/badge/Wispr%20Flow-hands--free%20input-ff8a6b)
 ![API key](https://img.shields.io/badge/API%20key-not%20needed-c8f25a)
-![Dependencies](https://img.shields.io/badge/runtime%20deps-1-5eead4)
+![Live](https://img.shields.io/badge/live-sayso--xi.vercel.app-c8f25a)
 ![Tests](https://img.shields.io/badge/tests-34%20passing-3f9d78)
 ![Licence](https://img.shields.io/badge/licence-MIT-64748b)
 
 **WeMakeDevs × Wispr Flow · No Hands: The Wispr Challenge · Builders track**
 
-[For judges](#for-judges) · [The solution](#the-solution) · [Features](#features) · [How Wispr Flow is used](#how-wispr-flow-is-used) · [Architecture](#architecture) · [Key prompts](#key-prompts) · [Getting started](#getting-started)
+[Live site](https://sayso-xi.vercel.app) · [For judges](#for-judges) · [The solution](#the-solution) · [Features](#features) · [How Wispr Flow is used](#how-wispr-flow-is-used) · [Architecture](#architecture) · [Built-in engine](#built-in-engine-no-api-key) · [Getting started](#getting-started)
 
 </div>
-
 
 ![Sayso: a spoken recap on the left, the CRM record it produced on the right](public/media/app-review.jpg)
 
@@ -29,12 +28,12 @@ fixes it by voice, drafts the follow-up email, and answers questions about your 
 
 **Watch:** [60-second product tour](public/media/sayso-tour.webm), captioned and recorded straight from the app.
 
-**Try it live:** **https://sayso-xi.vercel.app**. No sign-in: every visitor gets a private workspace with 6 example calls. Suggested path:
-1. **Try an example** and watch the record fill in. It's a second call with Priya, so you'll see her history and her phone number carried over.
+**Try it live:** **https://sayso-xi.vercel.app** → **Open app**. No sign-in, no API key: every visitor gets a private workspace with 6 example calls. Suggested path (about 2 minutes):
+1. Click **Try an example** and watch the record fill in. It's a second call with Priya, so you'll see her history and her phone number carried over.
 2. In the correction bar, say or type **"change the stage to proposal"**, then **"write the follow-up"**, then **"save"**.
-3. In **Ask your pipeline**, click **"Who should I follow up with this week?"** and click a citation.
-4. Open **Proof** to see real usage numbers from the author's own calls.
-5. **Reset to example data** puts the workspace back to a known state.
+3. In **Ask your pipeline**, click **"Who should I follow up with this week?"**, then click a citation to jump to the call.
+4. With [Wispr Flow](https://wisprflow.ai) installed: click the recap box, hold **fn** and talk through a call of your own. Release, pause, and it extracts by itself.
+5. Open **Proof** for the usage stats from real calls logged with Sayso.
 
 **Run it yourself, no API key needed:**
 ```bash
@@ -70,7 +69,8 @@ Sayso replaces the form with your voice. You talk; it writes the record.
 
 **Capture**
 - **Wispr Flow first.** The recap box shows your Wispr Flow shortcut (fn on Mac, Ctrl + Win on Windows) and confirms when dictation arrives. The browser's speech recognition is the fallback.
-- **No API key needed.** The built-in engine fills the record in milliseconds and runs entirely on your server. Add an Anthropic key and Claude takes over, streaming fields as it writes them. Extraction starts on its own when you stop the mic.
+- **No API key needed.** The built-in engine fills the record in milliseconds, in the browser on the live site or on your own machine. Add an Anthropic key to the local server and Claude takes over, streaming fields as it writes them.
+- **Hands-free.** Extraction starts on its own 2 seconds after Wispr Flow dictation stops (or when you stop the mic); dictated corrections and questions run by themselves too.
 - **Nothing invented.** Fields you didn't mention stay blank; names, emails, amounts and dates are never guessed.
 
 **Hands-free review**
@@ -104,32 +104,39 @@ Sayso replaces the form with your voice. You talk; it writes the record.
 | Where | How |
 |---|---|
 | **Building it** | Every prompt to the AI coding tool, the README, commit messages and progress posts were dictated with Wispr Flow. |
-| **Recap box** | Shows the Wispr Flow shortcut for your OS and lights up with "✓ Dictation detected" when Wispr Flow text arrives. |
-| **Detection** | Wispr Flow inserts whole phrases at once, while typing inserts one character at a time. Sayso tags recaps "dictated with Wispr Flow" on that signal. |
-| **Corrections and Ask** | Plain text fields, so Wispr Flow works in them like any other app. |
+| **Recap box** | Shows the Wispr Flow shortcut for your OS (fn on Mac, Ctrl + Win on Windows) and lights up with "✓ Dictation detected" when Wispr Flow text arrives. |
+| **Detection** | Wispr Flow inserts whole phrases at once (as a paste, one long insert, or text set through macOS accessibility), while typing adds a character at a time. Sayso measures how much text arrives per change and tags recaps "dictated with Wispr Flow". |
+| **Hands-free** | After a dictated recap, Sayso extracts by itself after a 2-second pause, with a visible countdown. Dictated corrections ("stage is proposal", "save") and Ask questions run about a second after you stop. |
 | **Measurement** | The stats bar and `/proof` count Wispr Flow recaps and the share of recaps given by voice. |
 
 ## Architecture
 
+Sayso runs two ways from the same pages and the same engine:
+
 ```mermaid
 graph LR
-  subgraph Browser
+  W[Wispr Flow<br/>desktop app] -->|dictates into| A
+  subgraph Pages
     L["/ landing"]
     A["/app<br/>recap · review · ask"]
     P["/proof<br/>stats · chart · share card"]
   end
-  W[Wispr Flow<br/>desktop app] -->|dictates into| A
-  A -->|NDJSON stream| S[Node.js server<br/>no framework]
-  P --> S
-  S -->|extract · revise · follow-up · ask| R[Built-in engine<br/>lib/rules.js, no key]
-  S -.->|optional, if a key is set| C[Claude<br/>structured outputs, streamed]
-  S --> D[(Workspace store<br/>JSON per workspace)]
+  A -->|/api calls| V[Live site on Vercel<br/>static-api.js in the browser]
+  V --> R1[Built-in engine<br/>lib/rules.js]
+  V --> B[(Visitor's browser<br/>localStorage)]
+  A -->|/api calls, NDJSON stream| S[Local Node.js server<br/>no framework]
+  S --> R2[Built-in engine<br/>lib/rules.js]
+  S -.->|optional, if a key is set| C[Claude<br/>structured outputs]
+  S --> D[(JSON file<br/>per workspace)]
   S -.->|background, optional| H[HubSpot]
 ```
 
+- **Live site (Vercel):** static files only. `public/static-api.js` answers the pages' `/api` calls inside the browser with the built-in engine, and each visitor's calls stay in their own browser, so nothing is shared and nothing can break server-side.
+- **Local server (`npm start`):** your real call log on disk, optional Claude and HubSpot, and the proof snapshot you publish.
+
 - **Two engines:** the built-in engine (`lib/rules.js`) needs no key. With `ANTHROPIC_API_KEY` set, Claude is used instead, and if a Claude call fails the built-in engine answers, so the app never breaks. Claude's JSON is parsed while it streams (`lib/partial-json.js`), so each field appears as soon as it's written. The browser cancels the request if you leave.
 - **Store:** each workspace is held in memory and written to disk in order (temp file + rename), so saves are instant and a crash can't corrupt the file.
-- **Public mode** (`PUBLIC_MODE=1`): private workspace per visitor with example calls, daily request caps per workspace, network and site, HubSpot off, `/proof` served from a committed snapshot.
+- **Public server mode** (`PUBLIC_MODE=1`, for hosting the full server): private workspace per visitor with example calls, daily request caps per workspace, network and site, HubSpot off, `/proof` served from a committed snapshot.
 
 **Tech stack:** Node.js 22 (no framework) · built-in rules engine · optional Anthropic Claude (`claude-opus-5-5`) · vanilla HTML/CSS/JS · Playwright (video recording, dev only).
 
@@ -203,21 +210,22 @@ For HubSpot sync and optional Claude: on [Render](https://dashboard.render.com) 
 | `PUBLIC_MODE` | `1` for a public site (a private workspace per visitor) | off |
 | `LIMIT_PER_WORKSPACE` / `LIMIT_PER_IP` / `LIMIT_GLOBAL` | Daily request caps in public mode | 40 / 80 / 1,500 |
 | `MANUAL_WRITEUP_MINUTES` | Minutes a manual write-up takes, for "minutes saved" | 6 |
-| `PUBLIC_URL` | Site address for link previews (Render sets it automatically) | from host |
+| `PUBLIC_URL` | Site address for link previews (Vercel and Render set it automatically) | from host |
 
 ## Quality and testing
 
 | Check | Result |
 |---|---|
 | Automated tests (`npm test`) | **34 passing**: the built-in engine on realistic recaps (lakh/crore/dollar amounts, spoken emails and phone numbers, "no wait" corrections, stages, departments vs companies), streaming extraction, corrections, follow-up emails, cited answers, workspace isolation, usage caps, reset rules, backup/restore, proof privacy scrubbing, CSV formula safety, partial-JSON parsing, page caching, and recovery when the API rejects the refusal-fallback beta. Runs the real server against a mocked Claude, so no key is needed. |
-| Judge walkthrough | Every step a judge takes (landing → tour → app → recap → correction → email → save → ask → export → proof → reset) passes on desktop and phone with no page errors, failed requests or sideways scrolling. |
-| Speed | Landing page is 14 KB gzipped and served from memory; fields stream as they're written; saves are optimistic. |
+| Judge walkthrough | Run against the live site in a fresh, signed-out browser: landing → tour video → app → example recap → correction → follow-up email → save → reload (calls kept) → Ask with citations → CSV and backup downloads → proof. Passes on desktop and phone with no page errors, failed requests or sideways scrolling. |
+| Wispr Flow input | Dictation inserted as a paste, a long insert or text set through accessibility is detected and auto-extracted; typing by hand is not. |
+| Speed | The built-in engine fills a record in about 0.03 s; saves are instant; pages are single files with no framework, served from Vercel's CDN. |
 | Production install | One runtime dependency (`@anthropic-ai/sdk`, only used if a key is set). Works fully offline with the built-in engine. |
 
 ## Security and privacy
 
 - Every value rendered in the page is HTML-escaped; record edits are limited to an allow-list of fields.
-- Public visitors get isolated workspaces (HTTP-only cookie); requests are rate-limited and inputs size-capped.
+- On the live site each visitor's calls stay in their own browser; on a public server, visitors get isolated workspaces (HTTP-only cookie), with rate limits and size caps.
 - `/proof` shows only aggregates and calls the owner chooses to feature; contact names are shortened and emails and phone numbers are scrubbed from the text.
 - CSV exports neutralise spreadsheet formulas; pages can't be embedded in other sites.
 
@@ -229,10 +237,12 @@ For HubSpot sync and optional Claude: on [Render](https://dashboard.render.com) 
 | `lib/rules.js` | Built-in engine: extraction, corrections, follow-up emails and pipeline answers without an API key |
 | `lib/extract.js` · `lib/claude.js` | Engine switch, Claude prompts and schemas · streaming structured-output helper |
 | `lib/partial-json.js` | Parses incomplete JSON while it streams |
-| `lib/store.js` · `lib/proof.js` | Workspace store and CSV · stats, proof data, scrubbing |
+| `lib/store.js` · `lib/proof.js` | Workspace store · proof snapshot files |
+| `lib/stats.js` · `lib/csv.js` | Stats, proof data and contact scrubbing · CSV export (shared by server and browser) |
 | `lib/hubspot.js` · `lib/limits.js` · `lib/samples.js` | HubSpot sync · usage caps · example calls |
-| `public/` | Landing page, app, proof page, `static-api.js` (in-browser API for the static build) and `media/` |
-| `scripts/` | Example mode, static build, Claude mock (tests), video recorders, doctor |
+| `public/` | Landing page, app, proof page, `static-api.js` (in-browser API for the live site) and `media/` |
+| `scripts/` | `try.js` (example calls), `build-static.mjs` (live site), video recorders, doctor, Claude mock for tests |
+| `vercel.json` · `render.yaml` · `Dockerfile` | Live site on Vercel · full server on Render · container |
 | `test/` | Unit and end-to-end tests |
 
 ## Limitations and roadmap
@@ -242,12 +252,12 @@ For HubSpot sync and optional Claude: on [Render](https://dashboard.render.com) 
 | Dictation detection is a heuristic, so pasted text also counts as dictated. | A confirmation toggle per recap. |
 | HubSpot sync follows HubSpot's v3 API but hasn't been tested against a live account. | Verify with a real portal; add Zoho and Salesforce. |
 | Data is a JSON file per workspace, and Render's free disk resets on redeploy. | A hosted database for multi-user teams. |
-| No sign-in: the local app is single-user, and public workspaces are tied to a browser cookie. | Accounts and shared team workspaces. |
+| No sign-in: the local app is single-user, and live-site data stays in one browser. | Accounts and shared team workspaces. |
 | Rate limits are in memory, per server instance. | Shared limits. |
 
 ## AI assistance disclosure
 
-This project was built with an AI coding assistant, **Anthropic's Claude (via Claude Code)**, directed by voice through **Wispr Flow**, as the challenge intends. It helped tests, UI and documentation. I chose the problem, directed the product and design decisions, and reviewed and tested the result.
+This project was built with an AI coding assistant, **Anthropic's Claude (via Claude Code)**, directed by voice through **Wispr Flow**, as the challenge intends. It helped with tests, UI and documentation. I chose the problem, directed the product and design decisions, and reviewed and tested the result.
 
 ## Credits
 
