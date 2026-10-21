@@ -26,7 +26,7 @@ fixes it by voice, drafts the follow-up email, and answers questions about your 
 
 ## For judges
 
-**Watch:** [60-second product tour](public/media/sayso-tour.webm), captioned and recorded straight from the app.
+**Watch:** [30-second product tour](public/media/sayso-tour.webm), captioned and recorded straight from the app.
 
 **Try it live:** **https://sayso-xi.vercel.app** → **Open app**. No sign-in, no API key. A pop-up asks how to start: **Open the demo** (6 example calls) or **Set up my company** (an empty workspace with your company name, your name, what you sell and your currency). Suggested path with the demo (about 2 minutes):
 1. Click **Try an example** and watch the record fill in. It's a second call with Priya, so you'll see her history and her phone number carried over.
@@ -101,8 +101,8 @@ Sayso replaces the form with your voice. You talk; it writes the record.
 |---|---|
 | Does it solve a real problem in your work? | Built for the author's own post-call admin; `/proof` shows real calls, minutes saved and field completeness. |
 | Was Wispr used meaningfully? | Built by dictating to an AI coding tool with Wispr Flow, and Wispr Flow is the product's main input (see below). |
-| Does it work? | A live link that opens without sign-in, with a private workspace per visitor, pre-filled with example calls. |
-| Is the video clear? | A captioned 1080p walkthrough video plus a 60-second tour, both recorded straight from the app by script (`npm run record:video`). |
+| Does it work? | A live link that opens without sign-in or an API key. A pop-up offers **Open the demo** (6 example calls) or **Set up my company**, and each visitor's workspace is private to their browser. |
+| Is the video clear? | A captioned 1080p walkthrough video (linked in the submission) and the 30-second tour above, both recorded straight from the app by script (`npm run record:video`, `npm run record:tour`). |
 
 ## How Wispr Flow is used
 
@@ -138,10 +138,9 @@ graph LR
 
 - **Live site (Vercel):** static files only. `public/static-api.js` answers the pages' `/api` calls inside the browser with the built-in engine, and each visitor's calls stay in their own browser, so nothing is shared and nothing can break server-side.
 - **Local server (`npm start`):** your real call log on disk, optional Claude and HubSpot, and the proof snapshot you publish.
-
 - **Two engines:** the built-in engine (`lib/rules.js`) needs no key. With `ANTHROPIC_API_KEY` set, Claude is used instead, and if a Claude call fails the built-in engine answers, so the app never breaks. Claude's JSON is parsed while it streams (`lib/partial-json.js`), so each field appears as soon as it's written. The browser cancels the request if you leave.
 - **Store:** each workspace is held in memory and written to disk in order (temp file + rename), so saves are instant and a crash can't corrupt the file.
-- **Public server mode** (`PUBLIC_MODE=1`, for hosting the full server): private workspace per visitor with example calls, daily request caps per workspace, network and site, HubSpot off, `/proof` served from a committed snapshot.
+- **Public server mode** (`PUBLIC_MODE=1`, for hosting the full server): private workspace per visitor with the same company-or-demo pop-up, daily request caps per workspace, network and site, HubSpot off, `/proof` served from a committed snapshot.
 
 **Tech stack:** Node.js 22 (no framework) · built-in rules engine · optional Anthropic Claude (`claude-opus-5-5`) · vanilla HTML/CSS/JS · Playwright (video recording, dev only).
 
@@ -198,7 +197,7 @@ npm run doctor        # checks your setup and prints the fix for anything wrong
 ```
 
 ### Deploy on Vercel (static, free)
-The live site needs no server: `npm run build:static` builds `dist/`, where `public/static-api.js` answers the app's `/api` calls in the browser with the built-in engine, and each visitor's calls stay in their own browser (seeded with the example calls).
+The live site needs no server: `npm run build:static` builds `dist/`, where `public/static-api.js` answers the app's `/api` calls in the browser with the built-in engine, and each visitor's company details and calls stay in their own browser (the pop-up offers company setup or the demo).
 1. On [Vercel](https://vercel.com/new): **Import** this GitHub repo. `vercel.json` sets the build; no settings or keys needed.
 2. To show your real results on `/proof`: on your local copy open `/proof` → **Publish proof snapshot**, commit `data/proof.json`, push. Vercel redeploys.
 
@@ -222,8 +221,9 @@ For HubSpot sync and optional Claude: on [Render](https://dashboard.render.com) 
 | Check | Result |
 |---|---|
 | Automated tests (`npm test`) | **37 passing**: company setup vs demo, currency defaults and sign-off, the built-in engine on realistic recaps (lakh/crore/dollar amounts, spoken emails and phone numbers, "no wait" corrections, stages, departments vs companies), streaming extraction, corrections, follow-up emails, cited answers, workspace isolation, usage caps, reset rules, backup/restore, proof privacy scrubbing, CSV formula safety, partial-JSON parsing, page caching, and recovery when the API rejects the refusal-fallback beta. Runs the real server against a mocked Claude, so no key is needed. |
-| Judge walkthrough | Run against the live site in a fresh, signed-out browser: landing → tour video → app → example recap → correction → follow-up email → save → reload (calls kept) → Ask with citations → CSV and backup downloads → proof. Passes on desktop and phone with no page errors, failed requests or sideways scrolling. |
+| Judge walkthrough | Run against the live site in a fresh, signed-out browser: landing → tour video → app → pop-up → **Open the demo** → example recap → correction → follow-up email → save → reload (calls kept) → Ask with citations → CSV and backup downloads → proof. Passes on desktop and phone with no page errors, failed requests or sideways scrolling. |
 | Wispr Flow input | Dictation inserted as a paste, a long insert or text set through accessibility is detected and auto-extracted; typing by hand is not. |
+| Company setup | On the live site: **Set up my company** with `$` starts an empty workspace, "forty thousand a year" becomes `$40,000/yr`, emails are signed with the name and company, and the workspace button switches to the demo and back. |
 | Speed | The built-in engine fills a record in about 0.03 s; saves are instant; pages are single files with no framework, served from Vercel's CDN. |
 | Production install | One runtime dependency (`@anthropic-ai/sdk`, only used if a key is set). Works fully offline with the built-in engine. |
 
