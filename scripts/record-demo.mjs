@@ -6,21 +6,20 @@
  * Runs Sayso in demo mode (built-in engine, sample data, throwaway data file) and walks through the whole
  * story with a visible cursor, large captions and chapter cards. No audio.
  *
- * Quality: the page is captured at 1920×1080 with Chrome's screencast (JPEG quality 95, real timestamps), then
- * re-timed to a steady 30 fps and encoded at ~8 Mbps VP8 with Playwright's bundled ffmpeg, so no extra
- * install is needed. Needs Playwright's Chromium and ffmpeg (`npx playwright install chromium ffmpeg`).
+ * Captured and encoded in 1080p by scripts/hq-video.mjs. Needs Playwright's Chromium and ffmpeg
+ * (`npx playwright install chromium ffmpeg`).
  */
 import { spawn } from "node:child_process";
-import { existsSync, mkdirSync, mkdtempSync, readdirSync, readFileSync, rmSync, writeFileSync } from "node:fs";
-import { homedir, tmpdir } from "node:os";
+import { mkdirSync, mkdtempSync, rmSync } from "node:fs";
+import { tmpdir } from "node:os";
 import path from "node:path";
 import { chromium } from "playwright";
+import { VIEWPORT, SCALE, prepareContext, startCapture, encode } from "./hq-video.mjs";
 
 const ROOT = path.join(import.meta.dirname, "..");
 const OUT = path.join(ROOT, "docs", "sayso-demo.webm");
 const PORT = 4410;
 const B = `http://localhost:${PORT}`;
-const SIZE = { width: 1280, height: 720 };
 const work = mkdtempSync(path.join(tmpdir(), "sayso-demo-"));
 mkdirSync(path.dirname(OUT), { recursive: true });
 
@@ -31,18 +30,8 @@ await new Promise((resolve) => server.stdout.on("data", (d) => String(d).include
 
 const browser = await chromium.launch();
 // 1280×720 layout rendered at 1.5× = 1920×1080 pixels: same composition, much sharper text.
-const ctx = await browser.newContext({ viewport: SIZE, deviceScaleFactor: 1.5 });
-// The screencast only sends a frame when something repaints; a 1-pixel ticker keeps frames (and timing) flowing.
-await ctx.addInitScript(() => {
-  const tick = () => {
-    if (!document.body) return requestAnimationFrame(tick);
-    let t = document.getElementById("tick");
-    if (!t) { t = document.createElement("div"); t.id = "tick"; t.style.cssText = "position:fixed;right:0;bottom:0;width:1px;height:1px;z-index:100001;pointer-events:none"; document.body.appendChild(t); }
-    t.style.background = t.style.background === "rgb(6, 8, 11)" ? "rgb(7, 8, 11)" : "rgb(6, 8, 11)";
-    requestAnimationFrame(tick);
-  };
-  requestAnimationFrame(tick);
-});
+const ctx = await browser.newContext({ viewport: VIEWPORT, deviceScaleFactor: SCALE });
+await prepareContext(ctx);
 await ctx.addInitScript(() => {
   const css = `
     #banner{display:none!important} .rv{opacity:1!important;transform:none!important}
@@ -76,18 +65,8 @@ await ctx.addInitScript(() => {
 
 const page = await ctx.newPage();
 page.on("dialog", (d) => d.accept());
-const FRAMES = path.join(work, "frames");
-mkdirSync(FRAMES);
-const frames = [];
-const cdp = await ctx.newCDPSession(page);
-cdp.on("Page.screencastFrame", (f) => {
-  const file = path.join(FRAMES, `${String(frames.length).padStart(6, "0")}.jpg`);
-  writeFileSync(file, Buffer.from(f.data, "base64"));
-  frames.push({ file, t: f.metadata.timestamp });
-  cdp.send("Page.screencastFrameAck", { sessionId: f.sessionId }).catch(() => {});
-});
 await page.setContent(card("", "", ""));
-await cdp.send("Page.startScreencast", { format: "jpeg", quality: 95, maxWidth: 1920, maxHeight: 1080, everyNthFrame: 1 });
+const stopCapture = await startCapture(ctx, page, path.join(work, "frames"));
 const t0 = Date.now();
 const PACE = 1.4; // stretch every pause so each caption can be read comfortably
 const sleep = (ms) => page.waitForTimeout(ms * PACE);
@@ -192,42 +171,13 @@ await chapter("30 seconds instead of 6 minutes.", "Every field. Every follow-up.
 await cap(null, null);
 await chapter("Sayso", "Talk for 30 seconds. Your CRM updates itself.", "Built hands-free with Wispr Flow · #NoHandsChallenge", 4500);
 
-await cdp.send("Page.stopScreencast").catch(() => {});
+const frames = await stopCapture();
 await ctx.close();
 await browser.close();
 server.kill();
-
-// Re-time to a steady 30 fps (each output frame shows the latest captured frame) and encode.
-const FPS = 30;
-const ffmpeg = findFfmpeg();
-const start = frames[0].t, end = frames.at(-1).t + 0.5;
-const enc = spawn(ffmpeg, [
-  "-hide_banner", "-loglevel", "error", "-y",
-  "-f", "image2pipe", "-c:v", "mjpeg", "-framerate", String(FPS), "-i", "pipe:0", // Playwright's build has pipe:, not "-"
-  "-vf", "scale=1920:1080:flags=lanczos,format=yuv420p",
-  "-c:v", "libvpx", "-b:v", "8M", "-crf", "6", "-qmin", "0", "-qmax", "24",
-  "-deadline", "good", "-cpu-used", "1", "-g", String(FPS * 2), "-an", OUT,
-], { stdio: ["pipe", "inherit", "inherit"] });
-const done = new Promise((resolve, reject) => enc.on("close", (code) => (code === 0 ? resolve() : reject(new Error(`ffmpeg exited with ${code}`)))));
-enc.stdin.on("error", () => {}); // if ffmpeg fails, its exit code (above) carries the error
-let i = 0;
-for (let t = start; t < end; t += 1 / FPS) {
-  while (i + 1 < frames.length && frames[i + 1].t <= t) i++;
-  if (!enc.stdin.write(readFileSync(frames[i].file))) await new Promise((r) => enc.stdin.once("drain", r));
-}
-enc.stdin.end();
-await done;
+const seconds = await encode(frames, OUT);
 rmSync(work, { recursive: true, force: true });
-console.log(`Wrote ${path.relative(ROOT, OUT)} (${(end - start).toFixed(0)}s, 1920×1080, ${frames.length} captured frames)`);
-
-// Playwright keeps its own ffmpeg build next to its browsers; use the newest one.
-function findFfmpeg() {
-  const cache = process.env.PLAYWRIGHT_BROWSERS_PATH || path.join(homedir(), process.platform === "darwin" ? "Library/Caches/ms-playwright" : process.platform === "win32" ? "AppData/Local/ms-playwright" : ".cache/ms-playwright");
-  const bin = process.platform === "darwin" ? "ffmpeg-mac" : process.platform === "win32" ? "ffmpeg-win64.exe" : "ffmpeg-linux";
-  const dirs = existsSync(cache) ? readdirSync(cache).filter((d) => d.startsWith("ffmpeg-")).sort().reverse() : [];
-  for (const d of dirs) if (existsSync(path.join(cache, d, bin))) return path.join(cache, d, bin);
-  throw new Error("Playwright's ffmpeg wasn't found. Run: npx playwright install ffmpeg");
-}
+console.log(`Wrote ${path.relative(ROOT, OUT)} (${seconds.toFixed(0)}s, 1920×1080, ${frames.length} captured frames)`);
 
 function card(title, accent, foot) {
   return `<!doctype html><html><head><meta charset="utf-8"><style>

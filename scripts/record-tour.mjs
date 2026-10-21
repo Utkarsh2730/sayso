@@ -12,10 +12,11 @@
  * Needs Playwright's Chromium (`npx playwright install chromium` if it isn't cached yet).
  */
 import { spawn } from "node:child_process";
-import { mkdirSync, mkdtempSync, readdirSync, renameSync, rmSync } from "node:fs";
+import { mkdirSync, mkdtempSync, readdirSync, rmSync } from "node:fs";
 import { tmpdir } from "node:os";
 import path from "node:path";
 import { chromium } from "playwright";
+import { VIEWPORT, SCALE, prepareContext, startCapture, encode } from "./hq-video.mjs";
 
 const ROOT = path.join(import.meta.dirname, "..");
 const MEDIA = path.join(ROOT, "public", "media");
@@ -90,7 +91,8 @@ const SIZE = { width: 1280, height: 720 };
 await fetch(`${B}/api/reset`, { method: "POST" });
 
 // ---- the tour video ----
-const ctx = await browser.newContext({ viewport: SIZE, recordVideo: { dir: work, size: SIZE } });
+const ctx = await browser.newContext({ viewport: VIEWPORT, deviceScaleFactor: SCALE });
+await prepareContext(ctx);
 await ctx.addInitScript(() => {
   const css = `
     #banner{display:none!important} .rv{opacity:1!important;transform:none!important}
@@ -136,6 +138,7 @@ const click = async (loc) => { await moveTo(loc); await loc.click(); };
 
 // 0 · intro card
 await page.setContent(card("Talk for 30 seconds.", "Your CRM updates itself.", "Product tour · sample data"));
+const stopCapture = await startCapture(ctx, page, path.join(work, "frames"));
 await sleep(3500);
 
 // 1 · the recap, dictated in phrases the way the Wispr Flow desktop app inserts them
@@ -195,13 +198,13 @@ await cap(null, null);
 await page.setContent(card("Stop typing up calls.", "Start talking them down.", "Built hands-free with Wispr Flow · #NoHandsChallenge"));
 await sleep(3500);
 
-const video = page.video();
+const frames = await stopCapture();
 await ctx.close();
-renameSync(await video.path(), path.join(MEDIA, "sayso-tour.webm"));
+await encode(frames, path.join(MEDIA, "sayso-tour.webm"));
 
 // poster: the record mid-review, from the still screenshots context
 {
-  const c = await browser.newContext({ viewport: SIZE });
+  const c = await browser.newContext({ viewport: SIZE, deviceScaleFactor: SCALE });
   const p = await c.newPage();
   await p.setContent(card("Talk for 30 seconds.", "Your CRM updates itself.", "▶ Watch the 60-second tour"));
   await p.screenshot({ path: path.join(MEDIA, "tour-poster.jpg"), type: "jpeg", quality: 85 });
