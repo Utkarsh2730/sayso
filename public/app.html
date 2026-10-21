@@ -1103,8 +1103,8 @@ function openSetup() {
   $("pProduct").value = p?.mode === "own" ? p.product : "";
   $("pCurrency").value = p?.currency || "₹";
   const editing = p?.mode === "own";
-  $("ownBtn").textContent = editing ? `Continue as ${p.company}` : "Start with my company";
-  $("ownNote").textContent = editing ? "Your calls stay as they are. Change any detail before continuing." : canDemo ? "Starts an empty workspace for your own calls. Follow-up emails are signed with your name and company." : "Follow-up emails are signed with your name and company, and amounts default to your currency.";
+  $("ownBtn").textContent = editing ? "Save company details" : "Start with my company";
+  $("ownNote").textContent = editing ? "Your calls stay as they are." : canDemo ? "Starts an empty workspace for your own calls. Follow-up emails are signed with your name and company." : "Follow-up emails are signed with your name and company, and amounts default to your currency.";
   $("demoBtn").textContent = p?.mode === "example" ? "Keep exploring the demo" : "Open the demo";
   $("setup").showModal();
   if (!editing) $("pCompany").focus();
@@ -1124,7 +1124,7 @@ $("ownForm").addEventListener("submit", async (e) => {
   const wasOwn = state.profile?.mode === "own";
   try {
     await saveProfile({ mode: "own", company: $("pCompany").value, your_name: $("pName").value, product: $("pProduct").value, currency: $("pCurrency").value, reset: !wasOwn && state.config.can_demo });
-    toast(wasOwn ? `Welcome back, ${state.profile.your_name || state.profile.company}` : `Workspace ready for ${state.profile.company}`);
+    toast(wasOwn ? "Company details saved" : `Workspace ready for ${state.profile.company}`);
   } catch (err) { toast(err.message); }
 });
 $("demoBtn").onclick = async () => {
@@ -1152,9 +1152,10 @@ api("/api/config").then((c) => {
   $("restoreBtn").hidden = c.public_mode;
   micIdle();
 }).then(refresh).then(() => {
-  // "Open app" and the other links from the landing page add ?start, which always shows the pop-up.
+  // "Open app" and the other links from the landing page add ?start: newcomers and demo visitors get the
+  // pop-up to choose; anyone who has set up their company goes straight in.
   const params = new URLSearchParams(location.search);
-  if (!state.profile || params.has("start")) openSetup();
+  if (!state.profile || (params.has("start") && state.profile.mode !== "own")) openSetup();
   if (params.has("start")) { params.delete("start"); history.replaceState(null, "", location.pathname + (params.toString() ? `?${params}` : "")); }
 }).catch((err) => toast(err.message));
 
