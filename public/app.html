@@ -439,29 +439,73 @@ const isMac = /mac|iphone|ipad/i.test(navigator.userAgentData?.platform || navig
 const wfPrompt = `Click the box below, hold <kbd title="Wispr Flow's default shortcut; yours may differ">${isMac ? "fn" : "Ctrl + Win"}</kbd> and talk.`;
 $("wfText").innerHTML = wfPrompt;
 
-// Wispr Flow (and other dictation tools) insert whole phrases at once; typing inserts a character at a time.
-let wisprChars = 0, typedChars = 0;
-$("transcript").addEventListener("beforeinput", (e) => {
-  const len = (e.data ?? e.dataTransfer?.getData("text") ?? "").length;
-  if ((e.inputType === "insertText" || e.inputType === "insertFromPaste" || e.inputType === "insertReplacementText") && len >= 12) wisprChars += len;
-  else if (e.inputType === "insertText") typedChars += len;
+// Wispr Flow (and other dictation tools) insert whole phrases at once, as a paste, one long insert, or text set
+// directly through macOS accessibility (which sends no beforeinput event). Typing adds a character or two. So we
+// compare the length before and after each change instead of trusting the event type.
+let wisprChars = 0, typedChars = 0, lastLen = 0, autoTimer = null, autoAt = 0;
+const DICTATION_CHUNK = 12; // characters arriving in one change
+const AUTO_EXTRACT_MS = 2000;
+$("transcript").addEventListener("keydown", () => { lastLen = $("transcript").value.length; });
+$("transcript").addEventListener("input", (e) => {
+  const len = $("transcript").value.length;
+  const delta = len - lastLen;
+  lastLen = len;
+  if (delta >= DICTATION_CHUNK || (e.inputType === "insertFromPaste" && delta > 0)) {
+    wisprChars += delta;
+    scheduleAutoExtract();
+  } else if (delta > 0) {
+    typedChars += delta;
+    cancelAutoExtract();
+  }
+  updateSource();
 });
-$("transcript").addEventListener("input", updateSource);
+
+// Hands-free: once dictation stops arriving for a moment, extract without a click.
+function scheduleAutoExtract() {
+  cancelAutoExtract();
+  autoAt = Date.now() + AUTO_EXTRACT_MS;
+  const tick = () => {
+    const left = Math.max(0, autoAt - Date.now());
+    $("wfText").innerHTML = `✓ Dictation detected. Extracting in ${(left / 1000).toFixed(0)}s… keep talking to add more · <button class="link" id="wfCancel" style="color:inherit;text-decoration:underline">wait</button>`;
+    $("wfCancel").onclick = () => { cancelAutoExtract(); updateSource(); $("transcript").focus(); };
+    if (left <= 0) { autoTimer = null; extract(); return; }
+    autoTimer = setTimeout(tick, Math.min(250, left));
+  };
+  tick();
+}
+function cancelAutoExtract() {
+  clearTimeout(autoTimer);
+  autoTimer = null;
+}
+
+// The correction bar and Ask box work the same way: dictate, pause, and it runs.
+function autoRunOnDictation(input, run, delay = 1200) {
+  let prev = 0, timer = null;
+  input.addEventListener("keydown", (e) => { prev = input.value.length; if (e.key !== "Enter") clearTimeout(timer); });
+  input.addEventListener("input", (e) => {
+    const delta = input.value.length - prev;
+    prev = input.value.length;
+    clearTimeout(timer);
+    if (delta >= 4 || (e.inputType === "insertFromPaste" && delta > 0)) timer = setTimeout(() => input.value.trim() && run(input.value), delay);
+  });
+}
 function updateSource() {
   const has = $("transcript").value.trim().length > 0;
   if (!has) { state.source = null; wisprChars = typedChars = 0; }
   else if (!["mic", "sample"].includes(state.source)) state.source = wisprChars > typedChars ? "wispr" : "typed";
   const labels = { wispr: "● dictated with Wispr Flow", mic: "● dictated with browser mic", typed: "typed", sample: "sample recap" };
   $("srcTag").textContent = state.source ? labels[state.source] : "";
+  lastLen = $("transcript").value.length;
   const dictated = state.source === "wispr";
   $("wfBar").classList.toggle("hit", dictated);
-  $("wfText").innerHTML = dictated ? "✓ Dictation detected. Keep talking, or extract when you're done." : wfPrompt;
+  if (!autoTimer) $("wfText").innerHTML = dictated ? "✓ Dictation detected. Extract when you're done, or keep talking." : wfPrompt;
   $("srcTag").className = `src ${state.source === "wispr" ? "wispr" : ""}`;
 }
 $("sampleBtn").onclick = () => { $("transcript").value = SAMPLE; state.source = "sample"; updateSource(); extract(); };
 
 // ---------- Extraction ----------
 async function extract() {
+  cancelAutoExtract();
   if (rec) return rec.stop();
   const transcript = $("transcript").value.trim();
   if (!transcript) { $("transcript").focus(); return; }
@@ -527,6 +571,7 @@ function renderReview(pending) {
   $("emailBtn").onclick = draftEmail;
   $("discardBtn").onclick = discard;
   $("fixInput").addEventListener("keydown", (e) => { if (e.key === "Enter") { e.preventDefault(); command($("fixInput").value); } });
+  autoRunOnDictation($("fixInput"), command);
   $("fixMic").onclick = () => {
     if (rec) return rec.stop();
     $("fixInput").value = "";
@@ -653,6 +698,7 @@ async function draftEmail() {
 }
 
 function resetCapture() {
+  cancelAutoExtract();
   $("transcript").value = ""; state.source = null; wisprChars = typedChars = 0; updateSource();
   micIdle();
   $("timing").textContent = ""; $("liveTag").textContent = "";
@@ -824,6 +870,7 @@ async function ask(question) {
 }
 $("askBtn").onclick = () => ask();
 $("askInput").addEventListener("keydown", (e) => { if (e.key === "Enter") { e.preventDefault(); ask(); } });
+autoRunOnDictation($("askInput"), (q) => ask(q));
 for (const b of $("askChips").querySelectorAll("button")) b.onclick = () => ask(b.textContent);
 $("askMic").onclick = () => {
   if (rec) return rec.stop();
