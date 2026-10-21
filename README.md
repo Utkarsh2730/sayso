@@ -28,7 +28,7 @@ fixes it by voice, drafts the follow-up email, and answers questions about your 
 
 ## For judges
 
-**Watch:** [demo video, 1:35, 1080p](docs/sayso-demo.webm) · [60-second product tour](public/media/sayso-tour.webm) (both captioned, recorded from the app on sample data).
+**Watch:** demo video (1:35, 1080p): _add YouTube link_ · [60-second product tour](public/media/sayso-tour.webm) (captioned, recorded from the app on sample data).
 
 **Try it live:** _add Render URL_. No sign-in: every visitor gets a private workspace with 6 sample calls. Suggested path:
 1. **Try a sample recap** and watch the record fill in. It's a second call with Priya, so you'll see her history and her phone number carried over.

@@ -7,3 +7,5 @@ data/workspaces/
 *.local.md
 .DS_Store
 .claude/
+# Demo video: kept locally for uploading, not committed
+docs/*.webm
