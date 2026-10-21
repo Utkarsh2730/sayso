@@ -42,8 +42,6 @@
   @media (max-width: 420px) { header nav { display: none; } }
 
   main { max-width: 1240px; margin: 0 auto; padding: 20px 20px 80px; }
-  .banner { display: flex; gap: 12px; align-items: center; flex-wrap: wrap; border: 1px solid rgba(255,138,107,.3); background: rgba(255,138,107,.07); border-radius: 14px; padding: 10px 14px; margin-bottom: 16px; font-size: 13.5px; color: #ffe0d6; }
-  .banner b { color: var(--accent); font: 600 11px var(--mono); letter-spacing: .1em; }
 
   .stats { display: grid; grid-template-columns: repeat(6, 1fr); border: 1px solid var(--line); border-radius: 16px; background: var(--card); overflow: hidden; margin-bottom: 20px; }
   .stat { padding: 16px 18px; border-right: 1px solid var(--line); min-width: 0; }
@@ -237,12 +235,11 @@
 </header>
 
 <main>
-  <div class="banner" id="banner" hidden><b>DEMO</b><span id="bannerText">This workspace is private to your browser and starts with 6 sample calls. Try the sample recap, ask your pipeline a question, or talk through a call of your own.</span><button class="btn sm" id="resetBtn" style="margin-left:auto">Reset to sample data</button></div>
   <section class="stats" id="stats"></section>
 
   <div class="grid">
     <section class="panel">
-      <div class="ph"><h2>01 · Recap the call</h2><button class="link" id="sampleBtn">Try a sample recap</button></div>
+      <div class="ph"><h2>01 · Recap the call</h2><button class="link" id="sampleBtn">Try an example</button></div>
       <div class="wf" id="wfBar">
         <span class="wfb"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round"><path d="M3 10v4M7 7v10M11 4v16M15 8v8M19 10v4"/></svg>WISPR FLOW</span>
         <span id="wfText">Click the box below, hold <kbd>fn</kbd> and talk.</span>
@@ -909,16 +906,6 @@ document.addEventListener("click", (e) => {
   card.classList.remove("flash"); void card.offsetWidth; card.classList.add("flash");
 });
 
-$("resetBtn").onclick = async () => {
-  if (!confirm("Replace everything in this workspace with the sample calls?")) return;
-  try {
-    await api("/api/reset", { method: "POST" });
-    discard();
-    $("askOut").innerHTML = ""; $("askTiming").textContent = ""; $("askInput").value = "";
-    await refresh();
-    toast("Workspace reset to sample data");
-  } catch (err) { toast(err.message); }
-};
 
 document.addEventListener("keydown", (e) => {
   if (!(e.metaKey || e.ctrlKey)) return;
@@ -935,7 +922,7 @@ let pollTimer;
 async function refresh() {
   const { calls, stats, all_stats } = await api("/api/calls");
   state.calls = calls;
-  state.stats = state.config.can_reset ? all_stats : stats; // demo workspaces count their sample calls
+  state.stats = state.config.can_reset ? all_stats : stats; // public workspaces count their example calls
   renderStats(); renderCalls();
   clearTimeout(pollTimer);
   if (calls.some((c) => c.hubspot_status === "pending")) pollTimer = setTimeout(refresh, 1500);
@@ -988,7 +975,7 @@ function renderCalls() {
         <div class="ctop">
           <div style="min-width:0"><h3>${esc(c.contact_name || "Unknown contact")}${c.company ? ` <span>· ${esc(c.company)}</span>` : ""}</h3>
             <div class="meta">${new Date(c.created_at).toLocaleString(undefined, { dateStyle: "medium", timeStyle: "short" })}${c.deal_value ? ` · ${esc(c.deal_value)}` : ""}${c.input_source ? ` · ${srcLabel[c.input_source] ?? ""}` : ""}${nth.get(c.id) > 1 ? ` · <b style="color:var(--brand);font-weight:500">${ordinal(nth.get(c.id))} call</b>` : ""}</div></div>
-          <div class="tags">${c.is_sample ? '<span class="tag sample">sample</span>' : ""}<span class="tag">${esc(c.deal_stage)}</span></div>
+          <div class="tags"><span class="tag">${esc(c.deal_stage)}</span></div>
         </div>
         ${c.summary ? `<p>${esc(c.summary)}</p>` : ""}
         ${c.next_step ? `<div class="next"><b>Next →</b> ${esc(c.next_step)}${c.follow_up_date ? ` · ${c.follow_up_done ? "done" : niceDate(c.follow_up_date)}` : ""}</div>` : ""}
@@ -1002,7 +989,7 @@ function renderCalls() {
         </div>
       </div>
     </article>`).join("")
-    : `<div class="empty"><b>${q ? "No matches" : "No calls yet"}</b>${q ? "Try a different search." : "Recap your first call above, or try the sample."}</div>`;
+    : `<div class="empty"><b>${q ? "No matches" : "No calls yet"}</b>${q ? "Try a different search." : "Recap your first call above, or try the example."}</div>`;
 }
 
 // One delegated handler for all list actions.
@@ -1060,10 +1047,8 @@ api("/api/config").then((c) => {
   $("modelChip").textContent = c.model;
   $("hsChip").textContent = c.hubspot ? "HubSpot connected" : "HubSpot off";
   $("hsChip").classList.toggle("on", c.hubspot);
-  $("banner").hidden = !c.can_reset;
   $("restoreBtn").hidden = c.public_mode;
   micIdle();
-  if (c.demo_mode && !c.public_mode) $("bannerText").textContent = "Demo mode: sample calls in a separate workspace. Your real data isn't touched.";
 }).then(refresh).catch((err) => toast(err.message));
 
 </script>

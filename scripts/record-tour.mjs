@@ -25,8 +25,8 @@ const B = `http://localhost:${PORT}`;
 const work = mkdtempSync(path.join(tmpdir(), "sayso-tour-"));
 mkdirSync(MEDIA, { recursive: true });
 
-console.log("Starting Sayso in demo mode…");
-const server = spawn(process.execPath, ["scripts/demo.js"], {
+console.log("Starting Sayso with example calls…");
+const server = spawn(process.execPath, ["scripts/try.js"], {
   cwd: ROOT, env: { ...process.env, PORT: String(PORT), CRM_FILE: path.join(work, "tour.json") }, stdio: ["ignore", "pipe", "inherit"],
 });
 await new Promise((resolve) => server.stdout.on("data", (d) => String(d).includes("running") && resolve()));
@@ -137,7 +137,7 @@ const moveTo = async (loc) => {
 const click = async (loc) => { await moveTo(loc); await loc.click(); };
 
 // 0 · intro card
-await page.setContent(card("Talk for 30 seconds.", "Your CRM updates itself.", "Product tour · sample data"));
+await page.setContent(card("Talk for 30 seconds.", "Your CRM updates itself.", "Product tour"));
 const stopCapture = await startCapture(ctx, page, path.join(work, "frames"));
 await sleep(3500);
 

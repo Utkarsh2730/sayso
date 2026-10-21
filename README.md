@@ -22,24 +22,23 @@ fixes it by voice, drafts the follow-up email, and answers questions about your 
 
 </div>
 
-<!-- TODO: add the demo video link once published -->
 
 ![Sayso: a spoken recap on the left, the CRM record it produced on the right](public/media/app-review.jpg)
 
 ## For judges
 
-**Watch:** demo video (1:35, 1080p): _add YouTube link_ · [60-second product tour](public/media/sayso-tour.webm) (captioned, recorded from the app on sample data).
+**Watch:** [60-second product tour](public/media/sayso-tour.webm), captioned and recorded straight from the app.
 
-**Try it live:** **https://sayso-xi.vercel.app**. No sign-in: every visitor gets a private workspace with 6 sample calls. Suggested path:
-1. **Try a sample recap** and watch the record fill in. It's a second call with Priya, so you'll see her history and her phone number carried over.
+**Try it live:** **https://sayso-xi.vercel.app**. No sign-in: every visitor gets a private workspace with 6 example calls. Suggested path:
+1. **Try an example** and watch the record fill in. It's a second call with Priya, so you'll see her history and her phone number carried over.
 2. In the correction bar, say or type **"change the stage to proposal"**, then **"write the follow-up"**, then **"save"**.
 3. In **Ask your pipeline**, click **"Who should I follow up with this week?"** and click a citation.
 4. Open **Proof** to see real usage numbers from the author's own calls.
-5. **Reset to sample data** puts the workspace back to a known state.
+5. **Reset to example data** puts the workspace back to a known state.
 
 **Run it yourself, no API key needed:**
 ```bash
-npm install && npm run demo     # http://localhost:3000, sample data, built-in engine
+npm install && npm run try      # http://localhost:3000, example calls, built-in engine
 ```
 
 ---
@@ -97,8 +96,8 @@ Sayso replaces the form with your voice. You talk; it writes the record.
 |---|---|
 | Does it solve a real problem in your work? | Built for the author's own post-call admin; `/proof` shows real calls, minutes saved and field completeness. |
 | Was Wispr used meaningfully? | Built by dictating to an AI coding tool with Wispr Flow, and Wispr Flow is the product's main input (see below). |
-| Does it work? | A live link that opens without sign-in, with a private sample workspace per visitor and usage caps. |
-| Is the demo clear? | A 1:35 captioned 1080p demo video plus a 60-second tour, both recorded straight from the app by script (`npm run record:demo`). |
+| Does it work? | A live link that opens without sign-in, with a private workspace per visitor, pre-filled with example calls. |
+| Is the video clear? | A captioned 1080p walkthrough video plus a 60-second tour, both recorded straight from the app by script (`npm run record:video`). |
 
 ## How Wispr Flow is used
 
@@ -130,7 +129,7 @@ graph LR
 
 - **Two engines:** the built-in engine (`lib/rules.js`) needs no key. With `ANTHROPIC_API_KEY` set, Claude is used instead, and if a Claude call fails the built-in engine answers, so the app never breaks. Claude's JSON is parsed while it streams (`lib/partial-json.js`), so each field appears as soon as it's written. The browser cancels the request if you leave.
 - **Store:** each workspace is held in memory and written to disk in order (temp file + rename), so saves are instant and a crash can't corrupt the file.
-- **Public demo mode** (`PUBLIC_MODE=1`): private sample workspace per visitor, daily request caps per workspace, network and site, HubSpot off, `/proof` served from a committed snapshot.
+- **Public mode** (`PUBLIC_MODE=1`): private workspace per visitor with example calls, daily request caps per workspace, network and site, HubSpot off, `/proof` served from a committed snapshot.
 
 **Tech stack:** Node.js 22 (no framework) · built-in rules engine · optional Anthropic Claude (`claude-opus-5-5`) · vanilla HTML/CSS/JS · Playwright (video recording, dev only).
 
@@ -180,14 +179,14 @@ Calls are numbered `C1…Cn` in the prompt; the server maps cited ids back to re
 
 ```bash
 npm install
-npm run demo          # sample data in a separate workspace
+npm run try           # example calls in a separate workspace
 npm start             # http://localhost:3000, your real call log
 # optional: cp .env.example .env and add ANTHROPIC_API_KEY to use Claude
 npm run doctor        # checks your setup and prints the fix for anything wrong
 ```
 
 ### Deploy on Vercel (static, free)
-The online demo needs no server: `npm run build:static` builds `dist/`, where `public/static-api.js` answers the app's `/api` calls in the browser with the built-in engine, and each visitor's calls stay in their own browser (seeded with the sample calls).
+The live site needs no server: `npm run build:static` builds `dist/`, where `public/static-api.js` answers the app's `/api` calls in the browser with the built-in engine, and each visitor's calls stay in their own browser (seeded with the example calls).
 1. On [Vercel](https://vercel.com/new): **Import** this GitHub repo. `vercel.json` sets the build; no settings or keys needed.
 2. To show your real results on `/proof`: on your local copy open `/proof` → **Publish proof snapshot**, commit `data/proof.json`, push. Vercel redeploys.
 
@@ -201,7 +200,7 @@ For HubSpot sync and optional Claude: on [Render](https://dashboard.render.com) 
 | `ANTHROPIC_API_KEY` | Use Claude instead of the built-in engine | optional |
 | `CLAUDE_MODEL` | Model id | `claude-opus-5-5` |
 | `HUBSPOT_TOKEN` | Optional HubSpot private-app token | off |
-| `PUBLIC_MODE` | `1` for the hosted demo | off |
+| `PUBLIC_MODE` | `1` for a public site (a private workspace per visitor) | off |
 | `LIMIT_PER_WORKSPACE` / `LIMIT_PER_IP` / `LIMIT_GLOBAL` | Daily request caps in public mode | 40 / 80 / 1,500 |
 | `MANUAL_WRITEUP_MINUTES` | Minutes a manual write-up takes, for "minutes saved" | 6 |
 | `PUBLIC_URL` | Site address for link previews (Render sets it automatically) | from host |
@@ -231,9 +230,9 @@ For HubSpot sync and optional Claude: on [Render](https://dashboard.render.com) 
 | `lib/extract.js` · `lib/claude.js` | Engine switch, Claude prompts and schemas · streaming structured-output helper |
 | `lib/partial-json.js` | Parses incomplete JSON while it streams |
 | `lib/store.js` · `lib/proof.js` | Workspace store and CSV · stats, proof data, scrubbing |
-| `lib/hubspot.js` · `lib/limits.js` · `lib/samples.js` | HubSpot sync · usage caps · sample calls |
+| `lib/hubspot.js` · `lib/limits.js` · `lib/samples.js` | HubSpot sync · usage caps · example calls |
 | `public/` | Landing page, app, proof page, `static-api.js` (in-browser API for the static build) and `media/` |
-| `scripts/` | Demo mode, static build, Claude mock (tests), video recorders, doctor |
+| `scripts/` | Example mode, static build, Claude mock (tests), video recorders, doctor |
 | `test/` | Unit and end-to-end tests |
 
 ## Limitations and roadmap
@@ -243,7 +242,7 @@ For HubSpot sync and optional Claude: on [Render](https://dashboard.render.com) 
 | Dictation detection is a heuristic, so pasted text also counts as dictated. | A confirmation toggle per recap. |
 | HubSpot sync follows HubSpot's v3 API but hasn't been tested against a live account. | Verify with a real portal; add Zoho and Salesforce. |
 | Data is a JSON file per workspace, and Render's free disk resets on redeploy. | A hosted database for multi-user teams. |
-| No sign-in: the local app is single-user, and demo workspaces are tied to a browser cookie. | Accounts and shared team workspaces. |
+| No sign-in: the local app is single-user, and public workspaces are tied to a browser cookie. | Accounts and shared team workspaces. |
 | Rate limits are in memory, per server instance. | Shared limits. |
 
 ## AI assistance disclosure
@@ -253,4 +252,4 @@ This project was built with an AI coding assistant, **Anthropic's Claude (via Cl
 ## Credits
 
 Built for **No Hands: The Wispr Challenge** (WeMakeDevs × Wispr Flow) by **Utkarsh Sonthalia**.
-Dictation by [Wispr Flow](https://wisprflow.ai). Optional AI by [Anthropic Claude](https://www.anthropic.com). All people and companies in the sample data are fictional.
+Dictation by [Wispr Flow](https://wisprflow.ai). Optional AI by [Anthropic Claude](https://www.anthropic.com). All people and companies in the example data are fictional.

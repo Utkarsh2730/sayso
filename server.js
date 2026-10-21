@@ -17,7 +17,7 @@ const MANUAL_MINUTES = Number(process.env.MANUAL_WRITEUP_MINUTES ?? 6);
 // Public mode is for the hosted demo: every visitor gets a private sample workspace, usage is capped,
 // HubSpot is off and the proof page shows the committed snapshot of the owner's real results.
 const PUBLIC = process.env.PUBLIC_MODE === "1";
-// Demo mode (npm run demo) runs on sample data, so resetting it is safe; real local data can never be reset.
+// Example mode (npm run try) runs on example calls, so resetting it is safe; real local data can never be reset.
 const DEMO = process.env.DEMO_MODE === "1";
 const HUBSPOT_TOKEN = PUBLIC ? "" : process.env.HUBSPOT_TOKEN;
 const SENDER_NAME = process.env.SENDER_NAME || "";

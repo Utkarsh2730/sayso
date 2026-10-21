@@ -1,7 +1,7 @@
 /**
  * Records the ~2-minute captioned demo video for the hackathon submission.
  *
- *   npm run record:demo        → docs/sayso-demo.webm
+ *   npm run record:video       → docs/sayso-video.webm
  *
  * Runs Sayso in demo mode (built-in engine, sample data, throwaway data file) and walks through the whole
  * story with a visible cursor, large captions and chapter cards. No audio.
@@ -17,13 +17,13 @@ import { chromium } from "playwright";
 import { VIEWPORT, SCALE, prepareContext, startCapture, encode } from "./hq-video.mjs";
 
 const ROOT = path.join(import.meta.dirname, "..");
-const OUT = path.join(ROOT, "docs", "sayso-demo.webm");
+const OUT = path.join(ROOT, "docs", "sayso-video.webm");
 const PORT = 4410;
 const B = `http://localhost:${PORT}`;
-const work = mkdtempSync(path.join(tmpdir(), "sayso-demo-"));
+const work = mkdtempSync(path.join(tmpdir(), "sayso-video-"));
 mkdirSync(path.dirname(OUT), { recursive: true });
 
-const server = spawn(process.execPath, ["scripts/demo.js"], {
+const server = spawn(process.execPath, ["scripts/try.js"], {
   cwd: ROOT, env: { ...process.env, PORT: String(PORT), CRM_FILE: path.join(work, "demo.json") }, stdio: ["ignore", "pipe", "inherit"],
 });
 await new Promise((resolve) => server.stdout.on("data", (d) => String(d).includes("running") && resolve()));
@@ -85,7 +85,7 @@ const scrollTo = (sel) => page.evaluate((s) => document.querySelector(s).scrollI
 const chapter = async (title, accent, foot, ms = 4200) => { await page.setContent(card(title, accent, foot)); await sleep(ms); };
 
 // 0:00 · the problem
-await chapter("Nobody updates the CRM.", "Writing up a call takes longer than the call.", "Sayso · No Hands: The Wispr Challenge · product walkthrough on sample data", 5200);
+await chapter("Nobody updates the CRM.", "Writing up a call takes longer than the call.", "No Hands: The Wispr Challenge · WeMakeDevs × Wispr Flow", 5200);
 await chapter("So I stopped typing.", "I talk for 30 seconds instead.", "Built and used with Wispr Flow", 3800);
 
 // 0:09 · landing

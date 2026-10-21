@@ -6,12 +6,12 @@
   "scripts": {
     "start": "node --env-file-if-exists=.env server.js",
     "test": "node --test",
-    "demo": "node scripts/demo.js",
     "start:public": "PUBLIC_MODE=1 node --env-file-if-exists=.env server.js",
     "record:tour": "node scripts/record-tour.mjs",
     "doctor": "node scripts/doctor.mjs",
-    "record:demo": "node scripts/record-demo.mjs",
-    "build:static": "node scripts/build-static.mjs"
+    "build:static": "node scripts/build-static.mjs",
+    "try": "node scripts/try.js",
+    "record:video": "node scripts/record-video.mjs"
   },
   "dependencies": {
     "@anthropic-ai/sdk": "^0.135.0"

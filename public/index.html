@@ -17,7 +17,7 @@
 <link rel="icon" href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 32 32'%3E%3Crect width='32' height='32' rx='8' fill='%23c8f25a'/%3E%3Cg transform='translate(4 4)' fill='none' stroke='%2306080b' stroke-width='2.2' stroke-linecap='round' stroke-linejoin='round'%3E%3Cpath d='M4 6.5A2.5 2.5 0 0 1 6.5 4h11A2.5 2.5 0 0 1 20 6.5v8a2.5 2.5 0 0 1-2.5 2.5H11l-4.5 3.5V17A2.5 2.5 0 0 1 4 14.5z'/%3E%3Cpath d='M9.5 9v3M12 7.5v6M14.5 9v3'/%3E%3C/g%3E%3C/svg%3E">
 <link rel="prefetch" href="/app">
 <dialog class="tour" id="tour" aria-label="Sayso product tour">
-  <div class="th"><div><b>How Sayso works</b><small>Recap → record → voice fix → follow-up email → save → ask your pipeline · sample data</small></div><button class="btn" id="tourClose" style="padding:8px 14px">✕ Close</button></div>
+  <div class="th"><div><b>How Sayso works</b><small>Recap → record → voice fix → follow-up email → save → ask your pipeline</small></div><button class="btn" id="tourClose" style="padding:8px 14px">✕ Close</button></div>
   <video id="tourVideo" controls playsinline preload="none" poster="/media/tour-poster.jpg"><source src="/media/sayso-tour.webm" type="video/webm"></video>
 </dialog>
 
@@ -80,11 +80,11 @@
   .trust span { display: inline-flex; align-items: center; gap: 7px; }
   .trust svg { width: 14px; height: 14px; color: var(--brand); }
 
-  /* Hero demo */
-  .demo { position: relative; border: 1px solid var(--line2); border-radius: 22px; background: linear-gradient(180deg, rgba(255,255,255,.05), rgba(255,255,255,.015)); padding: 18px; box-shadow: 0 40px 120px -30px rgba(0,0,0,.8), inset 0 1px 0 rgba(255,255,255,.06); }
-  .demo .bar { display: flex; align-items: center; gap: 6px; margin-bottom: 14px; }
-  .demo .bar i { width: 10px; height: 10px; border-radius: 50%; background: #2a3038; }
-  .demo .bar span { margin-left: auto; font: 11px var(--mono); color: var(--dim); }
+  /* Hero card */
+  .hero-card { position: relative; border: 1px solid var(--line2); border-radius: 22px; background: linear-gradient(180deg, rgba(255,255,255,.05), rgba(255,255,255,.015)); padding: 18px; box-shadow: 0 40px 120px -30px rgba(0,0,0,.8), inset 0 1px 0 rgba(255,255,255,.06); }
+  .hero-card .bar { display: flex; align-items: center; gap: 6px; margin-bottom: 14px; }
+  .hero-card .bar i { width: 10px; height: 10px; border-radius: 50%; background: #2a3038; }
+  .hero-card .bar span { margin-left: auto; font: 11px var(--mono); color: var(--dim); }
   .voice { display: flex; gap: 14px; align-items: flex-start; padding: 16px; border: 1px solid var(--line); border-radius: 14px; background: rgba(0,0,0,.25); min-height: 112px; }
   .orb { flex: none; width: 44px; height: 44px; border-radius: 50%; background: radial-gradient(circle at 35% 35%, #ecfbbf, var(--brand) 45%, #4d7c0f); box-shadow: 0 0 0 0 rgba(200,242,90,.5); animation: orb 1.6s infinite; }
   @keyframes orb { 70% { box-shadow: 0 0 0 14px rgba(200,242,90,0); } }
@@ -102,10 +102,10 @@
   .fld.on { border-color: rgba(200,242,90,.45); background: rgba(200,242,90,.06); }
   .fld .sk { display: block; height: 10px; margin-top: 6px; border-radius: 4px; width: 70%; background: linear-gradient(90deg, rgba(255,255,255,.04), rgba(255,255,255,.1), rgba(255,255,255,.04)); background-size: 200% 100%; animation: sh 1.4s infinite; }
   @keyframes sh { to { background-position: -200% 0; } }
-  .demo .foot { display: flex; justify-content: space-between; margin-top: 12px; font: 11px var(--mono); color: var(--dim); }
-  .demo .foot b { color: var(--brand); font-weight: 500; }
+  .hero-card .foot { display: flex; justify-content: space-between; margin-top: 12px; font: 11px var(--mono); color: var(--dim); }
+  .hero-card .foot b { color: var(--brand); font-weight: 500; }
 
-  /* Watch demo */
+  /* Watch the video */
   .watch { display: inline-flex; align-items: center; gap: 8px; background: none; border: 0; color: var(--brand); font: 600 14px var(--sans); cursor: pointer; padding: 8px 10px; border-radius: 999px; }
   .watch:hover { background: rgba(200,242,90,.08); }
   .watch svg { width: 20px; height: 20px; }
@@ -279,7 +279,7 @@
   <div class="wrap">
     <a class="logo" href="/"><i><svg viewBox="0 0 24 24" fill="none" stroke="#06080b" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"><path d="M4 6.5A2.5 2.5 0 0 1 6.5 4h11A2.5 2.5 0 0 1 20 6.5v8a2.5 2.5 0 0 1-2.5 2.5H11l-4.5 3.5V17A2.5 2.5 0 0 1 4 14.5z"/><path d="M9.5 9v3M12 7.5v6M14.5 9v3"/></svg></i>Sayso</a>
     <div class="navlinks"><a href="#how">How it works</a><a href="#features">Features</a><a href="/proof">Proof</a><a href="#pricing">Pricing</a><a href="#faq">FAQ</a></div>
-    <button class="watch" data-tour style="margin-left:auto"><svg viewBox="0 0 24 24" aria-hidden="true"><circle cx="12" cy="12" r="11" fill="currentColor" opacity=".15"/><path d="M10 8.5v7l6-3.5z" fill="currentColor"/></svg><span>Watch demo</span></button>
+    <button class="watch" data-tour style="margin-left:auto"><svg viewBox="0 0 24 24" aria-hidden="true"><circle cx="12" cy="12" r="11" fill="currentColor" opacity=".15"/><path d="M10 8.5v7l6-3.5z" fill="currentColor"/></svg><span>Watch video</span></button>
     <a class="btn primary" href="/app" style="margin-left:0">Open app</a>
   </div>
 </nav>
@@ -301,17 +301,17 @@
       </div>
     </div>
 
-    <div class="demo rv" aria-label="Animated example of a voice recap turning into a CRM record">
-      <div class="bar"><i></i><i></i><i></i><span id="demoClock">recording · 0:00</span></div>
+    <div class="hero-card rv" aria-label="Animated example of a voice recap turning into a CRM record">
+      <div class="bar"><i></i><i></i><i></i><span id="heroClock">recording · 0:00</span></div>
       <div class="voice">
         <div class="orb"></div>
         <div style="min-width:0">
-          <p id="demoText"></p>
+          <p id="heroText"></p>
           <div class="wave" aria-hidden="true"><i style="animation-delay:-.1s"></i><i style="animation-delay:-.5s"></i><i style="animation-delay:-.3s"></i><i style="animation-delay:-.8s"></i><i style="animation-delay:-.2s"></i><i style="animation-delay:-.6s"></i><i style="animation-delay:-.4s"></i><i style="animation-delay:-.9s"></i><i style="animation-delay:-.15s"></i><i style="animation-delay:-.7s"></i></div>
         </div>
       </div>
-      <div class="record" id="demoRecord"></div>
-      <div class="foot"><span>sayso · built-in engine</span><span id="demoTime">waiting for recap…</span></div>
+      <div class="record" id="heroRecord"></div>
+      <div class="foot"><span>sayso · built-in engine</span><span id="heroTime">waiting for recap…</span></div>
     </div>
   </div>
 </header>
@@ -356,7 +356,7 @@
   <div class="wrap">
     <div class="head rv">
       <div><div class="eyebrow">Features</div><h2>Everything a call log needs.<br><span class="grad">Nothing you have to type.</span></h2></div>
-      <p class="lede">Screenshots from the real app, running on sample data.</p>
+      <p class="lede">Screenshots from the real app.</p>
     </div>
     <div class="wispr rv">
       <div class="ico"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><path d="M3 10v4M7 7v10M11 4v16M15 8v8M19 10v4"/></svg></div>
@@ -536,14 +536,14 @@ const revealCheck = () => {
 };
 addEventListener("scroll", revealCheck, { passive: true });
 
-// Hero demo: types a recap, then fills the record field by field, on a loop.
+// Hero card: types a recap, then fills the record field by field, on a loop.
 const RECAP = "Just got off with Priya Nair, head of ops at Acme Logistics. Email is priya at acme logistics dot in. They lose two hours a day on dispatch spreadsheets. Budget's around four lakh a year. Sending the demo invite, follow up Tuesday, no wait, Thursday.";
 const FIELDS = [
   ["Contact", "Priya Nair"], ["Company", "Acme Logistics"], ["Email", "priya@acmelogistics.in"], ["Role", "Head of Ops"],
   ["Stage", "Demo"], ["Deal value", "₹4,00,000 / yr"], ["Next step", "Send demo invite to team leads", "wide"], ["Follow-up", "Thu, 22 Oct", "wide"],
 ];
-const textEl = document.getElementById("demoText"), recEl = document.getElementById("demoRecord");
-const clockEl = document.getElementById("demoClock"), timeEl = document.getElementById("demoTime");
+const textEl = document.getElementById("heroText"), recEl = document.getElementById("heroRecord");
+const clockEl = document.getElementById("heroClock"), timeEl = document.getElementById("heroTime");
 const reduce = matchMedia("(prefers-reduced-motion: reduce)").matches;
 const sleep = (ms) => new Promise((r) => setTimeout(r, ms));
 const fmt = (s) => `${Math.floor(s / 60)}:${String(Math.floor(s % 60)).padStart(2, "0")}`;
@@ -551,7 +551,7 @@ const fmt = (s) => `${Math.floor(s / 60)}:${String(Math.floor(s % 60)).padStart(
 function blankRecord() {
   recEl.innerHTML = FIELDS.map(([l, , w]) => `<div class="fld ${w || ""}"><small>${l}</small><div><span class="sk"></span></div></div>`).join("");
 }
-async function runDemo() {
+async function runHero() {
   if (reduce) {
     textEl.textContent = RECAP;
     recEl.innerHTML = FIELDS.map(([l, v, w]) => `<div class="fld on ${w || ""}"><small>${l}</small><div>${v}</div></div>`).join("");
@@ -584,7 +584,7 @@ async function runDemo() {
     await sleep(3800);
   }
 }
-runDemo();
+runHero();
 
 // Live stats from the app (count up when visible)
 const statsEl = document.getElementById("stats");
