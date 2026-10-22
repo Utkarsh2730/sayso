@@ -545,7 +545,12 @@ function scheduleAutoExtract() {
     const left = Math.max(0, autoAt - Date.now());
     $("wfText").innerHTML = `✓ Dictation detected. Extracting in ${(left / 1000).toFixed(0)}s… keep talking to add more · <button class="link" id="wfCancel" style="color:inherit;text-decoration:underline">wait</button>`;
     $("wfCancel").onclick = () => { cancelAutoExtract(); updateSource(); $("transcript").focus(); };
-    if (left <= 0) { autoTimer = null; extract(); return; }
+    if (left <= 0) {
+      autoTimer = null;
+      $("wfText").innerHTML = "✓ Extracted from your Wispr Flow dictation. Keep talking to add more.";
+      extract();
+      return;
+    }
     autoTimer = setTimeout(tick, Math.min(250, left));
   };
   tick();

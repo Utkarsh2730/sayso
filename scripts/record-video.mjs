@@ -6,7 +6,7 @@
  * Runs Sayso in demo mode (built-in engine, sample data, throwaway data file) and walks through the whole
  * story with a visible cursor, large captions and chapter cards. No audio.
  *
- * Captured and encoded in 1080p by scripts/hq-video.mjs. Needs Playwright's Chromium and ffmpeg
+ * Captured and encoded in 1440p by scripts/hq-video.mjs. Needs Playwright's Chromium and ffmpeg
  * (`npx playwright install chromium ffmpeg`).
  */
 import { spawn } from "node:child_process";
@@ -14,7 +14,9 @@ import { mkdirSync, mkdtempSync, rmSync } from "node:fs";
 import { tmpdir } from "node:os";
 import path from "node:path";
 import { chromium } from "playwright";
-import { VIEWPORT, SCALE, prepareContext, startCapture, encode } from "./hq-video.mjs";
+import { VIEWPORT, prepareContext, startCapture, encode, dictationChunks } from "./hq-video.mjs";
+
+const SCALE = 2; // 2560×1440: crisper text, and YouTube serves 1440p uploads with its better VP9 encode
 
 const ROOT = path.join(import.meta.dirname, "..");
 const OUT = path.join(ROOT, "docs", "sayso-video.webm");
@@ -31,7 +33,7 @@ await new Promise((resolve) => server.stdout.on("data", (d) => String(d).include
 await fetch(`${B}/api/profile`, { method: "POST", headers: { "Content-Type": "application/json" }, body: JSON.stringify({ mode: "example", reset: true }) });
 
 const browser = await chromium.launch();
-// 1280×720 layout rendered at 1.5× = 1920×1080 pixels: same composition, much sharper text.
+// 1280×720 layout rendered at 2× = 2560×1440 pixels: same composition, much sharper text.
 const ctx = await browser.newContext({ viewport: VIEWPORT, deviceScaleFactor: SCALE });
 await prepareContext(ctx);
 await ctx.addInitScript(() => {
@@ -68,7 +70,7 @@ await ctx.addInitScript(() => {
 const page = await ctx.newPage();
 page.on("dialog", (d) => d.accept());
 await page.setContent(card("", "", ""));
-const stopCapture = await startCapture(ctx, page, path.join(work, "frames"));
+const stopCapture = await startCapture(ctx, page, path.join(work, "frames"), SCALE);
 const t0 = Date.now();
 const PACE = 1.4; // stretch every pause so each caption can be read comfortably
 const sleep = (ms) => page.waitForTimeout(ms * PACE);
@@ -97,23 +99,24 @@ await sleep(3200);
 
 // 0:13 · dictate with Wispr Flow
 await page.goto(`${B}/app`, { waitUntil: "networkidle" });
-await cap("1", "Right after a call, I hold my Wispr Flow key and talk.");
+await cap("1", "Right after a call, I click the recap box…");
 await moveTo(page.locator("#wfBar"));
-await sleep(1800);
+await sleep(1600);
 await click(page.locator("#transcript"));
+await cap("1", "…hold my Wispr Flow key and talk.");
+await moveTo(page.locator("#wfBar"));
+await sleep(1600);
 const recap = await page.evaluate(() => SAMPLE);
-for (const phrase of recap.match(/[^,.]+[,.]?/g)) {
+for (const phrase of dictationChunks(recap)) {
   await page.keyboard.insertText(phrase);
   await sleep(230);
 }
-await cap("1", "Wispr Flow types it in; Sayso spots the dictation.");
+await cap("1", "Wispr Flow types it in. Sayso spots the dictation and counts down.");
 await moveTo(page.locator("#wfBar"));
-await sleep(2600);
 
-// 0:35 · streaming extraction
-await cap("2", "Sayso turns the ramble into a complete CRM record. No API key needed.");
-await click(page.getByRole("button", { name: "Extract CRM fields" }));
+// 0:35 · hands-free extraction, two seconds after I stop talking
 await page.waitForFunction(() => document.getElementById("liveTag").textContent.includes("ready"));
+await cap("2", "No click: Sayso turns the ramble into a complete CRM record. No API key needed.");
 await sleep(1800);
 await cap("2", "“Tuesday, no wait, Thursday” and “priya at acme logistics dot in” come out right.");
 await moveTo(page.locator('[data-k="follow_up_date"]'));
@@ -177,9 +180,9 @@ const frames = await stopCapture();
 await ctx.close();
 await browser.close();
 server.kill();
-const seconds = await encode(frames, OUT);
+const seconds = await encode(frames, OUT, SCALE);
 rmSync(work, { recursive: true, force: true });
-console.log(`Wrote ${path.relative(ROOT, OUT)} (${seconds.toFixed(0)}s, 1920×1080, ${frames.length} captured frames)`);
+console.log(`Wrote ${path.relative(ROOT, OUT)} (${seconds.toFixed(0)}s, ${VIEWPORT.width * SCALE}×${VIEWPORT.height * SCALE}, ${frames.length} captured frames)`);
 
 function card(title, accent, foot) {
   return `<!doctype html><html><head><meta charset="utf-8"><style>

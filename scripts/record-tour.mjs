@@ -16,7 +16,7 @@ import { mkdirSync, mkdtempSync, readdirSync, rmSync } from "node:fs";
 import { tmpdir } from "node:os";
 import path from "node:path";
 import { chromium } from "playwright";
-import { VIEWPORT, SCALE, prepareContext, startCapture, encode } from "./hq-video.mjs";
+import { VIEWPORT, SCALE, prepareContext, startCapture, encode, dictationChunks } from "./hq-video.mjs";
 
 const ROOT = path.join(import.meta.dirname, "..");
 const MEDIA = path.join(ROOT, "public", "media");
@@ -145,19 +145,18 @@ await sleep(3500);
 
 // 1 · the recap, dictated in phrases the way the Wispr Flow desktop app inserts them
 await page.goto(`${B}/app`, { waitUntil: "networkidle" });
-await cap("1", "Right after a call, hold your Wispr Flow key and talk.");
+await cap("1", "Right after a call, click the box, hold your Wispr Flow key and talk.");
 await click(page.locator("#transcript"));
+await sleep(900);
 const RECAP = await page.evaluate(() => SAMPLE);
-for (const phrase of RECAP.match(/[^,.]+[,.]?/g)) {
+for (const phrase of dictationChunks(RECAP)) {
   await page.keyboard.insertText(phrase);
   await sleep(170);
 }
-await sleep(700);
 
-// 2 · streaming extraction
-await cap("2", "Sayso fills in the whole CRM record in a moment.");
-await click(page.getByRole("button", { name: "Extract CRM fields" }));
+// 2 · hands-free extraction, two seconds after the dictation stops
 await page.waitForFunction(() => document.getElementById("liveTag").textContent.includes("ready"));
+await cap("2", "Two seconds later, Sayso fills in the whole CRM record by itself.");
 await sleep(1800);
 
 // 3 · voice correction
