@@ -109,7 +109,7 @@ Sayso replaces the form with your voice. You talk; it writes the record.
 | Where | How |
 |---|---|
 | **Building it** | Every prompt to the AI coding tool, the README, commit messages and progress posts were dictated with Wispr Flow. |
-| **Recap box** | Shows the Wispr Flow shortcut for your OS (fn on Mac, Ctrl + Win on Windows) and lights up with "✓ Dictation detected" when Wispr Flow text arrives. |
+| **Recap box** | Guides you step by step: it glows until you click it, then reads "✓ Ready. Hold fn, talk, then let go." (Ctrl + Win on Windows), and lights up with "✓ Dictation detected" when Wispr Flow text arrives. |
 | **Detection** | Wispr Flow inserts whole phrases at once (as a paste, one long insert, or text set through macOS accessibility), while typing adds a character at a time. Sayso measures how much text arrives per change and tags recaps "dictated with Wispr Flow". |
 | **Hands-free** | After a dictated recap, Sayso extracts by itself after a 2-second pause, with a visible countdown. Dictated corrections ("stage is proposal", "save") and Ask questions run about a second after you stop. |
 | **Measurement** | The stats bar and `/proof` count Wispr Flow recaps and the share of recaps given by voice. |

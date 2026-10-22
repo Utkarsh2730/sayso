@@ -69,6 +69,10 @@
   .wf a { margin-left: auto; font-size: 12.5px; color: var(--accent); white-space: nowrap; }
   .wf a:hover { text-decoration: underline; }
   .wf.hit { border-color: var(--accent); box-shadow: 0 0 0 3px rgba(255,138,107,.15); }
+  .wf.ready { border-color: rgba(200,242,90,.6); }
+  #transcript.invite { border-color: rgba(255,138,107,.55); animation: invite 2.2s ease-in-out infinite; }
+  @keyframes invite { 50% { box-shadow: 0 0 0 4px rgba(255,138,107,.16); } }
+  @media (prefers-reduced-motion: reduce) { #transcript.invite { animation: none; } }
   .mic { display: flex; align-items: center; gap: 16px; padding: 16px; border: 1px solid var(--line); border-radius: 14px; background: rgba(0,0,0,.25); margin-bottom: 12px; }
   .micBtn { flex: none; width: 60px; height: 60px; border-radius: 50%; border: 0; cursor: pointer; display: grid; place-items: center; color: #151b04;
     background: radial-gradient(circle at 35% 35%, #ecfbbf, var(--brand) 50%, #4d7c0f); box-shadow: 0 8px 26px -8px rgba(200,242,90,.6); transition: transform .12s; }
@@ -272,7 +276,7 @@
         <div><div id="micStatus">No Wispr Flow on this computer?</div><div id="micSub">tap the mic to use your browser's speech recognition</div></div>
         <div class="wave" aria-hidden="true"><i style="animation-delay:-.1s"></i><i style="animation-delay:-.5s"></i><i style="animation-delay:-.3s"></i><i style="animation-delay:-.8s"></i><i style="animation-delay:-.2s"></i><i style="animation-delay:-.6s"></i><i style="animation-delay:-.4s"></i></div>
       </div>
-      <textarea id="transcript" placeholder="Who did you speak to, what do they need, and what happens next?"></textarea>
+      <textarea id="transcript" class="invite" placeholder="Click here first, then hold fn and talk (or type). Who did you speak to, what do they need, and what happens next?"></textarea>
       <div class="src" id="srcTag"></div>
       <div class="hint" aria-label="Keyboard shortcuts (Ctrl on Windows)"><span><b>⌘↵</b> extract</span><span><b>⌘S</b> save</span><span><b>⌘M</b> mic</span><span><b>⌘E</b> email</span><span><b>⌘K</b> ask</span></div>
       <div class="row"><button class="btn primary" id="extractBtn">Extract CRM fields</button><span class="timing" id="timing"></span></div>
@@ -465,7 +469,6 @@ function toggleRecapMic() {
     onTick: (s) => { $("micSub").textContent = fmt(s); },
     onStop: (s, ok) => {
       $("micBox").classList.remove("rec-on");
-      readyForDictation();
       state.micSeconds += s;
       if (!state.source || state.source === "typed") state.source = "mic";
       updateSource();
@@ -481,20 +484,17 @@ $("micBtn").onclick = toggleRecapMic;
 
 // Wispr Flow's default push-to-talk key: fn on a Mac, Ctrl + Win on Windows (users can change it in Wispr Flow).
 const isMac = /mac|iphone|ipad/i.test(navigator.userAgentData?.platform || navigator.platform || navigator.userAgent);
-const wfPrompt = `Click the box below, hold <kbd title="Wispr Flow's default shortcut; yours may differ">${isMac ? "fn" : "Ctrl + Win"}</kbd> and talk.`;
+const wfPrompt = `<b>1.</b> Click the box below. <b>2.</b> Hold <kbd title="Wispr Flow's default shortcut; yours may differ">${isMac ? "fn" : "Ctrl + Win"}</kbd> and talk.`;
+const wfReady = `✓ Ready. Hold <kbd title="Wispr Flow's default shortcut; yours may differ">${isMac ? "fn" : "Ctrl + Win"}</kbd>, talk, then let go.`;
+if (!isMac) $("transcript").placeholder = $("transcript").placeholder.replace("hold fn", "hold Ctrl + Win");
 $("wfText").innerHTML = wfPrompt;
 
-// Wispr Flow types into whatever field has the cursor, and says "Select a textbox first" when none does. So keep
-// the cursor in the recap box: on load, after the pop-up or the browser mic, on a click on the Wispr bar, and when
-// fn is pressed with nothing else to type into. Desktop only, so phones don't pop their keyboard up unasked.
-const canHover = matchMedia("(hover: hover)").matches;
-function readyForDictation() {
-  const el = document.activeElement;
-  if (!canHover || $("setup").open || el?.matches?.("input, textarea, select, [contenteditable]")) return;
-  $("transcript").focus({ preventScroll: true });
-}
-$("wfBar").addEventListener("click", (e) => { if (!e.target.closest("a, button")) $("transcript").focus(); });
-document.addEventListener("keydown", (e) => { if (e.key === "Fn" || e.key === "FnLock") readyForDictation(); }, true);
+// The bar says "Ready" only once the box has been clicked: Safari doesn't let Wispr Flow type into a field the
+// page focused by itself.
+let clickedIn = false;
+$("transcript").addEventListener("pointerdown", () => { clickedIn = true; if (document.activeElement === $("transcript")) updateSource(); });
+$("transcript").addEventListener("focus", () => updateSource());
+$("transcript").addEventListener("blur", () => { clickedIn = false; updateSource(); });
 
 // Wispr Flow (and other dictation tools) insert whole phrases at once, as a paste, one long insert, or text set
 // directly through macOS accessibility (which sends no beforeinput event). Typing adds a character or two. So we
@@ -575,7 +575,10 @@ function updateSource() {
   lastLen = $("transcript").value.length;
   const dictated = state.source === "wispr";
   $("wfBar").classList.toggle("hit", dictated);
-  if (!autoTimer) $("wfText").innerHTML = dictated ? "✓ Dictation detected. Extract when you're done, or keep talking." : wfPrompt;
+  const focused = clickedIn && document.activeElement === $("transcript");
+  $("wfBar").classList.toggle("ready", focused && !has);
+  $("transcript").classList.toggle("invite", !focused && !has);
+  if (!autoTimer) $("wfText").innerHTML = dictated ? "✓ Dictation detected. Extract when you're done, or keep talking." : focused && !has ? wfReady : wfPrompt;
   $("srcTag").className = `src ${state.source === "wispr" ? "wispr" : ""}`;
 }
 $("sampleBtn").onclick = () => { $("transcript").value = SAMPLE; state.source = "sample"; updateSource(); extract(); };
@@ -1150,7 +1153,6 @@ $("setupClose").onclick = () => $("setup").close();
 // Closing the first-visit pop-up without choosing means "just look around": the demo, where it's available.
 $("setup").addEventListener("close", () => {
   if (!state.profile && state.config.can_demo) saveProfile({ mode: "example", reset: false }).catch(() => {});
-  setTimeout(readyForDictation, 0);
 });
 $("wsBtn").onclick = openSetup;
 
@@ -1171,7 +1173,6 @@ api("/api/config").then((c) => {
   const params = new URLSearchParams(location.search);
   if (!state.profile || (params.has("start") && state.profile.mode !== "own")) openSetup();
   if (params.has("start")) { params.delete("start"); history.replaceState(null, "", location.pathname + (params.toString() ? `?${params}` : "")); }
-  readyForDictation();
 }).catch((err) => toast(err.message));
 
 </script>
