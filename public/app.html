@@ -264,7 +264,7 @@
       <div class="ph"><h2>01 · Recap the call</h2><button class="link" id="sampleBtn">Try an example</button></div>
       <div class="wf" id="wfBar">
         <span class="wfb"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round"><path d="M3 10v4M7 7v10M11 4v16M15 8v8M19 10v4"/></svg>WISPR FLOW</span>
-        <span id="wfText">Click the box below, hold <kbd>fn</kbd> and talk.</span>
+        <span id="wfText">Hold <kbd>fn</kbd> and talk: your words land in the box below.</span>
         <a href="https://wisprflow.ai" target="_blank" rel="noopener">Get Wispr Flow ↗</a>
       </div>
       <div class="mic" id="micBox">
@@ -465,6 +465,7 @@ function toggleRecapMic() {
     onTick: (s) => { $("micSub").textContent = fmt(s); },
     onStop: (s, ok) => {
       $("micBox").classList.remove("rec-on");
+      readyForDictation();
       state.micSeconds += s;
       if (!state.source || state.source === "typed") state.source = "mic";
       updateSource();
@@ -480,8 +481,20 @@ $("micBtn").onclick = toggleRecapMic;
 
 // Wispr Flow's default push-to-talk key: fn on a Mac, Ctrl + Win on Windows (users can change it in Wispr Flow).
 const isMac = /mac|iphone|ipad/i.test(navigator.userAgentData?.platform || navigator.platform || navigator.userAgent);
-const wfPrompt = `Click the box below, hold <kbd title="Wispr Flow's default shortcut; yours may differ">${isMac ? "fn" : "Ctrl + Win"}</kbd> and talk.`;
+const wfPrompt = `Hold <kbd title="Wispr Flow's default shortcut; yours may differ">${isMac ? "fn" : "Ctrl + Win"}</kbd> and talk: your words land in the box below.`;
 $("wfText").innerHTML = wfPrompt;
+
+// Wispr Flow types into whatever field has the cursor, and says "Select a textbox first" when none does. So keep
+// the cursor in the recap box: on load, after the pop-up or the browser mic, on a click on the Wispr bar, and when
+// fn is pressed with nothing else to type into. Desktop only, so phones don't pop their keyboard up unasked.
+const canHover = matchMedia("(hover: hover)").matches;
+function readyForDictation() {
+  const el = document.activeElement;
+  if (!canHover || $("setup").open || el?.matches?.("input, textarea, select, [contenteditable]")) return;
+  $("transcript").focus({ preventScroll: true });
+}
+$("wfBar").addEventListener("click", (e) => { if (!e.target.closest("a, button")) $("transcript").focus(); });
+document.addEventListener("keydown", (e) => { if (e.key === "Fn" || e.key === "FnLock") readyForDictation(); }, true);
 
 // Wispr Flow (and other dictation tools) insert whole phrases at once, as a paste, one long insert, or text set
 // directly through macOS accessibility (which sends no beforeinput event). Typing adds a character or two. So we
@@ -1137,6 +1150,7 @@ $("setupClose").onclick = () => $("setup").close();
 // Closing the first-visit pop-up without choosing means "just look around": the demo, where it's available.
 $("setup").addEventListener("close", () => {
   if (!state.profile && state.config.can_demo) saveProfile({ mode: "example", reset: false }).catch(() => {});
+  setTimeout(readyForDictation, 0);
 });
 $("wsBtn").onclick = openSetup;
 
@@ -1157,6 +1171,7 @@ api("/api/config").then((c) => {
   const params = new URLSearchParams(location.search);
   if (!state.profile || (params.has("start") && state.profile.mode !== "own")) openSetup();
   if (params.has("start")) { params.delete("start"); history.replaceState(null, "", location.pathname + (params.toString() ? `?${params}` : "")); }
+  readyForDictation();
 }).catch((err) => toast(err.message));
 
 </script>
