@@ -102,7 +102,7 @@ Sayso replaces the form with your voice. You talk; it writes the record.
 | Does it solve a real problem in your work? | Built for the author's own post-call admin. `/proof` tracks real use: calls logged, minutes saved, field completeness and Wispr Flow recaps. |
 | Was Wispr used meaningfully? | Built by dictating to an AI coding tool with Wispr Flow, and Wispr Flow is the product's main input (see below). |
 | Does it work? | A live link that opens without sign-in or an API key. A pop-up offers **Open the demo** (6 example calls) or **Set up my company**, and each visitor's workspace is private to their browser. |
-| Is the video clear? | A captioned 1080p walkthrough video (linked in the submission) and the 30-second tour above, both recorded straight from the app by script (`npm run record:video`, `npm run record:tour`). |
+| Is the video clear? | A captioned 1440p walkthrough video (linked in the submission) and the 30-second tour above, both recorded straight from the app by script (`npm run record:video`, `npm run record:tour`). |
 
 ## How Wispr Flow is used
 
