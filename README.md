@@ -13,12 +13,13 @@ fixes it by voice, drafts the follow-up email, and answers questions about your 
 ![Wispr Flow](https://img.shields.io/badge/Wispr%20Flow-hands--free%20input-ff8a6b)
 ![API key](https://img.shields.io/badge/API%20key-not%20needed-c8f25a)
 ![Live](https://img.shields.io/badge/live-sayso--xi.vercel.app-c8f25a)
+[![Demo video](https://img.shields.io/badge/demo-YouTube-ff0000?logo=youtube&logoColor=white)](https://www.youtube.com/watch?v=Pih-PcSCfJI)
 ![Tests](https://img.shields.io/badge/tests-37%20passing-3f9d78)
 ![Licence](https://img.shields.io/badge/licence-MIT-64748b)
 
 **WeMakeDevs × Wispr Flow · No Hands: The Wispr Challenge · Builders track**
 
-[Live site](https://sayso-xi.vercel.app) · [For judges](#for-judges) · [The solution](#the-solution) · [Features](#features) · [How Wispr Flow is used](#how-wispr-flow-is-used) · [Architecture](#architecture) · [Built-in engine](#built-in-engine-no-api-key) · [Getting started](#getting-started)
+[Live site](https://sayso-xi.vercel.app) · [Demo video](https://www.youtube.com/watch?v=Pih-PcSCfJI) · [For judges](#for-judges) · [The solution](#the-solution) · [Features](#features) · [How Wispr Flow is used](#how-wispr-flow-is-used) · [Architecture](#architecture) · [Built-in engine](#built-in-engine-no-api-key) · [Getting started](#getting-started)
 
 </div>
 
@@ -26,7 +27,9 @@ fixes it by voice, drafts the follow-up email, and answers questions about your 
 
 ## For judges
 
-**Watch:** [30-second product tour](public/media/sayso-tour.webm), captioned and recorded straight from the app.
+[![Watch the Sayso demo on YouTube](docs/youtube-thumbnail.jpg)](https://www.youtube.com/watch?v=Pih-PcSCfJI)
+
+**Watch:** the [1:27 demo video on YouTube](https://www.youtube.com/watch?v=Pih-PcSCfJI) (1440p, captioned), or the [30-second product tour](public/media/sayso-tour.webm). Both are recorded straight from the app.
 
 **Try it live:** **https://sayso-xi.vercel.app** → **Open app**. No sign-in, no API key. A pop-up asks how to start: **Open the demo** (6 example calls) or **Set up my company** (an empty workspace with your company name, your name, what you sell and your currency). Suggested path with the demo (about 2 minutes):
 1. Click **Try an example** and watch the record fill in. It's a second call with Priya, so you'll see her history and her phone number carried over.
@@ -102,7 +105,7 @@ Sayso replaces the form with your voice. You talk; it writes the record.
 | Does it solve a real problem in your work? | Built for the author's own post-call admin. `/proof` tracks real use: calls logged, minutes saved, field completeness and Wispr Flow recaps. |
 | Was Wispr used meaningfully? | Built by dictating to an AI coding tool with Wispr Flow, and Wispr Flow is the product's main input (see below). |
 | Does it work? | A live link that opens without sign-in or an API key. A pop-up offers **Open the demo** (6 example calls) or **Set up my company**, and each visitor's workspace is private to their browser. |
-| Is the video clear? | A captioned 1440p walkthrough video (linked in the submission) and the 30-second tour above, both recorded straight from the app by script (`npm run record:video`, `npm run record:tour`). |
+| Is the video clear? | A captioned 1440p [walkthrough video on YouTube](https://www.youtube.com/watch?v=Pih-PcSCfJI) and the 30-second tour above, both recorded straight from the app by script (`npm run record:video`, `npm run record:tour`). |
 
 ## How Wispr Flow is used
 
